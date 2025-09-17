@@ -1,6 +1,4 @@
 'use strict';
-
-
 define('forum/topic', [
 	'forum/infinitescroll',
 	'forum/topic/threadTools',
@@ -38,6 +36,7 @@ define('forum/topic', [
 	});
 
 	Topic.init = async function () {
+		console.log('topic.init is running');
 		const tidChanged = tid === '0' || String(tid) !== String(ajaxify.data.tid);
 		tid = String(ajaxify.data.tid);
 		currentUrl = ajaxify.currentPage;
@@ -75,6 +74,7 @@ define('forum/topic', [
 		handleTopicSearch();
 
 		hooks.fire('action:topic.loaded', ajaxify.data);
+		addResolvedStatus();
 	};
 
 	function handleTopicSearch() {
@@ -480,6 +480,22 @@ define('forum/topic', [
 		}
 	}
 
+	function addResolvedStatus() {
+		console.log('check resolved/unresolved status');
+		$('[component="post"]').each(function (index) {
+			//find all topic posts
+			const postelem = $(this);
+			console.log('Found post:', index, postelem);
+			
+			// creating status highlight
+			const statuscolor = $('<div style="background: red; color: white; padding: 7px; margin: 7px; font-weight: bold;">unresolved</div>');
+			
+			postelem.prepend(statuscolor);
+		});
+	}
+
 
 	return Topic;
 });
+
+
