@@ -462,6 +462,7 @@ async function canSeeVotes(uid, cids, type) {
 	const forLoggedInUsers = configValue === 'loggedin';
 	const userIsLoggedIn = Number.isFinite(Number(uid)) && Number(uid) > 0;
 	const configAllowsView = forAllUsers || (forLoggedInUsers && userIsLoggedIn);
+	console.log('Jerry Chen', configValue, userIsLoggedIn, uid);
 	const checks = cids.map((cid, index) => {
 		const hasPriv = cidToAllowed[cid];
 		const modAtIndex = isMod[index];
