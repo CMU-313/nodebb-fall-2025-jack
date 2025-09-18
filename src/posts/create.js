@@ -14,6 +14,8 @@ const utils = require('../utils');
 module.exports = function (Posts) {
 	Posts.create = async function (data) {
 		// This is an internal method, consider using Topics.reply instead
+		console.log('newpost being created');
+		data.resolved = false;
 		const { uid, tid, _activitypub, sourceContent } = data;
 		const content = data.content.toString();
 		const timestamp = data.timestamp || Date.now();
