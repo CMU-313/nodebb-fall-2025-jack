@@ -479,13 +479,13 @@ define('forum/topic', [
 			alerts.remove('bookmark');
 		}
 	}
-
+	
 	function addResolvedStatus() {
 		console.log('check resolved/unresolved status');
 		$('[component="post"]').each(function (i) {
 			// 
-			const postEl = $(this);
-			console.log('Found post:', i, postEl);
+			const post_elem = $(this);
+			console.log('Found post:', i, post_elem);
 			
 			
 			const isResolved = false;
@@ -520,9 +520,9 @@ define('forum/topic', [
 			});
 			
 			
-			postEl.prepend(currStatus);
+			post_elem.prepend(currStatus);
 		});
-	}
+	} 
 
 
 	return Topic;
