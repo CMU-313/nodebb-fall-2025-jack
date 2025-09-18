@@ -9,7 +9,7 @@ define('accounts/delete', ['api', 'bootbox', 'alerts'], function (api, bootbox, 
 			confirmText: '[[user:delete-this-account-confirm]]',
 			path: '/account',
 			successText: '[[user:account-deleted]]',
-			callback
+			callback,
 		});
 	};
 
@@ -19,7 +19,7 @@ define('accounts/delete', ['api', 'bootbox', 'alerts'], function (api, bootbox, 
 			confirmText: '[[user:delete-account-content-confirm]]',
 			path: '/content',
 			successText: '[[user:account-content-deleted]]',
-			callback
+			callback,
 		});
 	};
 
@@ -29,7 +29,7 @@ define('accounts/delete', ['api', 'bootbox', 'alerts'], function (api, bootbox, 
 			confirmText: '[[user:delete-all-confirm]]',
 			path: '',
 			successText: '[[user:account-deleted]]',
-			callback
+			callback,
 		});
 	};
 
