@@ -1,1 +1,0 @@
-module.exports = require('../../../../../node_modules/nodebb-theme-persona/public/modules/taskbar.js');
