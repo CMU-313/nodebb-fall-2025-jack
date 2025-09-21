@@ -5,5 +5,9 @@
   "main": "library.js",
   "keywords": ["nodebb", "plugin", "email", "mailgun"],
   "license": "MIT",
-  "nbbpm": { "compatibility": "^4.4.6" }  
+  "nbbpm": { "compatibility": "^4.4.6" },
+  "dependencies": {
+    "form-data": "^4.0.0",
+    "mailgun.js": "^11.1.0"
+  }
 }
