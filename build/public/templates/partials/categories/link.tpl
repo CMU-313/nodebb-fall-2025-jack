@@ -1,5 +1,11 @@
-{{{ if ./isSection }}}
-{./name}
-{{{ else }}}
-<a class="text-reset" href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" itemprop="url">{../name}</a>
-{{{ end }}}
+<!-- IF ../isSection -->
+{../name}
+<!-- ELSE -->
+<!-- IF ../link -->
+<a href="{../link}" itemprop="url">
+<!-- ELSE -->
+<a href="{config.relative_path}/category/{../slug}" itemprop="url">
+<!-- ENDIF ../link -->
+{../name}
+</a>
+<!-- ENDIF ../isSection -->

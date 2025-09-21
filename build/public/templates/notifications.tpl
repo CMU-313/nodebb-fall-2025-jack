@@ -1,52 +1,66 @@
-<div class="notifications flex-fill">
-<div class="btn-toolbar justify-content-end" role="toolbar">
-<button class="btn btn-sm btn-light" component="notifications/mark_all">[[notifications:mark-all-read]]</button>
-</div>
-<hr class="text-muted opacity-25"/>
-<div class="d-flex flex-column flex-md-row">
-<div class="flex-shrink-0 pe-2 border-end-md text-sm mb-3 flex-basis-md-200">
-<div class="nav sticky-top d-flex flex-row flex-md-column flex-wrap gap-1" style="z-index: 1;">
+<div class="notifications">
+<!-- IF breadcrumbs.length -->
+<ol class="breadcrumb" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
+{{{each breadcrumbs}}}
+<li<!-- IF @last --> component="breadcrumb/current"<!-- ENDIF @last --> itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item <!-- IF @last -->active<!-- ENDIF @last -->">
+<meta itemprop="position" content="{@index}" />
+{{{ if ./url }}}<a href="{breadcrumbs.url}" itemprop="item">{{{ end }}}
+<span itemprop="name">
+{breadcrumbs.text}
+<!-- IF @last -->
+<!-- IF !feeds:disableRSS -->
+<!-- IF rssFeedUrl --><a target="_blank" href="{rssFeedUrl}" itemprop="item"><i class="fa fa-rss-square"></i></a><!-- ENDIF rssFeedUrl --><!-- ENDIF !feeds:disableRSS -->
+<!-- ENDIF @last -->
+</span>
+{{{ if ./url }}}</a>{{{ end }}}
+</li>
+{{{end}}}
+</ol>
+<!-- ENDIF breadcrumbs.length -->
+<div class="d-flex gap-2 justify-content-end" role="toolbar">
+<div class="btn-group me-2">
+<button class="btn btn-ghost btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+{{{ if selectedFilter }}}{selectedFilter.name}{{{ end}}} <span class="caret"></span>
+</button>
+<ul class="dropdown-menu dropdown-menu-end p-1" role="menu">
 {{{ each filters }}}
-{{{ if ./separator }}}
-<hr/>
+{{{ if filters.separator }}}
+<li role="separator" class="dropdown-divider"></li>
 {{{ else }}}
-<a class="btn btn-ghost d-flex gap-2 text-start text-sm ff-secondary fw-semibold {{{ if ./selected }}}active{{{ end }}}" href="{config.relative_path}/notifications?filter={./filter}">
-<div class="flex-grow-1">{filters.name}</div>
-<span class="flex-shrink-0 text-xs" title="{./count}">{humanReadableNumber(./count)}</span>
+<li role="presentation" class="category">
+<a class="dropdown-item rounded-1 d-flex gap-3 align-items-center justify-content-between" role="menuitem" href="{config.relative_path}/notifications?filter={filters.filter}">
+<span><i class="fa fa-fw {{{ if filters.selected }}}fa-check{{{ end }}}"></i> {filters.name}</span>
+<span class="">{./count}</span>
 </a>
+</li>
 {{{ end }}}
 {{{ end }}}
+</ul>
 </div>
+<button component="notifications/mark_all" class="btn btn-ghost btn-sm" type="button">
+<i class="fa fa-eye"></i>
+[[notifications:mark-all-read]]
+</button>
 </div>
-<div class="flex-grow-1 ps-md-2 ps-lg-5">
+<hr />
+<div class="alert alert-info {{{ if notifications.length }}}hidden{{{ end }}}">
+[[notifications:no-notifs]]
+</div>
 <ul component="notifications/list" class="notifications-list list-unstyled" data-nextstart="{nextStart}">
-{{{ if !notifications.length }}}
-<div class="no-notifs text-center p-4 d-flex flex-column">
-<div class="p-4"><i class="fa-solid fa-wind fs-2 text-muted"></i></div>
-<div class="text-xs fw-semibold text-muted">[[notifications:no-notifs]]</div>
-</div>
-{{{ end }}}
-{{{ each notifications }}}
-<div class="{./readClass}" data-nid="{./nid}" data-path="{./path}" {{{ if ./pid }}}data-pid="{./pid}"{{{ end }}}{{{ if ./tid }}}data-tid="{./tid}"{{{ end }}}>
-<div class="d-flex gap-1 justify-content-between">
-<div class="btn btn-ghost btn-sm d-flex gap-2 flex-grow-1 text-start align-items-start">
-<a class="flex-grow-0 flex-shrink-0" href="{{{ if ./user.userslug}}}{config.relative_path}/user/{./user.userslug}{{{ else }}}#{{{ end }}}">
-{{{ if (./image && ./from) }}}
-<img class="avatar avatar-rounded" style="--avatar-size: 32px;" src="{./image}" />
+{{{each notifications}}}
+<li data-nid="{notifications.nid}" class="{notifications.readClass} {{{ if !./read}}}unread{{{ end }}} d-flex pointer border p-3 mb-2 d-flex gap-2" component="notifications/item">
+<div>
+{{{ if notifications.from }}}
+{buildAvatar(notifications.user, "24px", true)}
 {{{ else }}}
-{{{ if ./icon }}}
-<div class="avatar avatar-rounded" style="--avatar-size: 32px;"><i class="text-secondary fa {./icon}"></i></div>
-{{{ else }}}
-<div class="avatar avatar-rounded" style="--avatar-size: 32px; background-color: {./user.icon:bgColor};">{./user.icon:text}</div>
+{{{ if notifications.image }}}
+<img width="24" height="24" src="{notifications.image}" />
 {{{ end }}}
 {{{ end }}}
-</a>
-<div class="d-flex flex-grow-1 flex-column align-items-start position-relative">
-<a href="{./path}" class="text-decoration-none d-inline-block text-reset text-break text-sm ff-sans stretched-link" component="notifications/item/link">
-{./bodyShort}
-</a>
-<div class="text-xs text-muted">{{{ if ./timeagoLong }}}{./timeagoLong}{{{ else }}}<span class="timeago" title="{./datetimeISO}"></span>{{{ end }}}</div>
 </div>
+<div class="d-flex flex-column gap-1 flex-grow-1">
+<a class="text-reset" component="notifications/item/link" href="{notifications.path}">{notifications.bodyShort}</a>
+<span class="timeago text-sm text-secondary" title="{notifications.datetimeISO}"></span>
 </div>
 <div>
 {{{ if ./nid }}}
@@ -56,53 +70,45 @@
 </button>
 {{{ end }}}
 </div>
-</div>
-</div>
-{{{ if !@last }}}
-<hr class="my-1" />
-{{{ end }}}
-{{{ end }}}
+</li>
+{{{end}}}
 </ul>
-<nav component="pagination" class="pagination-container mt-3{{{ if !pagination.pages.length }}} hidden{{{ end }}}" aria-label="[[global:pagination]]">
-<ul class="pagination pagination-sm gap-1 hidden-xs hidden-sm justify-content-center">
-<li class="page-item previous {{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+<nav component="pagination" class="pagination-container<!-- IF !pagination.pages.length --> hidden<!-- ENDIF !pagination.pages.length -->" aria-label="[[global:pagination]]">
+<ul class="pagination hidden-xs justify-content-center">
+<li class="page-item previous float-start<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 {{{each pagination.pages}}}
-{{{ if ./separator }}}
+<!-- IF pagination.pages.separator -->
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link rounded fw-secondary px-3" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
 </li>
-{{{ else }}}
-<li class="page-item page{{{ if ./active }}} active{{{ end }}}" >
-<a class="page-link rounded fw-secondary px-3" href="?{./qs}" data-page="{./page}" aria-label="[[global:pagination.page-x, {./page}]]">{./page}</a>
+<!-- ELSE -->
+<li class="page-item page<!-- IF pagination.pages.active --> active<!-- ENDIF pagination.pages.active -->" >
+<a class="page-link" href="?{pagination.pages.qs}" data-page="{pagination.pages.page}" aria-label="[[global:pagination.page-x, {./page}]]">{pagination.pages.page}</a>
 </li>
-{{{ end }}}
+<!-- ENDIF pagination.pages.separator -->
 {{{end}}}
-<li class="page-item next {{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next float-end<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
 </ul>
-{{{ if !template.topic }}}
-<ul class="pagination pagination-sm hidden-md hidden-lg justify-content-center">
-<li class="page-item first{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
+<ul class="pagination hidden-sm hidden-md hidden-lg justify-content-center">
+<li class="page-item first<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
 </li>
-<li class="page-item previous{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+<li class="page-item previous<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link fw-secondary" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
 </li>
-<li class="page-item next{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
-<li class="page-item last{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary"  href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
+<li class="page-item last<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
 </li>
 </ul>
-{{{ end }}}
 </nav>
-</div>
-</div>
 </div>

@@ -31,15 +31,19 @@
             "\n" + 
               __escape(guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['name'] : null)) + 
               "\n" :
-            "\n<a class=\"text-reset\" href=\"" + 
+            "\n" + 
               (guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['link'] : null) ?
-                __escape(guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['link'] : null)) :
-                __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
+                "\n<a href=\"" + 
+                  __escape(guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['link'] : null)) + 
+                  "\" itemprop=\"url\">\n" :
+                "\n<a href=\"" + 
+                  __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
                   "/category/" + 
-                  __escape(guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['slug'] : null))) + 
-              "\" itemprop=\"url\">" + 
+                  __escape(guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['slug'] : null)) + 
+                  "\" itemprop=\"url\">\n") + 
+              "\n" + 
               __escape(guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['name'] : null)) + 
-              "</a>\n") + 
+              "\n</a>\n") + 
           "\n</div>\n" + 
           (guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['descriptionParsed'] : null) ?
             "\n<div class=\"description text-muted text-xs w-100\">" + 

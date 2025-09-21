@@ -1,20 +1,37 @@
-<div class="pagination-block d-none d-lg-block">
-<div class="scroller-content d-flex gap-2 flex-column align-items-start">
-<button class="pagetop btn btn-ghost btn-sm ff-secondary d-inline-flex border-0 align-items-center gap-2" style="padding: 4px 8px;"><i class="fa fa-fw fa-chevron-up"></i> <span class="timeago text-xs text-muted text-nowrap" title="{./timestampISO}"></span></button>
-<div class="scroller-container position-relative">
-<div class="scroller-thumb d-flex gap-2 text-nowrap position-relative" style="height: 40px;">
-<div class="scroller-thumb-icon bg-primary rounded d-inline-block" style="width:9px; height: 40px;"></div>
-<div>
-<p class="small thumb-text d-none d-md-inline-block ff-secondary fw-semibold user-select-none mb-0"></p>
-<p class="meta thumb-timestamp timeago text-xs text-muted ff-secondary fw-semibold mb-0 user-select-none"></p>
+<div class="pagination-block border border-1 text-bg-light text-center">
+<div class="progress-bar bg-info"></div>
+<div class="wrapper dropup">
+<i class="fa fa-2x fa-angle-double-up pointer fa-fw pagetop"></i>
+<a href="#" class="text-reset dropdown-toggle d-inline-block text-decoration-none" data-bs-toggle="dropdown" data-bs-reference="parent" aria-haspopup="true" aria-expanded="false">
+<span class="pagination-text"></span>
+</a>
+<i class="fa fa-2x fa-angle-double-down pointer fa-fw pagebottom"></i>
+<ul class="dropdown-menu dropdown-menu-end" role="menu">
+<li>
+<div class="row">
+<div class="col-8 post-content"></div>
+<div class="col-4 text-end">
+<div class="scroller-content">
+<span class="pointer pagetop">[[topic:first-post]] <i class="fa fa-angle-double-up"></i></span>
+<div class="scroller-container">
+<div class="scroller-thumb">
+<span class="thumb-text"></span>
+<div class="scroller-thumb-icon"></div>
 </div>
 </div>
-<div class="unread d-inline-block position-absolute bottom-0">
-<div class="meta small position-absolute top-50 translate-middle-y text-nowrap fw-semibold ms-2">
-<a class="text-decoration-none" href="{url}" tabindex="-1" aria-disabled="true" aria-label="[[topic:unread-posts-link]]"></a>
+<span class="pointer pagebottom">[[topic:last-post]] <i class="fa fa-angle-double-down"></i></span>
 </div>
 </div>
 </div>
-<button class="pagebottom btn btn-ghost btn-sm ff-secondary d-inline-flex border-0 align-items-center gap-2" style="padding: 4px 8px;"><i class="fa fa-fw fa-chevron-down"></i> <span class="timeago text-xs text-muted text-nowrap" title="{./lastposttimeISO}"></span></button>
+<div class="row">
+<div class="col-6">
+<button id="myNextPostBtn" class="btn btn-outline-secondary form-control" disabled>[[topic:go-to-my-next-post]]</button>
+</div>
+<div class="col-6">
+<input type="number" class="form-control" id="indexInput" placeholder="[[global:pagination.enter-index]]">
+</div>
+</div>
+</li>
+</ul>
 </div>
 </div>

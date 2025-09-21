@@ -1,319 +1,248 @@
-<div class="account w-100 mx-auto">
-<div class="cover position-absolute start-0 top-0 w-100" component="account/cover" style="background-image: url({cover:url}); background-position: {cover:position};">
-<div class="container">
-{{{ if allowCoverPicture }}}
-{{{ if canEdit }}}
-<div class="controls text-center">
-<a href="#" class="upload p-2 m-2 rounded-1 text-bg-light opacity-75"><i class="fa fa-fw fa-upload"></i></a>
-<a href="#" class="resize p-2 m-2 rounded-1 text-bg-light opacity-75"><i class="fa fa-fw fa-arrows"></i></a>
-<a href="#" class="remove p-2 m-2 rounded-1 text-bg-light opacity-75"><i class="fa fa-fw fa-times"></i></a>
-</div>
-<a href="#" class="save text-bg-primary">[[groups:cover-save]] <i class="fa fa-fw fa-floppy-o"></i></a>
-<div class="indicator text-bg-primary">[[groups:cover-saving]] <i class="fa fa-fw fa-refresh fa-spin"></i></div>
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-<div class="d-flex flex-column flex-md-row gap-2 w-100 pb-4 mb-4 mt-2 border-bottom">
-<div {{{ if (allowProfilePicture && isSelfOrAdminOrGlobalModerator)}}}component="profile/change/picture"{{{ end }}} class="avatar-wrapper border border-white border-4 rounded-circle position-relative align-self-center align-self-md-start hover-parent" style="margin-top: -75px;">
-{buildAvatar(@value, "142px", true)}
-{{{ if (allowProfilePicture && isSelfOrAdminOrGlobalModerator)}}}
-<a href="#" component="profile/change/picture" class="d-none d-md-block pointer p-2 rounded-1 text-bg-light position-absolute top-50 start-50 translate-middle hover-opacity-75">
-<span class="upload"><i class="fa fa-fw fa-upload"></i></span>
-</a>
-{{{ end }}}
-</div>
-<div class="d-flex flex-column flex-md-row mt-1 justify-content-between w-100 gap-2">
-<div class="d-flex flex-grow-1 flex-row gap-2">
-<div class="d-flex flex-column gap-1">
-<h2 class="fullname fw-semibold fs-2 tracking-tight mb-0">{{{ if fullname }}}{fullname}{{{ else }}}{username}{{{ end }}}</h2>
-<div class="d-flex flex-wrap gap-1 text-sm align-items-center">
-<span class="username fw-bold">{{{ if !banned }}}@{username}{{{ else }}}[[user:banned]]{{{ end }}}</span>
-<div class="d-flex align-items-center gap-1 p-1 flex-wrap">
-{{{ if selectedGroup.length }}}
-{{{ each selectedGroup }}}
-{{{ if ./slug }}}
-<a href="{config.relative_path}/groups/{./slug}" class="badge rounded-1 text-uppercase text-truncate text-decoration-none" style="max-width: 150px;color:{./textColor};background-color: {./labelColor};"><i class="fa {{{ if ./icon }}}{./icon}{{{ if ./userTitle}}} me-1{{{ end }}}{{{else}}}hidden{{{ end }}}"></i><span class="badge-text align-text-bottom">{{{ if ./userTitle }}}{./userTitle}{{{ end }}}</span></a>
-{{{ end }}}
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-<div class="d-flex gap-2" component="user/badges"></div>
-{{{ if isAdminOrGlobalModeratorOrModerator }}}
-{{{ if banned }}}
-<div class="text-xm text-muted">
-{{{ if banned_until }}}
-[[user:info.banned-until, {banned_until_readable}]]
-{{{ else }}}
-[[user:info.banned-permanently]]
-{{{ end }}}
-</div>
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-<div class="flex-shrink-0 d-flex gap-1 align-self-stretch align-self-md-start justify-content-end">
-{{{ if loggedIn }}}
-{{{ if !isSelf }}}
-<a component="account/unfollow" href="#" class="btn btn-outline-warning flex-fill{{{ if (!isFollowing && !isFollowPending) }}} hide{{{ end }}}">[[user:{{{ if isFollowPending }}}cancel-follow{{{ else }}}unfollow{{{ end }}}]]</a>
-<a component="account/follow" href="#" class="btn btn-primary flex-fill{{{ if (isFollowing || isFollowPending) }}} hide{{{ end }}}">[[user:follow]]</a>
-{{{ end }}}
-{{{ end }}}
-{{{ if (canChat && !banned) }}}
-<div class="btn-group flex-fill">
-<a {{{ if hasPrivateChat }}}component="account/chat"{{{ else }}}component="account/new-chat"{{{ end }}} href="#" class="btn btn-light" role="button">[[user:chat]]</a>
-{{{ if hasPrivateChat}}}
-<button type="button" class="btn btn-light dropdown-toggle flex-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<i class="fa fa-caret-down"></i>
-</button>
-<ul class="dropdown-menu dropdown-menu-end p-1 text-sm" role="menu">
-<li><a class="dropdown-item rounded-1" href="#" component="account/new-chat" role="menuitem"s>[[user:new-chat-with, {username}]]</a></li>
-</ul>
-{{{ end }}}
-</div>
-{{{ end }}}
-{{{ if !isSelf }}}
-{{{ if (isAdmin || (canBan || canMute ))}}}
-<div class="btn-group bottom-sheet">
-<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<i class="fa fa-gear fa-fw"></i>
-</button>
-<ul class="dropdown-menu dropdown-menu-end p-1 text-sm account-sub-links" role="menu">
-<li>
-<a class="dropdown-item rounded-1" href="{config.relative_path}/user/{userslug}/info" role="menuitem">[[user:account-info]]</a>
+<div class="account">
+<!-- IF breadcrumbs.length -->
+<ol class="breadcrumb" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
+{{{each breadcrumbs}}}
+<li<!-- IF @last --> component="breadcrumb/current"<!-- ENDIF @last --> itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item <!-- IF @last -->active<!-- ENDIF @last -->">
+<meta itemprop="position" content="{@index}" />
+{{{ if ./url }}}<a href="{breadcrumbs.url}" itemprop="item">{{{ end }}}
+<span itemprop="name">
+{breadcrumbs.text}
+<!-- IF @last -->
+<!-- IF !feeds:disableRSS -->
+<!-- IF rssFeedUrl --><a target="_blank" href="{rssFeedUrl}" itemprop="item"><i class="fa fa-rss-square"></i></a><!-- ENDIF rssFeedUrl --><!-- ENDIF !feeds:disableRSS -->
+<!-- ENDIF @last -->
+</span>
+{{{ if ./url }}}</a>{{{ end }}}
 </li>
-{{{ if (canBan || canMute) }}}
-<li role="separator" class="dropdown-divider"></li>
-{{{ end }}}
-{{{ if canBan }}}
-<li class="{{{ if banned }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/ban" href="#" role="menuitem">[[user:ban-account]]</a>
-</li>
-<li class="{{{ if !banned }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/unban" href="#" role="menuitem">[[user:unban-account]]</a>
-</li>
-{{{ end }}}
-{{{ if canMute }}}
-<li class="{{{ if muted }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/mute" href="#" role="menuitem">[[user:mute-account]]</a>
-</li>
-<li class="{{{ if !muted }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/unmute" href="#" role="menuitem">[[user:unmute-account]]</a>
-</li>
-{{{ end }}}
-{{{ if isAdmin }}}
-<li>
-<a component="account/delete-account" href="#" class="dropdown-item rounded-1" role="menuitem">[[user:delete-account-as-admin]]</a>
-<a component="account/delete-content" href="#" class="dropdown-item rounded-1" role="menuitem">[[user:delete-content]]</a>
-<a component="account/delete-all" href="#" class="dropdown-item rounded-1" role="menuitem">[[user:delete-all]]</a>
-</li>
-{{{ end }}}
-</ul>
-</div>
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-</div>
+{{{end}}}
+</ol>
+<!-- ENDIF breadcrumbs.length -->
 <div data-widget-area="header">
 {{{each widgets.header}}}
 {{widgets.header.html}}
 {{{end}}}
 </div>
-<div class="d-flex flex-column flex-md-row">
-<div class="flex-shrink-0 pe-2 border-end-md text-sm mb-3 flex-basis-md-200">
-<div class="sticky-md-top d-flex flex-row flex-md-column flex-wrap gap-1" style="top: 1rem;z-index: 1;">
-<a href="{config.relative_path}/user/{userslug}" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold {{{ if template.account/profile }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:about]]</div>
-</a>
-<a href="{config.relative_path}/user/{userslug}/posts"class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/posts }}}active{{{ end }}}
-{{{ if template.account/best }}}active{{{ end }}}
-{{{ if template.account/controversial }}}active{{{ end }}}
-{{{ if template.account/upvoted }}}active{{{ end }}}
-{{{ if template.account/downvoted }}}active{{{ end }}}
-{{{ if template.account/bookmarks }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:posts]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.posts}">{humanReadableNumber(counts.posts)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/topics" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/topics }}}active{{{ end }}}
-{{{ if template.account/watched }}}active{{{ end }}}
-{{{ if template.account/ignored }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:topics]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.topics}">{humanReadableNumber(counts.topics)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/shares" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/shares }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:shares]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.shares}">{humanReadableNumber(counts.shares)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/groups" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/groups }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:header.groups]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.groups}">{humanReadableNumber(counts.groups)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/followers" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/followers }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:followers]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.followers}">{humanReadableNumber(counts.followers)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/following" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/following }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:following]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.following}">{humanReadableNumber(counts.following)}</span>
-</a>
-{{{ if canEdit }}}
-<a href="{config.relative_path}/user/{userslug}/categories" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/categories }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:watched-categories]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.categoriesWatched}">{counts.categoriesWatched}</span>
-</a>
+<div class="cover" component="account/cover" style="background-image: url({cover:url}); background-position: {cover:position};">
+<div class="avatar-wrapper" data-uid="{uid}">
+<!-- IF picture -->
+<img src="{picture}" class="avatar avatar-rounded" style="--avatar-size: 128px;" />
+<!-- ELSE -->
+<div class="avatar avatar-rounded" style="background-color: {icon:bgColor}; --avatar-size: 128px;" title="{username}">{icon:text}</div>
+<!-- ENDIF picture -->
+<span component="user/status" class="position-absolute border border-white border-2 rounded-circle status {status}"><span class="visually-hidden">[[global:{status}]]</span></span>
+<!-- IF loggedIn -->
+<!-- IF !isSelf -->
+<button class="btn-morph persona-fab <!-- IF isFollowing -->heart<!-- ELSE -->plus<!-- ENDIF isFollowing -->" title="<!-- IF isFollowing -->[[global:unfollow]]<!-- ELSE -->[[global:follow]]<!-- ENDIF isFollowing -->">
+<span>
+<span class="s1"></span>
+<span class="s2"></span>
+<span class="s3"></span>
+</span>
+</button>
+<!-- ENDIF !isSelf -->
+<!-- ENDIF loggedIn -->
+</div>
+<div class="container">
+<!-- IF allowCoverPicture -->
+<!-- IF canEdit -->
+<div class="controls">
+<a href="#" class="upload"><i class="fa fa-fw fa-4x fa-upload"></i></a>
+<a href="#" class="resize"><i class="fa fa-fw fa-4x fa-arrows"></i></a>
+<a href="#" class="remove"><i class="fa fa-fw fa-4x fa-times"></i></a>
+</div>
+<a href="#" class="save">[[groups:cover-save]] <i class="fa fa-fw fa-floppy-o"></i></a>
+<div class="indicator">[[groups:cover-saving]] <i class="fa fa-fw fa-refresh fa-spin"></i></div>
+<!-- ENDIF canEdit -->
+<!-- ENDIF allowCoverPicture -->
+<div class="btn-group account-fab bottom-sheet">
+<button type="button" class="persona-fab dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<i class="fa fa-ellipsis-v"></i>
+</button>
+<ul class="dropdown-menu dropdown-menu-end account-sub-links" role="menu">
+<!-- IF loggedIn -->
+<!-- IF !isSelf -->
+<!-- IF !banned -->
+<!-- IF canChat -->
+<li class="<!-- IF !hasPrivateChat -->hidden<!-- ENDIF !hasPrivateChat -->">
+<a class="dropdown-item" component="account/chat" href="#" role="menuitem">[[user:chat-with, {username}]]</a>
+</li>
+<li>
+<a class="dropdown-item" component="account/new-chat" href="#" role="menuitem">[[user:new-chat-with, {username}]]</a>
+</li>
+<!-- ENDIF canChat -->
+<li>
+<a {{{if flagId }}}hidden{{{end}}} class="dropdown-item" component="account/flag" href="#" role="menuitem">[[user:flag-profile]]</a>
+</li>
+<li>
+<a {{{if !flagId }}}hidden{{{end}}} class="dropdown-item" component="account/already-flagged" href="#" role="menuitem" data-flag-id="{flagId}">[[user:profile-flagged]]</a>
+</li>
+<li>
+<a class="dropdown-item {{{ if ./isBlocked }}}hidden{{{ end }}}" component="account/block" href="#" role="menuitem">[[user:block-user]]</a>
+</li>
+<li>
+<a class="dropdown-item {{{ if !./isBlocked }}}hidden{{{ end }}}" component="account/unblock" href="#" role="menuitem">[[user:unblock-user]]</a>
+</li>
+<li role="separator" class="dropdown-divider"></li>
+<!-- ENDIF !banned -->
+<!-- ENDIF !isSelf -->
+<!-- ENDIF loggedIn -->
+<li>
+<a class="dropdown-item" href="{config.relative_path}/user/{userslug}" class="d-inline-block" id="profile" role="menuitem">[[user:profile]]</a>
+</li>
+<!-- IF canEdit -->
+<li><a class="dropdown-item" href="{config.relative_path}/user/{userslug}/edit" role="menuitem">[[user:edit]]</a></li>
+<li><a class="dropdown-item" href="{config.relative_path}/user/{userslug}/settings" role="menuitem">[[user:settings]]</a></li>
+<!-- ENDIF canEdit -->
+<!-- IF !isSelf -->
+{{{ if (canBan || canMute) }}}
+<li role="separator" class="dropdown-divider"></li>
+<li class="dropdown-header">[[user:admin-actions-label]]</li>
+{{{ end }}}
+{{{ if canBan }}}
+<li class="<!-- IF banned -->hide<!-- ENDIF banned -->">
+<a class="dropdown-item" component="account/ban" href="#" role="menuitem">[[user:ban-account]]</a>
+</li>
+<li class="<!-- IF !banned -->hide<!-- ENDIF !banned -->">
+<a class="dropdown-item" component="account/unban" href="#" role="menuitem">[[user:unban-account]]</a>
+</li>
+{{{ end }}}
+{{{ if canMute }}}
+<li class="<!-- IF muted -->hide<!-- ENDIF muted -->">
+<a class="dropdown-item" component="account/mute" href="#" role="menuitem">[[user:mute-account]]</a>
+</li>
+<li class="<!-- IF !muted -->hide<!-- ENDIF !muted -->">
+<a class="dropdown-item" component="account/unmute" href="#" role="menuitem">[[user:unmute-account]]</a>
+</li>
+{{{ end }}}
+<!-- IF isAdmin -->
+<li>
+<a component="account/delete-account" href="#" class="dropdown-item" role="menuitem">[[user:delete-account-as-admin]]</a>
+<a component="account/delete-content" href="#" class="dropdown-item" role="menuitem">[[user:delete-content]]</a>
+<a component="account/delete-all" href="#" class="dropdown-item" role="menuitem">[[user:delete-all]]</a>
+</li>
+<!-- ENDIF isAdmin -->
+<!-- ENDIF !isSelf -->
+<li role="separator" class="dropdown-divider"></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/following" role="menuitem">[[user:following]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.following}">{formattedNumber(counts.following)}</span></a></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/followers" role="menuitem">[[user:followers]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.followers}">{formattedNumber(counts.followers)}</span></a></li>
+<!-- IF canEdit -->
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/blocks" role="menuitem">[[user:blocks]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.blocks}">{formattedNumber(counts.blocks)}</span></a></li>
+<!-- ENDIF canEdit -->
+<li role="separator" class="dropdown-divider"></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/topics" role="menuitem">[[global:topics]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.topics}">{formattedNumber(counts.topics)}</span></a></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/posts" role="menuitem">[[global:posts]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.posts}">{formattedNumber(counts.posts)}</span></a></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/groups" role="menuitem">[[global:header.groups]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.groups}">{formattedNumber(counts.groups)}</span></a></li>
+<!-- IF canEdit -->
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/categories" role="menuitem">[[user:watched-categories]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.categoriesWatched}">{formattedNumber(counts.categoriesWatched)}</span></a></li>
 {{{ if isSelf }}}
-<a href="{config.relative_path}/user/{userslug}/tags" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/tags }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:watched-tags]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.tagsWatched}">{counts.tagsWatched}</span>
-</a>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/tags" role="menuitem">
+[[user:watched-tags]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.tagsWatched}">{formattedNumber(counts.tagsWatched)}</span></a></li>
 {{{ end }}}
-<a href="{config.relative_path}/user/{userslug}/blocks" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/blocks }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:blocked-users]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.blocks}">{humanReadableNumber(counts.blocks)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/uploads" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/uploads }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:uploads]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.uploaded}">{humanReadableNumber(counts.uploaded)}</span>
-</a>
-{{{ end }}}
-{{{ if remoteUrl }}}
-<hr class="w-100 my-2"/>
-<a href="{remoteUrl}" target="_self" component="account/view-remote" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start">
-<i class="flex-shrink-0 fa-solid fa-globe"></i>
-<div class="flex-grow-1 text-nowrap">[[user:view-remote]]</div>
-</a>
-{{{ end }}}
-{{{ if (loggedIn && (!isSelf && !banned)) }}}
-<hr class="w-100 my-2"/>
-<a href="#" component="account/flag" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{if flagId }}}hidden{{{end}}}">
-<i class="flex-shrink-0 fa-solid fa-flag text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:flag-profile]]</div>
-</a>
-<a href="#" component="account/already-flagged" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{if !flagId }}}hidden{{{end}}}" data-flag-id="{flagId}">
-<i class="flex-shrink-0 fa-solid fa-flag text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:profile-flagged]]</div>
-</a>
-<a href="#" component="account/block" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{ if isBlocked }}}hidden{{{ end }}}">
-<i class="flex-shrink-0 fa-solid fa-ban text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:block-user]]</div>
-</a>
-<a href="#" component="account/unblock" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{ if !isBlocked }}}hidden{{{ end }}}">
-<i class="flex-shrink-0 fa-solid fa-ban text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:unblock-user]]</div>
-</a>
-{{{ end }}}
-{{{ if canEdit }}}
-<hr class="w-100 my-2"/>
-<a href="{config.relative_path}/user/{userslug}/edit" class="btn btn-ghost btn-sm ff-secondary text-xs text-start
-{{{ if template.account/edit }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:edit-profile]]</div>
-</a>
-<a href="{config.relative_path}/user/{userslug}/settings" class="btn btn-ghost btn-sm ff-secondary text-xs text-start
-{{{ if template.account/settings }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:settings]]</div>
-</a>
-{{{ end }}}
-{{{ each profile_links }}}
-<a href="{config.relative_path}/user/{userslug}/{./route}" class="btn btn-ghost btn-sm ff-secondary text-xs text-start plugin-link {{{ if ./public }}}public{{{ else }}}private{{{ end }}} {{{ if (url == ./url) }}}active{{{ end }}}" id="{./id}">
-<div class="flex-grow-1">{./name}</div>
-</a>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/uploads" role="menuitem">[[global:uploads]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.uploaded}">{formattedNumber(counts.uploaded)}</span></a></li>
+<!-- ENDIF canEdit -->
+{{{each profile_links}}}
+<!-- IF @first -->
+<li role="separator" class="dropdown-divider"></li>
+<!-- ENDIF @first -->
+<li id="{profile_links.id}" class="plugin-link <!-- IF profile_links.public -->public<!-- ELSE -->private<!-- ENDIF profile_links.public -->"><a class="dropdown-item" href="{config.relative_path}/user/{userslug}/{profile_links.route}"><!-- IF ../icon --><i class="fa fa-fw {profile_links.icon}"></i> <!-- END -->{profile_links.name}</a></li>
 {{{end}}}
+</ul>
 </div>
 </div>
-<div class="account-content flex-grow-1 ps-md-2 ps-lg-3 ps-xl-4" style="min-width: 0;">
-<h3 class="fw-semibold fs-5">[[pages:{template.name}, {username}]]</h3>
-{{{ if !users.length }}}
+</div>
+<h1 class="fs-4">[[pages:{template.name}, {username}]]</h1>
+<div class="users row">
+<div class="col-12">
+<ul id="users-container" class="users-container list-unstyled d-flex flex-wrap gap-2">
+{{{each users}}}
+<li class="users-box registered-user text-center pb-3" data-uid="{users.uid}" style="width: 102px;">
+<a href="{config.relative_path}/user/{users.userslug}">{buildAvatar(users, "64px", true)}</a>
+<div class="user-info">
+<div class="text-nowrap text-truncate">
+<a href="{config.relative_path}/user/{users.userslug}">{users.username}</a>
+</div>
+<!-- IF section_online -->
+<div class="lastonline">
+<span class="timeago" title="{users.lastonlineISO}"></span>
+</div>
+<!-- ENDIF section_online -->
+<!-- IF section_joindate -->
+<div class="joindate">
+<span class="timeago" title="{users.joindateISO}"></span>
+</div>
+<!-- ENDIF section_joindate -->
+<!-- IF section_sort-reputation -->
+<div class="reputation">
+<i class="fa fa-star"></i>
+<span>{formattedNumber(users.reputation)}</span>
+</div>
+<!-- ENDIF section_sort-reputation -->
+<!-- IF section_sort-posts -->
+<div class="post-count">
+<i class="fa fa-pencil"></i>
+<span>{formattedNumber(users.postcount)}</span>
+</div>
+<!-- ENDIF section_sort-posts -->
+<!-- IF section_flagged -->
+<div class="flag-count">
+<i class="fa fa-flag"></i>
+<span><a href="{config.relative_path}/flags?targetUid={users.uid}">{users.flags}</a></span>
+</div>
+<!-- ENDIF section_flagged -->
+</div>
+</li>
+{{{end}}}
+<!-- IF anonymousUserCount -->
+<li class="users-box anon-user text-center pb-3" style="width: 102px;">
+<span class="avatar avatar-rounded text-bg-secondary" component="avatar/icon" style="--avatar-size: 64px;">G</span>
+<br/>
+<div class="user-info">
+<span id="online_anon_count">{anonymousUserCount}</span>
+<span>[[global:guests]]</span>
+</div>
+</li>
+<!-- ENDIF anonymousUserCount -->
+</ul>
+<!-- IF !users.length -->
 <div class="alert alert-warning text-center">[[user:has-no-follower]]</div>
-{{{ end }}}
-<div class="row row-cols-2 row-cols-lg-3 row-cols-xl-4 g-4">
-{{{ each users }}}
-<div>
-<a href="{config.relative_path}/user/{./userslug}" class="btn btn-ghost gap-2 ff-base d-flex align-items-start justify-content-start p-2 text-start">
-{buildAvatar(@value, "48px", true, "flex-shrink-0")}
-<div class="d-flex flex-column gap-1 text-truncate">
-<div class="fw-semibold text-truncate" title="{./displayname}">{./displayname}</div>
-<div class="text-xs text-muted text-truncate">@{./username}</div>
-{{{ if section_online }}}
-<div class="text-xs text-muted text-truncate">
-<span class="timeago" title="{./lastonlineISO}"></span>
-</div>
-{{{ end }}}
-{{{ if section_joindate }}}
-<div class="text-xs text-muted text-truncate">
-<span class="timeago" title="{./joindateISO}"></span>
-</div>
-{{{ end }}}
-{{{ if section_sort-reputation }}}
-<div class="text-xs text-muted text-truncate">
-<span>{formattedNumber(./reputation)}</span>
-</div>
-{{{ end }}}
-{{{ if section_sort-posts }}}
-<div class="text-xs text-muted text-truncate">
-<span>{formattedNumber(./postcount)}</span>
-</div>
-{{{ end }}}
-{{{ if section_flagged }}}
-<div class="text-xs text-muted text-truncate">
-<span>{formattedNumber(./flags)}</span>
-</div>
-{{{ end }}}
-</div>
-</a>
-</div>
-{{{end}}}
-</div>
-<nav component="pagination" class="pagination-container mt-3{{{ if !pagination.pages.length }}} hidden{{{ end }}}" aria-label="[[global:pagination]]">
-<ul class="pagination pagination-sm gap-1 hidden-xs hidden-sm justify-content-center">
-<li class="page-item previous {{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+<!-- ENDIF !users.length -->
+<nav component="pagination" class="pagination-container<!-- IF !pagination.pages.length --> hidden<!-- ENDIF !pagination.pages.length -->" aria-label="[[global:pagination]]">
+<ul class="pagination hidden-xs justify-content-center">
+<li class="page-item previous float-start<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 {{{each pagination.pages}}}
-{{{ if ./separator }}}
+<!-- IF pagination.pages.separator -->
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link rounded fw-secondary px-3" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
 </li>
-{{{ else }}}
-<li class="page-item page{{{ if ./active }}} active{{{ end }}}" >
-<a class="page-link rounded fw-secondary px-3" href="?{./qs}" data-page="{./page}" aria-label="[[global:pagination.page-x, {./page}]]">{./page}</a>
+<!-- ELSE -->
+<li class="page-item page<!-- IF pagination.pages.active --> active<!-- ENDIF pagination.pages.active -->" >
+<a class="page-link" href="?{pagination.pages.qs}" data-page="{pagination.pages.page}" aria-label="[[global:pagination.page-x, {./page}]]">{pagination.pages.page}</a>
 </li>
-{{{ end }}}
+<!-- ENDIF pagination.pages.separator -->
 {{{end}}}
-<li class="page-item next {{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next float-end<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
 </ul>
-{{{ if !template.topic }}}
-<ul class="pagination pagination-sm hidden-md hidden-lg justify-content-center">
-<li class="page-item first{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
+<ul class="pagination hidden-sm hidden-md hidden-lg justify-content-center">
+<li class="page-item first<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
 </li>
-<li class="page-item previous{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+<li class="page-item previous<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link fw-secondary" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
 </li>
-<li class="page-item next{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
-<li class="page-item last{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary"  href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
+<li class="page-item last<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
 </li>
 </ul>
-{{{ end }}}
 </nav>
 </div>
 </div>

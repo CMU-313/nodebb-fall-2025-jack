@@ -1,255 +1,211 @@
-<div class="account w-100 mx-auto">
-<div class="cover position-absolute start-0 top-0 w-100" component="account/cover" style="background-image: url({cover:url}); background-position: {cover:position};">
-<div class="container">
-{{{ if allowCoverPicture }}}
-{{{ if canEdit }}}
-<div class="controls text-center">
-<a href="#" class="upload p-2 m-2 rounded-1 text-bg-light opacity-75"><i class="fa fa-fw fa-upload"></i></a>
-<a href="#" class="resize p-2 m-2 rounded-1 text-bg-light opacity-75"><i class="fa fa-fw fa-arrows"></i></a>
-<a href="#" class="remove p-2 m-2 rounded-1 text-bg-light opacity-75"><i class="fa fa-fw fa-times"></i></a>
-</div>
-<a href="#" class="save text-bg-primary">[[groups:cover-save]] <i class="fa fa-fw fa-floppy-o"></i></a>
-<div class="indicator text-bg-primary">[[groups:cover-saving]] <i class="fa fa-fw fa-refresh fa-spin"></i></div>
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-<div class="d-flex flex-column flex-md-row gap-2 w-100 pb-4 mb-4 mt-2 border-bottom">
-<div {{{ if (allowProfilePicture && isSelfOrAdminOrGlobalModerator)}}}component="profile/change/picture"{{{ end }}} class="avatar-wrapper border border-white border-4 rounded-circle position-relative align-self-center align-self-md-start hover-parent" style="margin-top: -75px;">
-{buildAvatar(@value, "142px", true)}
-{{{ if (allowProfilePicture && isSelfOrAdminOrGlobalModerator)}}}
-<a href="#" component="profile/change/picture" class="d-none d-md-block pointer p-2 rounded-1 text-bg-light position-absolute top-50 start-50 translate-middle hover-opacity-75">
-<span class="upload"><i class="fa fa-fw fa-upload"></i></span>
-</a>
-{{{ end }}}
-</div>
-<div class="d-flex flex-column flex-md-row mt-1 justify-content-between w-100 gap-2">
-<div class="d-flex flex-grow-1 flex-row gap-2">
-<div class="d-flex flex-column gap-1">
-<h2 class="fullname fw-semibold fs-2 tracking-tight mb-0">{{{ if fullname }}}{fullname}{{{ else }}}{username}{{{ end }}}</h2>
-<div class="d-flex flex-wrap gap-1 text-sm align-items-center">
-<span class="username fw-bold">{{{ if !banned }}}@{username}{{{ else }}}[[user:banned]]{{{ end }}}</span>
-<div class="d-flex align-items-center gap-1 p-1 flex-wrap">
-{{{ if selectedGroup.length }}}
-{{{ each selectedGroup }}}
-{{{ if ./slug }}}
-<a href="{config.relative_path}/groups/{./slug}" class="badge rounded-1 text-uppercase text-truncate text-decoration-none" style="max-width: 150px;color:{./textColor};background-color: {./labelColor};"><i class="fa {{{ if ./icon }}}{./icon}{{{ if ./userTitle}}} me-1{{{ end }}}{{{else}}}hidden{{{ end }}}"></i><span class="badge-text align-text-bottom">{{{ if ./userTitle }}}{./userTitle}{{{ end }}}</span></a>
-{{{ end }}}
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-<div class="d-flex gap-2" component="user/badges"></div>
-{{{ if isAdminOrGlobalModeratorOrModerator }}}
-{{{ if banned }}}
-<div class="text-xm text-muted">
-{{{ if banned_until }}}
-[[user:info.banned-until, {banned_until_readable}]]
-{{{ else }}}
-[[user:info.banned-permanently]]
-{{{ end }}}
-</div>
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-<div class="flex-shrink-0 d-flex gap-1 align-self-stretch align-self-md-start justify-content-end">
-{{{ if loggedIn }}}
-{{{ if !isSelf }}}
-<a component="account/unfollow" href="#" class="btn btn-outline-warning flex-fill{{{ if (!isFollowing && !isFollowPending) }}} hide{{{ end }}}">[[user:{{{ if isFollowPending }}}cancel-follow{{{ else }}}unfollow{{{ end }}}]]</a>
-<a component="account/follow" href="#" class="btn btn-primary flex-fill{{{ if (isFollowing || isFollowPending) }}} hide{{{ end }}}">[[user:follow]]</a>
-{{{ end }}}
-{{{ end }}}
-{{{ if (canChat && !banned) }}}
-<div class="btn-group flex-fill">
-<a {{{ if hasPrivateChat }}}component="account/chat"{{{ else }}}component="account/new-chat"{{{ end }}} href="#" class="btn btn-light" role="button">[[user:chat]]</a>
-{{{ if hasPrivateChat}}}
-<button type="button" class="btn btn-light dropdown-toggle flex-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<i class="fa fa-caret-down"></i>
-</button>
-<ul class="dropdown-menu dropdown-menu-end p-1 text-sm" role="menu">
-<li><a class="dropdown-item rounded-1" href="#" component="account/new-chat" role="menuitem"s>[[user:new-chat-with, {username}]]</a></li>
-</ul>
-{{{ end }}}
-</div>
-{{{ end }}}
-{{{ if !isSelf }}}
-{{{ if (isAdmin || (canBan || canMute ))}}}
-<div class="btn-group bottom-sheet">
-<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<i class="fa fa-gear fa-fw"></i>
-</button>
-<ul class="dropdown-menu dropdown-menu-end p-1 text-sm account-sub-links" role="menu">
-<li>
-<a class="dropdown-item rounded-1" href="{config.relative_path}/user/{userslug}/info" role="menuitem">[[user:account-info]]</a>
+<div class="account">
+<!-- IF breadcrumbs.length -->
+<ol class="breadcrumb" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
+{{{each breadcrumbs}}}
+<li<!-- IF @last --> component="breadcrumb/current"<!-- ENDIF @last --> itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item <!-- IF @last -->active<!-- ENDIF @last -->">
+<meta itemprop="position" content="{@index}" />
+{{{ if ./url }}}<a href="{breadcrumbs.url}" itemprop="item">{{{ end }}}
+<span itemprop="name">
+{breadcrumbs.text}
+<!-- IF @last -->
+<!-- IF !feeds:disableRSS -->
+<!-- IF rssFeedUrl --><a target="_blank" href="{rssFeedUrl}" itemprop="item"><i class="fa fa-rss-square"></i></a><!-- ENDIF rssFeedUrl --><!-- ENDIF !feeds:disableRSS -->
+<!-- ENDIF @last -->
+</span>
+{{{ if ./url }}}</a>{{{ end }}}
 </li>
-{{{ if (canBan || canMute) }}}
-<li role="separator" class="dropdown-divider"></li>
-{{{ end }}}
-{{{ if canBan }}}
-<li class="{{{ if banned }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/ban" href="#" role="menuitem">[[user:ban-account]]</a>
-</li>
-<li class="{{{ if !banned }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/unban" href="#" role="menuitem">[[user:unban-account]]</a>
-</li>
-{{{ end }}}
-{{{ if canMute }}}
-<li class="{{{ if muted }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/mute" href="#" role="menuitem">[[user:mute-account]]</a>
-</li>
-<li class="{{{ if !muted }}}hide{{{ end }}}">
-<a class="dropdown-item rounded-1" component="account/unmute" href="#" role="menuitem">[[user:unmute-account]]</a>
-</li>
-{{{ end }}}
-{{{ if isAdmin }}}
-<li>
-<a component="account/delete-account" href="#" class="dropdown-item rounded-1" role="menuitem">[[user:delete-account-as-admin]]</a>
-<a component="account/delete-content" href="#" class="dropdown-item rounded-1" role="menuitem">[[user:delete-content]]</a>
-<a component="account/delete-all" href="#" class="dropdown-item rounded-1" role="menuitem">[[user:delete-all]]</a>
-</li>
-{{{ end }}}
-</ul>
-</div>
-{{{ end }}}
-{{{ end }}}
-</div>
-</div>
-</div>
+{{{end}}}
+</ol>
+<!-- ENDIF breadcrumbs.length -->
 <div data-widget-area="header">
 {{{each widgets.header}}}
 {{widgets.header.html}}
 {{{end}}}
 </div>
-<div class="d-flex flex-column flex-md-row">
-<div class="flex-shrink-0 pe-2 border-end-md text-sm mb-3 flex-basis-md-200">
-<div class="sticky-md-top d-flex flex-row flex-md-column flex-wrap gap-1" style="top: 1rem;z-index: 1;">
-<a href="{config.relative_path}/user/{userslug}" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold {{{ if template.account/profile }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:about]]</div>
-</a>
-<a href="{config.relative_path}/user/{userslug}/posts"class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/posts }}}active{{{ end }}}
-{{{ if template.account/best }}}active{{{ end }}}
-{{{ if template.account/controversial }}}active{{{ end }}}
-{{{ if template.account/upvoted }}}active{{{ end }}}
-{{{ if template.account/downvoted }}}active{{{ end }}}
-{{{ if template.account/bookmarks }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:posts]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.posts}">{humanReadableNumber(counts.posts)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/topics" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/topics }}}active{{{ end }}}
-{{{ if template.account/watched }}}active{{{ end }}}
-{{{ if template.account/ignored }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:topics]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.topics}">{humanReadableNumber(counts.topics)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/shares" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/shares }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:shares]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.shares}">{humanReadableNumber(counts.shares)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/groups" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/groups }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:header.groups]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.groups}">{humanReadableNumber(counts.groups)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/followers" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/followers }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:followers]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.followers}">{humanReadableNumber(counts.followers)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/following" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/following }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:following]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.following}">{humanReadableNumber(counts.following)}</span>
-</a>
-{{{ if canEdit }}}
-<a href="{config.relative_path}/user/{userslug}/categories" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/categories }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:watched-categories]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.categoriesWatched}">{counts.categoriesWatched}</span>
-</a>
+<div class="cover" component="account/cover" style="background-image: url({cover:url}); background-position: {cover:position};">
+<div class="avatar-wrapper" data-uid="{uid}">
+<!-- IF picture -->
+<img src="{picture}" class="avatar avatar-rounded" style="--avatar-size: 128px;" />
+<!-- ELSE -->
+<div class="avatar avatar-rounded" style="background-color: {icon:bgColor}; --avatar-size: 128px;" title="{username}">{icon:text}</div>
+<!-- ENDIF picture -->
+<span component="user/status" class="position-absolute border border-white border-2 rounded-circle status {status}"><span class="visually-hidden">[[global:{status}]]</span></span>
+<!-- IF loggedIn -->
+<!-- IF !isSelf -->
+<button class="btn-morph persona-fab <!-- IF isFollowing -->heart<!-- ELSE -->plus<!-- ENDIF isFollowing -->" title="<!-- IF isFollowing -->[[global:unfollow]]<!-- ELSE -->[[global:follow]]<!-- ENDIF isFollowing -->">
+<span>
+<span class="s1"></span>
+<span class="s2"></span>
+<span class="s3"></span>
+</span>
+</button>
+<!-- ENDIF !isSelf -->
+<!-- ENDIF loggedIn -->
+</div>
+<div class="container">
+<!-- IF allowCoverPicture -->
+<!-- IF canEdit -->
+<div class="controls">
+<a href="#" class="upload"><i class="fa fa-fw fa-4x fa-upload"></i></a>
+<a href="#" class="resize"><i class="fa fa-fw fa-4x fa-arrows"></i></a>
+<a href="#" class="remove"><i class="fa fa-fw fa-4x fa-times"></i></a>
+</div>
+<a href="#" class="save">[[groups:cover-save]] <i class="fa fa-fw fa-floppy-o"></i></a>
+<div class="indicator">[[groups:cover-saving]] <i class="fa fa-fw fa-refresh fa-spin"></i></div>
+<!-- ENDIF canEdit -->
+<!-- ENDIF allowCoverPicture -->
+<div class="btn-group account-fab bottom-sheet">
+<button type="button" class="persona-fab dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<i class="fa fa-ellipsis-v"></i>
+</button>
+<ul class="dropdown-menu dropdown-menu-end account-sub-links" role="menu">
+<!-- IF loggedIn -->
+<!-- IF !isSelf -->
+<!-- IF !banned -->
+<!-- IF canChat -->
+<li class="<!-- IF !hasPrivateChat -->hidden<!-- ENDIF !hasPrivateChat -->">
+<a class="dropdown-item" component="account/chat" href="#" role="menuitem">[[user:chat-with, {username}]]</a>
+</li>
+<li>
+<a class="dropdown-item" component="account/new-chat" href="#" role="menuitem">[[user:new-chat-with, {username}]]</a>
+</li>
+<!-- ENDIF canChat -->
+<li>
+<a {{{if flagId }}}hidden{{{end}}} class="dropdown-item" component="account/flag" href="#" role="menuitem">[[user:flag-profile]]</a>
+</li>
+<li>
+<a {{{if !flagId }}}hidden{{{end}}} class="dropdown-item" component="account/already-flagged" href="#" role="menuitem" data-flag-id="{flagId}">[[user:profile-flagged]]</a>
+</li>
+<li>
+<a class="dropdown-item {{{ if ./isBlocked }}}hidden{{{ end }}}" component="account/block" href="#" role="menuitem">[[user:block-user]]</a>
+</li>
+<li>
+<a class="dropdown-item {{{ if !./isBlocked }}}hidden{{{ end }}}" component="account/unblock" href="#" role="menuitem">[[user:unblock-user]]</a>
+</li>
+<li role="separator" class="dropdown-divider"></li>
+<!-- ENDIF !banned -->
+<!-- ENDIF !isSelf -->
+<!-- ENDIF loggedIn -->
+<li>
+<a class="dropdown-item" href="{config.relative_path}/user/{userslug}" class="d-inline-block" id="profile" role="menuitem">[[user:profile]]</a>
+</li>
+<!-- IF canEdit -->
+<li><a class="dropdown-item" href="{config.relative_path}/user/{userslug}/edit" role="menuitem">[[user:edit]]</a></li>
+<li><a class="dropdown-item" href="{config.relative_path}/user/{userslug}/settings" role="menuitem">[[user:settings]]</a></li>
+<!-- ENDIF canEdit -->
+<!-- IF !isSelf -->
+{{{ if (canBan || canMute) }}}
+<li role="separator" class="dropdown-divider"></li>
+<li class="dropdown-header">[[user:admin-actions-label]]</li>
+{{{ end }}}
+{{{ if canBan }}}
+<li class="<!-- IF banned -->hide<!-- ENDIF banned -->">
+<a class="dropdown-item" component="account/ban" href="#" role="menuitem">[[user:ban-account]]</a>
+</li>
+<li class="<!-- IF !banned -->hide<!-- ENDIF !banned -->">
+<a class="dropdown-item" component="account/unban" href="#" role="menuitem">[[user:unban-account]]</a>
+</li>
+{{{ end }}}
+{{{ if canMute }}}
+<li class="<!-- IF muted -->hide<!-- ENDIF muted -->">
+<a class="dropdown-item" component="account/mute" href="#" role="menuitem">[[user:mute-account]]</a>
+</li>
+<li class="<!-- IF !muted -->hide<!-- ENDIF !muted -->">
+<a class="dropdown-item" component="account/unmute" href="#" role="menuitem">[[user:unmute-account]]</a>
+</li>
+{{{ end }}}
+<!-- IF isAdmin -->
+<li>
+<a component="account/delete-account" href="#" class="dropdown-item" role="menuitem">[[user:delete-account-as-admin]]</a>
+<a component="account/delete-content" href="#" class="dropdown-item" role="menuitem">[[user:delete-content]]</a>
+<a component="account/delete-all" href="#" class="dropdown-item" role="menuitem">[[user:delete-all]]</a>
+</li>
+<!-- ENDIF isAdmin -->
+<!-- ENDIF !isSelf -->
+<li role="separator" class="dropdown-divider"></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/following" role="menuitem">[[user:following]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.following}">{formattedNumber(counts.following)}</span></a></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/followers" role="menuitem">[[user:followers]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.followers}">{formattedNumber(counts.followers)}</span></a></li>
+<!-- IF canEdit -->
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/blocks" role="menuitem">[[user:blocks]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.blocks}">{formattedNumber(counts.blocks)}</span></a></li>
+<!-- ENDIF canEdit -->
+<li role="separator" class="dropdown-divider"></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/topics" role="menuitem">[[global:topics]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.topics}">{formattedNumber(counts.topics)}</span></a></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/posts" role="menuitem">[[global:posts]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.posts}">{formattedNumber(counts.posts)}</span></a></li>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/groups" role="menuitem">[[global:header.groups]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.groups}">{formattedNumber(counts.groups)}</span></a></li>
+<!-- IF canEdit -->
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/categories" role="menuitem">[[user:watched-categories]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.categoriesWatched}">{formattedNumber(counts.categoriesWatched)}</span></a></li>
 {{{ if isSelf }}}
-<a href="{config.relative_path}/user/{userslug}/tags" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/tags }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:watched-tags]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.tagsWatched}">{counts.tagsWatched}</span>
-</a>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/tags" role="menuitem">
+[[user:watched-tags]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.tagsWatched}">{formattedNumber(counts.tagsWatched)}</span></a></li>
 {{{ end }}}
-<a href="{config.relative_path}/user/{userslug}/blocks" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/blocks }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:blocked-users]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.blocks}">{humanReadableNumber(counts.blocks)}</span>
-</a>
-<a href="{config.relative_path}/user/{userslug}/uploads" class="btn btn-ghost btn-sm text-start ff-secondary fw-semibold d-flex gap-2 align-items-center
-{{{ if template.account/uploads }}}active{{{ end }}}">
-<div class="flex-grow-1">[[global:uploads]]</div>
-<span class="flex-shrink-0 text-xs" title="{counts.uploaded}">{humanReadableNumber(counts.uploaded)}</span>
-</a>
-{{{ end }}}
-{{{ if remoteUrl }}}
-<hr class="w-100 my-2"/>
-<a href="{remoteUrl}" target="_self" component="account/view-remote" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start">
-<i class="flex-shrink-0 fa-solid fa-globe"></i>
-<div class="flex-grow-1 text-nowrap">[[user:view-remote]]</div>
-</a>
-{{{ end }}}
-{{{ if (loggedIn && (!isSelf && !banned)) }}}
-<hr class="w-100 my-2"/>
-<a href="#" component="account/flag" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{if flagId }}}hidden{{{end}}}">
-<i class="flex-shrink-0 fa-solid fa-flag text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:flag-profile]]</div>
-</a>
-<a href="#" component="account/already-flagged" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{if !flagId }}}hidden{{{end}}}" data-flag-id="{flagId}">
-<i class="flex-shrink-0 fa-solid fa-flag text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:profile-flagged]]</div>
-</a>
-<a href="#" component="account/block" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{ if isBlocked }}}hidden{{{ end }}}">
-<i class="flex-shrink-0 fa-solid fa-ban text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:block-user]]</div>
-</a>
-<a href="#" component="account/unblock" class="btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 text-start {{{ if !isBlocked }}}hidden{{{ end }}}">
-<i class="flex-shrink-0 fa-solid fa-ban text-danger"></i>
-<div class="flex-grow-1 text-nowrap">[[user:unblock-user]]</div>
-</a>
-{{{ end }}}
-{{{ if canEdit }}}
-<hr class="w-100 my-2"/>
-<a href="{config.relative_path}/user/{userslug}/edit" class="btn btn-ghost btn-sm ff-secondary text-xs text-start
-{{{ if template.account/edit }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:edit-profile]]</div>
-</a>
-<a href="{config.relative_path}/user/{userslug}/settings" class="btn btn-ghost btn-sm ff-secondary text-xs text-start
-{{{ if template.account/settings }}}active{{{ end }}}">
-<div class="flex-grow-1">[[user:settings]]</div>
-</a>
-{{{ end }}}
-{{{ each profile_links }}}
-<a href="{config.relative_path}/user/{userslug}/{./route}" class="btn btn-ghost btn-sm ff-secondary text-xs text-start plugin-link {{{ if ./public }}}public{{{ else }}}private{{{ end }}} {{{ if (url == ./url) }}}active{{{ end }}}" id="{./id}">
-<div class="flex-grow-1">{./name}</div>
-</a>
+<li><a class="dropdown-item d-flex justify-content-between align-items-center" href="{config.relative_path}/user/{userslug}/uploads" role="menuitem">[[global:uploads]] <span class="badge bg-secondary rounded-pill ms-2" title="{counts.uploaded}">{formattedNumber(counts.uploaded)}</span></a></li>
+<!-- ENDIF canEdit -->
+{{{each profile_links}}}
+<!-- IF @first -->
+<li role="separator" class="dropdown-divider"></li>
+<!-- ENDIF @first -->
+<li id="{profile_links.id}" class="plugin-link <!-- IF profile_links.public -->public<!-- ELSE -->private<!-- ENDIF profile_links.public -->"><a class="dropdown-item" href="{config.relative_path}/user/{userslug}/{profile_links.route}"><!-- IF ../icon --><i class="fa fa-fw {profile_links.icon}"></i> <!-- END -->{profile_links.name}</a></li>
 {{{end}}}
+</ul>
 </div>
 </div>
-<div class="account-content flex-grow-1 ps-md-2 ps-lg-3 ps-xl-4" style="min-width: 0;">
-<div class="d-flex justify-content-between py-1 mb-3 align-items-center position-sticky top-0 bg-body z-1">
-<h3 class="fw-semibold fs-5 mb-0">{{{ if isSelf }}}[[user:edit-profile]]{{{ else }}}[[pages:account/edit, {username}]]{{{ end }}}</h3>
-<button id="submitBtn" class="btn btn-sm btn-primary">[[global:save-changes]]</button>
 </div>
+<!-- IF sso.length --><div><!-- ENDIF sso.length -->
 <div class="row">
-<div class="col-xl-6 col-12">
+<div class="col-md-3 col-sm-4">
+<div class="account-picture-block text-center">
+<div class="row mb-3">
+<div class="col-12 hidden-xs">
+<!-- IF picture -->
+<img id="user-current-picture" class="avatar avatar-rounded" style="--avatar-size: 128px;" src="{picture}" />
+<!-- ELSE -->
+<div class="avatar avatar-rounded" style="background-color: {icon:bgColor}; --avatar-size: 128px;">{icon:text}</div>
+<!-- ENDIF picture -->
+</div>
+</div>
+<ul class="list-group mb-3">
+{{{ if allowProfilePicture }}}
+<li class="list-group-item"><a component="profile/change/picture" href="#" class="text-decoration-none text-reset">[[user:change-picture]]</a></li>
+{{{ end }}}
+{{{ if !username:disableEdit }}}
+<li class="list-group-item"><a href="{config.relative_path}/user/{userslug}/edit/username" class="text-decoration-none text-reset">[[user:change-username]]</a></li>
+{{{ end }}}
+{{{ if !email:disableEdit }}}
+<li class="list-group-item"><a href="{config.relative_path}/user/{userslug}/edit/email" class="text-decoration-none text-reset">[[user:change-email]]</a></li>
+{{{ end }}}
+{{{ if canChangePassword }}}
+<li class="list-group-item"><a href="{config.relative_path}/user/{userslug}/edit/password" class="text-decoration-none text-reset">[[user:change-password]]</a></li>
+{{{ end }}}
+{{{ each editButtons }}}
+<li class="list-group-item"><a href="{config.relative_path}{./link}" class="text-decoration-none text-reset">{./text}</a></li>
+{{{ end }}}
+</ul>
+<!-- IF config.requireEmailConfirmation -->
+<!-- IF email -->
+<!-- IF isSelf -->
+<a id="confirm-email" href="#" class="btn btn-warning <!-- IF email:confirmed -->hide<!-- ENDIF email:confirmed -->">[[user:confirm-email]]</a><br/><br/>
+<!-- ENDIF isSelf -->
+<!-- ENDIF email -->
+<!-- ENDIF config.requireEmailConfirmation -->
+<!-- IF allowAccountDelete -->
+<!-- IF isSelf -->
+<a id="deleteAccountBtn" href="#" class="btn btn-danger">[[user:delete-account]]</a><br/><br/>
+<!-- ENDIF isSelf -->
+<!-- ENDIF allowAccountDelete -->
+</div>
+</div>
+<div class="<!-- IF !sso.length -->col-md-9 col-sm-8<!-- ELSE -->col-md-5 col-sm-4<!-- ENDIF !sso.length -->">
 <form role="form" component="profile/edit/form">
-<div class="mb-3">
+<div class="mb-2">
 <label class="form-label fw-bold" for="fullname">[[user:fullname]]</label>
 <input class="form-control" type="text" id="fullname" name="fullname" placeholder="[[user:fullname]]" value="{fullname}">
 </div>
-<div class="mb-3">
+<div class="mb-2">
 <label class="form-label fw-bold" for="birthday">[[user:birthday]]</label>
 <input class="form-control" type="date" id="birthday" name="birthday" value="{birthday}" placeholder="mm/dd/yyyy">
 </div>
 {{{ each customUserFields }}}
-<div class="mb-3">
+<div class="mb-2">
 <label class="form-label fw-bold" for="{./key}">{./name}</label>
 {{{ if ((./type == "input-text") || (./type == "input-link")) }}}
 <input class="form-control" type="text" id="{./key}" name="{./key}" value="{./value}">
@@ -269,13 +225,12 @@
 {{{ end }}}
 </div>
 {{{ end }}}
-{{{ if groups.length }}}
-<div class="mb-3">
+<div class="mb-2">
 <label class="form-label fw-bold" for="groupTitle">[[user:grouptitle]]</label>
 <div class="d-flex flex-column gap-2" component="group/badge/list">
 {{{ each groups }}}
 <div component="group/badge/item" class="d-flex gap-2 justify-content-between align-items-center" data-value="{./displayName}" data-selected="{./selected}">
-<a href="{config.relative_path}/groups/{./slug}" class="badge rounded-1 text-uppercase text-truncate text-decoration-none" style="max-width: 150px;color:{./textColor};background-color: {./labelColor};"><i class="fa {{{ if ./icon }}}{./icon}{{{ if ./userTitle}}} me-1{{{ end }}}{{{else}}}hidden{{{ end }}}"></i><span class="badge-text align-text-bottom">{{{ if ./userTitle }}}{./userTitle}{{{ end }}}</span></a>
+<a href="{config.relative_path}/groups/{./slug}" class="badge rounded-1 text-uppercase text-truncate" style="max-width: 150px;color:{./textColor};background-color: {./labelColor};"><i class="fa {{{ if ./icon }}}{./icon}{{{ if ./userTitle}}} me-1{{{ end }}}{{{else}}}hidden{{{ end }}}"></i><span class="badge-text">{{{ if ./userTitle }}}{./userTitle}{{{ end }}}</span></a>
 <div class="d-flex gap-1">
 <button component="group/toggle/hide" type="button" class="btn btn-ghost btn-sm {{{ if !./selected }}}hidden{{{ end }}}" title="[[user:hide-group-title]]"><i class="fa fa-fw fa-eye"></i></button>
 <button component="group/toggle/show" type="button" class="btn btn-ghost btn-sm {{{ if ./selected }}}hidden{{{ end }}}" title="[[user:show-group-title]]"><i class="fa fa-fw fa-eye-slash"></i></button>
@@ -288,72 +243,43 @@
 {{{ end }}}
 </div>
 </div>
-{{{ end }}}
-{{{ if allowAboutMe }}}
-<div class="mb-3">
+<!-- IF allowAboutMe -->
+<div class="mb-2">
 <label class="form-label fw-bold" for="aboutme">[[user:aboutme]]</label> <small><label id="aboutMeCharCountLeft"></label></small>
 <textarea class="form-control" id="aboutme" name="aboutme" rows="5">{aboutme}</textarea>
 </div>
-{{{ end }}}
-{{{ if (allowSignature && !disableSignatures) }}}
-<div class="mb-3">
+<!-- ENDIF allowAboutMe -->
+<!-- IF allowSignature -->
+<!-- IF !disableSignatures -->
+<div class="mb-2">
 <label class="form-label fw-bold" for="signature">[[user:signature]]</label> <small><label id="signatureCharCountLeft"></label></small>
 <textarea class="form-control" id="signature" name="signature" rows="5">{signature}</textarea>
 </div>
-{{{ end }}}
+<!-- ENDIF !disableSignatures -->
+<!-- ENDIF allowSignature -->
+<a id="submitBtn" href="#" class="btn btn-primary">[[global:save-changes]]</a>
 </form>
 <hr class="visible-xs visible-sm"/>
 </div>
-<div class="col-xl-6 col-12">
-<div class="text-center">
-<ul class="list-group mb-3 text-sm text-nowrap">
-{{{ if allowProfilePicture }}}
-<li class="list-group-item"><a component="profile/change/picture" href="#" class="text-decoration-none text-reset">[[user:change-picture]]</a></li>
-{{{ end }}}
-{{{ if !username:disableEdit }}}
-<li class="list-group-item"><a href="{config.relative_path}/user/{userslug}/edit/username" class="text-decoration-none text-reset">[[user:change-username]]</a></li>
-{{{ end }}}
-{{{ if !email:disableEdit }}}
-<li class="list-group-item"><a href="{config.relative_path}/user/{userslug}/edit/email" class="text-decoration-none text-reset">[[user:change-email]]</a></li>
-{{{ end }}}
-{{{ if canChangePassword }}}
-<li class="list-group-item"><a href="{config.relative_path}/user/{userslug}/edit/password" class="text-decoration-none text-reset">[[user:change-password]]</a></li>
-{{{ end }}}
-{{{ each editButtons }}}
-<li class="list-group-item"><a href="{config.relative_path}{./link}" class="text-decoration-none text-reset">{./text}</a></li>
-{{{ end }}}
-</ul>
-{{{ if config.requireEmailConfirmation }}}
-{{{ if (email && isSelf) }}}
-<a id="confirm-email" href="#" class="btn btn-warning {{{ if email:confirmed }}}hide{{{ end }}}">[[user:confirm-email]]</a><br/><br/>
-{{{ end }}}
-{{{ end }}}
-</div>
-{{{ if sso.length }}}
-<label class="form-label text-sm fw-semibold">[[user:sso.title]]</label>
+<!-- IF sso.length -->
+<div class="col-md-4 col-sm-4">
+<label>[[user:sso.title]]</label>
 <div class="list-group">
-{{{ each sso }}}
-<div class="list-group-item d-flex align-items-center justify-content-between">
-<a class="text-sm text-reset text-decoration-none" data-component="{./component}" href="{{{ if ./url }}}{./url}{{{ else }}}#{{{ end }}}" target="{{{ if ./associated }}}_blank{{{ else }}}_top{{{ end }}}">
-{{{ if ./icon }}}<i class="fa {./icon}"></i>{{{ end }}}
-{{{ if ./associated }}}[[user:sso.associated]]{{{ else }}}[[user:sso.not-associated]]{{{ end }}}
-{./name}
+{{{each sso}}}
+<div class="list-group-item">
+<!-- IF ../deauthUrl -->
+<a data-component="{../component}" class="btn btn-outline-secondary btn-sm float-end" href="{../deauthUrl}">[[user:sso.dissociate]]</a>
+<!-- END -->
+<a data-component="{../component}" href="{{{ if ./url }}}{./url}{{{ else }}}#{{{ end }}}" target="<!-- IF ../associated -->_blank<!-- ELSE -->_top<!-- ENDIF ../associated -->">
+<!-- IF ../icon --><i class="fa {../icon}"></i><!-- ENDIF ../icon -->
+<!-- IF ../associated -->[[user:sso.associated]]<!-- ELSE -->[[user:sso.not-associated]]<!-- ENDIF ../associated -->
+{../name}
 </a>
-{{{ if ./deauthUrl }}}
-<a data-component="{./component}" class="btn btn-outline-secondary btn-sm" href="{./deauthUrl}">[[user:sso.dissociate]]</a>
-{{{ end }}}
 </div>
-{{{ end }}}
-</div>
-{{{ end }}}
-<hr/>
-{{{ if (allowAccountDelete && isSelf) }}}
-<div class="d-flex justify-content-center">
-<button id="deleteAccountBtn" class="btn btn-danger">[[user:delete-account]]</button>
-</div>
-{{{ end }}}
+{{{end}}}
 </div>
 </div>
+<!-- ENDIF sso.length -->
 </div>
-</div>
+<!-- IF sso.length --></div><!-- ENDIF sso.length -->
 </div>

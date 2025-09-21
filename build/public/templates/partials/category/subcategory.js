@@ -31,12 +31,12 @@
               "\n</span>\n</button>\n<div class=\"dropdown-menu p-1\">\n<div component=\"category-selector-search\" class=\"p-1 hidden\">\n<input type=\"text\" class=\"form-control form-control-sm\" placeholder=\"[[search:type-to-search]]\" autocomplete=\"off\">\n<hr class=\"mt-2 mb-0\"/>\n</div>\n<ul component=\"category/list\" class=\"list-unstyled mb-0 text-sm category-dropdown-menu ghost-scrollbar\" role=\"menu\">\n<li component=\"category/no-matches\" role=\"presentation\" class=\"category hidden\">\n<a class=\"dropdown-item rounded-1\" role=\"menuitem\">[[search:no-matches]]</a>\n</li>\n" + 
               compiled.blocks['categoryItems'](helpers, context, guard, iter, helper) + 
               "\n</ul>\n</div>\n</div></div>\n" :
-            "\n<h3 class=\"fs-6 fw-semibold\">[[category:subcategories]]</h3>\n") + 
-          "\n<ul component=\"category/subcategory/container\" class=\"categories-list list-unstyled\" itemscope itemtype=\"http://www.schema.org/ItemList\">\n<li><hr class=\"text-muted\"/></li>\n" + 
+            "\n<p>[[category:subcategories]]</p>\n") + 
+          "\n<ul component=\"category/subcategory/container\" class=\"categories list-unstyled\" itemscope itemtype=\"http://www.schema.org/ItemList\">\n" + 
           compiled.blocks['children'](helpers, context, guard, iter, helper) + 
           "\n</ul>\n" + 
           (guard((context != null) ? context['hasMoreSubCategories'] : null) ?
-            "\n<button class=\"btn btn-ghost btn-sm ff-secondary mb-2\" component=\"category/load-more-subcategories\">[[category:x-more-categories, " + 
+            "\n<button class=\"btn btn-ghost btn-sm mb-2\" component=\"category/load-more-subcategories\">[[category:x-more-categories, " + 
               __escape(guard((context != null) ? context['subCategoriesLeft'] : null)) + 
               "]]</button>\n" :
             "") + 
@@ -90,28 +90,36 @@
         var key = key0;
         return "\n<li component=\"categories/category\" data-cid=\"" + 
           __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['cid'] : null)) + 
-          "\" class=\"w-100 border-bottom py-3 py-lg-4 gap-lg-0 gap-2 d-flex flex-column flex-lg-row align-items-start category-" + 
+          "\" class=\"w-100 py-2 mb-2 gap-lg-0 gap-2 d-flex flex-column flex-md-row align-items-start " + 
+          (index === length - 1 ?
+            "" :
+            "border-bottom") + 
+          " border-bottom-lg-0 category-" + 
           __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['cid'] : null)) + 
           " " + 
           __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['unread-class'] : null)) + 
           "\">\n<meta itemprop=\"name\" content=\"" + 
           __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['name'] : null)) + 
-          "\">\n<div class=\"d-flex col-lg-7 gap-2 gap-lg-3\">\n<div class=\"flex-shrink-0\">\n" + 
-          __escape(helper(context, helpers, 'buildCategoryIcon', [guard(value), "40px", "rounded-1"])) + 
-          "\n</div>\n<div class=\"flex-grow-1 d-flex flex-wrap gap-1 me-0 me-lg-2\">\n<h2 class=\"title text-break fs-4 fw-semibold m-0 tracking-tight w-100\">\n" + 
+          "\">\n<div class=\"d-flex col-md-7 gap-2 gap-lg-3\">\n<div class=\"flex-shrink-0\">\n" + 
+          __escape(helper(context, helpers, 'buildCategoryIcon', [guard(value), "48px", "rounded-circle"])) + 
+          "\n</div>\n<div class=\"flex-grow-1 d-flex flex-wrap gap-1\">\n<h2 class=\"title text-break fs-4 fw-semibold m-0 tracking-tight w-100\">\n" + 
           (guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['isSection'] : null) ?
             "\n" + 
               __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['name'] : null)) + 
               "\n" :
-            "\n<a class=\"text-reset\" href=\"" + 
+            "\n" + 
               (guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['link'] : null) ?
-                __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['link'] : null)) :
-                __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
+                "\n<a href=\"" + 
+                  __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['link'] : null)) + 
+                  "\" itemprop=\"url\">\n" :
+                "\n<a href=\"" + 
+                  __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
                   "/category/" + 
-                  __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['slug'] : null))) + 
-              "\" itemprop=\"url\">" + 
+                  __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['slug'] : null)) + 
+                  "\" itemprop=\"url\">\n") + 
+              "\n" + 
               __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['name'] : null)) + 
-              "</a>\n") + 
+              "\n</a>\n") + 
           "\n</h2>\n" + 
           (guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['descriptionParsed'] : null) ?
             "\n<div class=\"description text-muted text-sm w-100 line-clamp-sm-5\">\n" + 
@@ -119,26 +127,13 @@
               "\n</div>\n" :
             "") + 
           "\n" + 
-          (guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['link'] : null) ?
-            "" :
-            "\n<div class=\"d-flex gap-1 d-block d-lg-none w-100\">\n<span class=\"badge text-body border stats text-xs text-muted\">\n<i class=\"fa fa-fw fa-list\"></i>\n<span class=\"fw-normal\">" + 
-              __escape(helper(context, helpers, 'humanReadableNumber', [guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['totalTopicCount'] : null), guard((context != null) ? context['0'] : null)])) + 
-              "</span>\n</span>\n<span class=\"badge text-body border stats text-xs text-muted\">\n<i class=\"fa-regular fa-fw fa-message\"></i>\n<span class=\"fw-normal\">" + 
-              __escape(helper(context, helpers, 'humanReadableNumber', [guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['totalPostCount'] : null), guard((context != null) ? context['0'] : null)])) + 
-              "</span>\n</span>\n" + 
-              (guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['teaser'] : null) ?
-                "\n<a href=\"" + 
-                  __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
-                  __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['teaser'] != null) ? context['children'][key0]['teaser']['url'] : null)) + 
-                  "\" class=\"border badge bg-transparent text-muted fw-normal timeago " + 
-                  ((!guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['teaser'] != null) ? context['children'][key0]['teaser']['timestampISO'] : null) || guard((context != null && context['config'] != null && context['config']['theme'] != null) ? context['config']['theme']['mobileTopicTeasers'] : null)) ?
-                    "hidden" :
-                    "") + 
-                  "\" title=\"" + 
-                  __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['teaser'] != null) ? context['children'][key0]['teaser']['timestampISO'] : null)) + 
-                  "\"></a>\n" :
-                "") + 
-              "\n</div>\n") + 
+          (guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['teaser'] != null) ? context['children'][key0]['teaser']['timestampISO'] : null) ?
+            "\n<div class=\"d-block d-md-none\">\n<a class=\"permalink timeago text-muted\" title=\"" + 
+              __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['teaser'] != null) ? context['children'][key0]['teaser']['timestampISO'] : null)) + 
+              "\" href=\"" + 
+              __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['teaser'] != null) ? context['children'][key0]['teaser']['url'] : null)) + 
+              "\">\n</a>\n</div>\n" :
+            "") + 
           "\n" + 
           (guard((context != null && context['config'] != null) ? context['config']['hideSubCategories'] : null) ?
             "" :
@@ -150,17 +145,17 @@
                     return "\n" + 
                       (guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['children'] != null && context['children'][key0]['children'][key1] != null) ? context['children'][key0]['children'][key1]['isSection'] : null) ?
                         "" :
-                        "\n<li data-cid=\"" + 
-                          __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['children'] != null && context['children'][key0]['children'][key1] != null) ? context['children'][key0]['children'][key1]['cid'] : null)) + 
-                          "\" class=\"category-children-item small\">\n<div class=\"d-flex gap-1\">\n<i class=\"fa fa-fw fa-caret-right text-primary\" style=\"line-height: var(--bs-body-line-height);\"></i>\n<a href=\"" + 
+                        "\n<li class=\"category-children-item small d-flex gap-1 align-items-center\">\n" + 
+                          __escape(helper(context, helpers, 'buildCategoryIcon', [guard(value), "24px", "rounded-circle"])) + 
+                          "\n<a href=\"" + 
                           (guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['children'] != null && context['children'][key0]['children'][key1] != null) ? context['children'][key0]['children'][key1]['link'] : null) ?
                             __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['children'] != null && context['children'][key0]['children'][key1] != null) ? context['children'][key0]['children'][key1]['link'] : null)) :
                             __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
                               "/category/" + 
                               __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['children'] != null && context['children'][key0]['children'][key1] != null) ? context['children'][key0]['children'][key1]['slug'] : null))) + 
-                          "\" class=\"text-reset fw-semibold\">" + 
+                          "\" class=\"text-reset\">" + 
                           __escape(guard((context != null && context['children'] != null && context['children'][key0] != null && context['children'][key0]['children'] != null && context['children'][key0]['children'][key1] != null) ? context['children'][key0]['children'][key1]['name'] : null)) + 
-                          "</a>\n</div>\n</li>\n") + 
+                          "</a>\n</li>\n") + 
                       "\n";
                   }, function alt() {
                     return "";
@@ -171,22 +166,18 @@
           "\n</div>\n</div>\n" + 
           (guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['link'] : null) ?
             "" :
-            "\n<div class=\"d-flex col-lg-5 col-12 align-content-stretch\">\n<div class=\"meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted\" style=\"grid-template-columns: 1fr 1fr;\">\n<div class=\"card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center\">\n<span class=\"fs-5 ff-secondary lh-1\" title=\"" + 
+            "\n<div class=\"d-flex col-md-5 col-12 align-content-stretch\">\n<div class=\"meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted\" style=\"grid-template-columns: 1fr 1fr;\">\n<div class=\"overflow-hidden rounded-1 d-flex flex-column align-items-center\">\n<span class=\"fs-4\" title=\"" + 
               __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['totalTopicCount'] : null)) + 
               "\">" + 
               __escape(helper(context, helpers, 'humanReadableNumber', [guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['totalTopicCount'] : null), guard((context != null) ? context['0'] : null)])) + 
-              "</span>\n<span class=\"d-none d-xl-flex text-lowercase text-xs\">[[global:topics]]</span>\n<i class=\"d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-list\"></i>\n</div>\n<div class=\"card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center\">\n<span class=\"fs-5 ff-secondary lh-1\" title=\"" + 
+              "</span>\n<span class=\"text-uppercase text-xs\">[[global:topics]]</span>\n</div>\n<div class=\"overflow-hidden rounded-1 d-flex flex-column align-items-center\">\n<span class=\"fs-4\" title=\"" + 
               __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['totalPostCount'] : null)) + 
               "\">" + 
               __escape(helper(context, helpers, 'humanReadableNumber', [guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['totalPostCount'] : null), guard((context != null) ? context['0'] : null)])) + 
-              "</span>\n<span class=\"d-none d-xl-flex text-lowercase text-xs\">[[global:posts]]</span>\n<i class=\"d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message\"></i>\n</div>\n</div>\n" + 
+              "</span>\n<span class=\"text-uppercase text-xs\">[[global:posts]]</span>\n</div>\n</div>\n" + 
               (guard((context != null && context['config'] != null) ? context['config']['hideCategoryLastPost'] : null) ?
                 "" :
-                "\n<div component=\"topic/teaser\" class=\"teaser ps-5 ps-lg-0 col-lg-6 col-12 " + 
-                  (guard((context != null && context['config'] != null && context['config']['theme'] != null) ? context['config']['theme']['mobileTopicTeasers'] : null) ?
-                    "" :
-                    "d-none d-lg-block") + 
-                  "\">\n<div class=\"lastpost border-start border-2 lh-sm h-100\" style=\"border-color: " + 
+                "\n<div component=\"topic/teaser\" class=\"teaser col-md-6 col-12 d-none d-md-block\">\n<div class=\"lastpost border-start border-4 lh-sm h-100\" style=\"border-color: " + 
                   __escape(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['bgColor'] : null)) + 
                   "!important;\">\n" + 
                   iter(guard((context != null && context['children'] != null && context['children'][key0] != null) ? context['children'][key0]['posts'] : null), function each(key1, index, length, value) {

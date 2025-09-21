@@ -22,7 +22,7 @@
           __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
           "/tags/" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEncoded'] : null)) + 
-          "\"><span class=\"badge border border-gray-300 fw-normal tag tag-class-" + 
+          "\"><span class=\"tag tag-item fw-bold tag-class-" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['class'] : null)) + 
           "\" data-tag=\"" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['value'] : null)) + 

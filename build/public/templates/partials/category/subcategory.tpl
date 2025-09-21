@@ -42,43 +42,39 @@
 </div>
 </div></div>
 {{{ else }}}
-<h3 class="fs-6 fw-semibold">[[category:subcategories]]</h3>
+<p>[[category:subcategories]]</p>
 {{{ end }}}
-<ul component="category/subcategory/container" class="categories-list list-unstyled" itemscope itemtype="http://www.schema.org/ItemList">
-<li><hr class="text-muted"/></li>
+<ul component="category/subcategory/container" class="categories list-unstyled" itemscope itemtype="http://www.schema.org/ItemList">
 {{{each children}}}
-<li component="categories/category" data-cid="{./cid}" class="w-100 border-bottom py-3 py-lg-4 gap-lg-0 gap-2 d-flex flex-column flex-lg-row align-items-start category-{./cid} {./unread-class}">
+<li component="categories/category" data-cid="{./cid}" class="w-100 py-2 mb-2 gap-lg-0 gap-2 d-flex flex-column flex-md-row align-items-start {{{ if !@last }}}border-bottom{{{ end }}} border-bottom-lg-0 category-{./cid} {./unread-class}">
 <meta itemprop="name" content="{./name}">
-<div class="d-flex col-lg-7 gap-2 gap-lg-3">
+<div class="d-flex col-md-7 gap-2 gap-lg-3">
 <div class="flex-shrink-0">
-{buildCategoryIcon(@value, "40px", "rounded-1")}
+{buildCategoryIcon(@value, "48px", "rounded-circle")}
 </div>
-<div class="flex-grow-1 d-flex flex-wrap gap-1 me-0 me-lg-2">
+<div class="flex-grow-1 d-flex flex-wrap gap-1">
 <h2 class="title text-break fs-4 fw-semibold m-0 tracking-tight w-100">
-{{{ if ./isSection }}}
-{./name}
-{{{ else }}}
-<a class="text-reset" href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" itemprop="url">{../name}</a>
-{{{ end }}}
+<!-- IF ../isSection -->
+{../name}
+<!-- ELSE -->
+<!-- IF ../link -->
+<a href="{../link}" itemprop="url">
+<!-- ELSE -->
+<a href="{config.relative_path}/category/{../slug}" itemprop="url">
+<!-- ENDIF ../link -->
+{../name}
+</a>
+<!-- ENDIF ../isSection -->
 </h2>
 {{{ if ./descriptionParsed }}}
 <div class="description text-muted text-sm w-100 line-clamp-sm-5">
 {./descriptionParsed}
 </div>
 {{{ end }}}
-{{{ if !./link }}}
-<div class="d-flex gap-1 d-block d-lg-none w-100">
-<span class="badge text-body border stats text-xs text-muted">
-<i class="fa fa-fw fa-list"></i>
-<span class="fw-normal">{humanReadableNumber(./totalTopicCount, 0)}</span>
-</span>
-<span class="badge text-body border stats text-xs text-muted">
-<i class="fa-regular fa-fw fa-message"></i>
-<span class="fw-normal">{humanReadableNumber(./totalPostCount, 0)}</span>
-</span>
-{{{ if ./teaser }}}
-<a href="{config.relative_path}{./teaser.url}" class="border badge bg-transparent text-muted fw-normal timeago {{{ if (!./teaser.timestampISO || config.theme.mobileTopicTeasers) }}}hidden{{{ end }}}" title="{./teaser.timestampISO}"></a>
-{{{ end }}}
+{{{ if ./teaser.timestampISO }}}
+<div class="d-block d-md-none">
+<a class="permalink timeago text-muted" title="{../teaser.timestampISO}" href="{../teaser.url}">
+</a>
 </div>
 {{{ end }}}
 {{{ if !config.hideSubCategories }}}
@@ -86,11 +82,9 @@
 <ul class="list-unstyled category-children row row-cols-1 row-cols-md-2 g-2 my-1 w-100">
 {{{ each ./children }}}
 {{{ if !./isSection }}}
-<li data-cid="{./cid}" class="category-children-item small">
-<div class="d-flex gap-1">
-<i class="fa fa-fw fa-caret-right text-primary" style="line-height: var(--bs-body-line-height);"></i>
-<a href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" class="text-reset fw-semibold">{./name}</a>
-</div>
+<li class="category-children-item small d-flex gap-1 align-items-center">
+{buildCategoryIcon(@value, "24px", "rounded-circle")}
+<a href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" class="text-reset">{./name}</a>
 </li>
 {{{ end }}}
 {{{ end }}}
@@ -100,22 +94,20 @@
 </div>
 </div>
 {{{ if !./link }}}
-<div class="d-flex col-lg-5 col-12 align-content-stretch">
+<div class="d-flex col-md-5 col-12 align-content-stretch">
 <div class="meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted" style="grid-template-columns: 1fr 1fr;">
-<div class="card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
-<span class="fs-5 ff-secondary lh-1" title="{./totalTopicCount}">{humanReadableNumber(./totalTopicCount, 0)}</span>
-<span class="d-none d-xl-flex text-lowercase text-xs">[[global:topics]]</span>
-<i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-list"></i>
+<div class="overflow-hidden rounded-1 d-flex flex-column align-items-center">
+<span class="fs-4" title="{./totalTopicCount}">{humanReadableNumber(./totalTopicCount, 0)}</span>
+<span class="text-uppercase text-xs">[[global:topics]]</span>
 </div>
-<div class="card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
-<span class="fs-5 ff-secondary lh-1" title="{./totalPostCount}">{humanReadableNumber(./totalPostCount, 0)}</span>
-<span class="d-none d-xl-flex text-lowercase text-xs">[[global:posts]]</span>
-<i class="d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message"></i>
+<div class="overflow-hidden rounded-1 d-flex flex-column align-items-center">
+<span class="fs-4" title="{./totalPostCount}">{humanReadableNumber(./totalPostCount, 0)}</span>
+<span class="text-uppercase text-xs">[[global:posts]]</span>
 </div>
 </div>
 {{{ if !config.hideCategoryLastPost }}}
-<div component="topic/teaser" class="teaser ps-5 ps-lg-0 col-lg-6 col-12 {{{ if !config.theme.mobileTopicTeasers }}}d-none d-lg-block{{{ end }}}">
-<div class="lastpost border-start border-2 lh-sm h-100" style="border-color: {./bgColor}!important;">
+<div component="topic/teaser" class="teaser col-md-6 col-12 d-none d-md-block">
+<div class="lastpost border-start border-4 lh-sm h-100" style="border-color: {./bgColor}!important;">
 {{{ each ./posts }}}
 {{{ if @first }}}
 <div component="category/posts" class="ps-2 text-xs d-flex flex-column h-100 gap-1">
@@ -146,7 +138,7 @@
 {{{end}}}
 </ul>
 {{{ if hasMoreSubCategories}}}
-<button class="btn btn-ghost btn-sm ff-secondary mb-2" component="category/load-more-subcategories">[[category:x-more-categories, {subCategoriesLeft}]]</button>
+<button class="btn btn-ghost btn-sm mb-2" component="category/load-more-subcategories">[[category:x-more-categories, {subCategoriesLeft}]]</button>
 {{{ end }}}
 </div>
 {{{ end }}}

@@ -9,7 +9,7 @@
   function compiled(helpers, context, guard, iter, helper) {
     var __escape = helpers.__escape;
     var value = context;
-    return "</div>\n</div>\n</div>";
+    return "</div>";
   }
 
   compiled.blocks = {

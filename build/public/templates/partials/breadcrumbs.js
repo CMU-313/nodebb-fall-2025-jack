@@ -10,11 +10,7 @@
     var __escape = helpers.__escape;
     var value = context;
     return (guard((context != null && context['breadcrumbs'] != null) ? context['breadcrumbs']['length'] : null) ?
-        "\n<ol class=\"breadcrumb mb-0 " + 
-          (guard((context != null && context['config'] != null && context['config']['theme'] != null) ? context['config']['theme']['centerHeaderElements'] : null) ?
-            "justify-content-center" :
-            "") + 
-          "\" itemscope=\"itemscope\" itemprop=\"breadcrumb\" itemtype=\"http://schema.org/BreadcrumbList\">\n" + 
+        "\n<ol class=\"breadcrumb\" itemscope=\"itemscope\" itemprop=\"breadcrumb\" itemtype=\"http://schema.org/BreadcrumbList\">\n" + 
           compiled.blocks['breadcrumbs'](helpers, context, guard, iter, helper) + 
           "\n</ol>\n" :
         "");
@@ -35,16 +31,29 @@
             "active" :
             "") + 
           "\">\n<meta itemprop=\"position\" content=\"" + 
-          __escape(helper(context, helpers, 'increment', [index, "1"])) + 
+          __escape(index) + 
           "\" />\n" + 
           (guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['url'] : null) ?
             "<a href=\"" + 
               __escape(guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['url'] : null)) + 
               "\" itemprop=\"item\">" :
             "") + 
-          "\n<span class=\"fw-semibold\" itemprop=\"name\">" + 
+          "\n<span itemprop=\"name\">\n" + 
           __escape(guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['text'] : null)) + 
-          "</span>\n" + 
+          "\n" + 
+          (index === length - 1 ?
+            "\n" + 
+              (guard((context != null) ? context['feeds:disableRSS'] : null) ?
+                "" :
+                "\n" + 
+                  (guard((context != null) ? context['rssFeedUrl'] : null) ?
+                    "<a target=\"_blank\" href=\"" + 
+                      __escape(guard((context != null) ? context['rssFeedUrl'] : null)) + 
+                      "\" itemprop=\"item\"><i class=\"fa fa-rss-square\"></i></a>" :
+                    "")) + 
+              "\n" :
+            "") + 
+          "\n</span>\n" + 
           (guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['url'] : null) ?
             "</a>" :
             "") + 

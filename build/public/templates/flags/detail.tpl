@@ -1,15 +1,21 @@
-{{{ if breadcrumbs.length }}}
-<ol class="breadcrumb mb-0 {{{ if config.theme.centerHeaderElements }}}justify-content-center{{{ end }}}" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
-{{{ each breadcrumbs }}}
-<li{{{ if @last }}} component="breadcrumb/current"{{{ end }}} itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item {{{ if @last }}}active{{{ end }}}">
-<meta itemprop="position" content="{increment(@index, "1")}" />
-{{{ if ./url }}}<a href="{./url}" itemprop="item">{{{ end }}}
-<span class="fw-semibold" itemprop="name">{./text}</span>
+<!-- IF breadcrumbs.length -->
+<ol class="breadcrumb" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
+{{{each breadcrumbs}}}
+<li<!-- IF @last --> component="breadcrumb/current"<!-- ENDIF @last --> itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item <!-- IF @last -->active<!-- ENDIF @last -->">
+<meta itemprop="position" content="{@index}" />
+{{{ if ./url }}}<a href="{breadcrumbs.url}" itemprop="item">{{{ end }}}
+<span itemprop="name">
+{breadcrumbs.text}
+<!-- IF @last -->
+<!-- IF !feeds:disableRSS -->
+<!-- IF rssFeedUrl --><a target="_blank" href="{rssFeedUrl}" itemprop="item"><i class="fa fa-rss-square"></i></a><!-- ENDIF rssFeedUrl --><!-- ENDIF !feeds:disableRSS -->
+<!-- ENDIF @last -->
+</span>
 {{{ if ./url }}}</a>{{{ end }}}
 </li>
-{{{ end }}}
+{{{end}}}
 </ol>
-{{{ end }}}
+<!-- ENDIF breadcrumbs.length -->
 <div class="d-flex flex-column flex-md-row">
 <div class="flex-shrink-0 d-flex flex-column gap-3 border-end-md text-sm mb-3 pe-4" style="flex-basis: 240px !important;">
 <div class="d-grid gap-1">

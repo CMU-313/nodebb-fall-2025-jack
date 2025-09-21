@@ -39,7 +39,7 @@
               __escape(guard((context != null && context['notifications'] != null && context['notifications'][key0] != null) ? context['notifications'][key0]['tid'] : null)) + 
               "\"" :
             "") + 
-          ">\n<div class=\"d-flex gap-1 justify-content-between\">\n<div class=\"btn btn-ghost btn-sm d-flex gap-2 flex-grow-1 text-start align-items-start\">\n<a class=\"flex-grow-0 flex-shrink-0\" href=\"" + 
+          ">\n<div class=\"d-flex gap-1 justify-content-between\">\n<div class=\"btn btn-ghost btn-sm d-flex gap-2 flex-grow-1 align-items-start text-start\">\n<a class=\"flex-grow-0 flex-shrink-0\" href=\"" + 
           (guard((context != null && context['notifications'] != null && context['notifications'][key0] != null && context['notifications'][key0]['user'] != null) ? context['notifications'][key0]['user']['userslug'] : null) ?
             __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
               "/user/" + 
@@ -73,7 +73,7 @@
               "\"></span>") + 
           "</div>\n</div>\n</div>\n<div>\n" + 
           (guard((context != null && context['notifications'] != null && context['notifications'][key0] != null) ? context['notifications'][key0]['nid'] : null) ?
-            "\n<button class=\"mark-read btn btn-ghost btn-sm d-flex align-items-center justify-content-center flex-grow-0 flex-shrink-0 p-1\" style=\"width: 1.5rem; height: 1.5rem;\">\n<i class=\"unread fa fa-2xs fa-circle text-primary " + 
+            "\n<button class=\"mark-read btn btn-ghost btn-sm flex-grow-0 flex-shrink-0 p-1\" style=\"width: 1.5rem; height: 1.5rem;\">\n<i class=\"unread fa fa-2xs fa-circle text-primary " + 
               (guard((context != null && context['notifications'] != null && context['notifications'][key0] != null) ? context['notifications'][key0]['read'] : null) ?
                 "hidden" :
                 "") + 

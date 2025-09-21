@@ -53,7 +53,7 @@
         return "\n<li data-cid=\"" + 
           __escape(guard((context != null && context['categories'] != null && context['categories'][key0] != null) ? context['categories'][key0]['cid'] : null)) + 
           "\" class=\"d-flex flex-column gap-1\">\n<div class=\"btn btn-ghost btn-sm ff-secondary d-flex gap-2 align-items-center rounded-1 text-start text-reset d-block text-truncate px-2 py-1 position-relative\">\n<div class=\"flex-shrink-0\">" + 
-          __escape(helper(context, helpers, 'buildCategoryIcon', [guard(value), "40px", "rounded-1"])) + 
+          __escape(helper(context, helpers, 'buildCategoryIcon', [guard(value), "40px", "rounded-circle"])) + 
           "</div>\n<div class=\"flex-grow-1\">\n<a class=\"stretched-link\" href=\"" + 
           __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
           "/category/" + 

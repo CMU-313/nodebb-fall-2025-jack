@@ -21,7 +21,7 @@
           "\">\n" + 
           iter(guard((context != null) ? context['topics'] : null), function each(key0, index, length, value) {
             var key = key0;
-            return "\n<li component=\"category/topic\" class=\"category-item hover-parent border-bottom py-3 py-lg-4 d-flex flex-column flex-lg-row align-items-start " + 
+            return "\n<li component=\"category/topic\" class=\"category-item hover-parent py-2 mb-2 d-flex flex-column flex-lg-row align-items-start " + 
               __escape(helper(context, helpers, 'generateTopicClass', [guard(value)])) + 
               "\" data-tid=\"" + 
               __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['tid'] : null)) + 
@@ -57,7 +57,7 @@
               __escape(helper(context, helpers, 'buildAvatar', [guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['user'] : null), "40px", guard((context != null) ? context['true'] : null)])) + 
               "\n</a>\n" + 
               (guard((context != null) ? context['showSelect'] : null) ?
-                "\n<div class=\"checkbox position-absolute top-100 start-50 translate-middle-x pt-2 m-0 d-none d-lg-flex\" style=\"max-width:max-content\">\n<i component=\"topic/select\" class=\"fa text-muted pointer fa-square-o p-1 hover-visible\"></i>\n</div>\n" :
+                "\n<div class=\"checkbox position-absolute top-100 start-50 translate-middle-x m-0 d-none d-lg-flex\" style=\"max-width:max-content\">\n<i component=\"topic/select\" class=\"fa text-muted pointer fa-square-o p-1 hover-visible\"></i>\n</div>\n" :
                 "") + 
               "\n</div>\n<div class=\"flex-grow-1 d-flex flex-wrap gap-1 position-relative\">\n<h3 component=\"topic/header\" class=\"title text-break fs-5 fw-semibold m-0 tracking-tight w-100 " + 
               (guard((context != null) ? context['showSelect'] : null) ?
@@ -75,7 +75,7 @@
                     "")) + 
               "\">" + 
               __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['title'] : null)) + 
-              "</a>\n</h3>\n<span component=\"topic/labels\" class=\"d-flex flex-wrap gap-1 w-100\">\n<span component=\"topic/watched\" class=\"badge border border-gray-300 text-body " + 
+              "</a>\n</h3>\n<div component=\"topic/labels\" class=\"d-flex flex-wrap gap-1 w-100 align-items-center\">\n<span component=\"topic/watched\" class=\"badge border border-gray-300 text-body " + 
               (guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['followed'] : null) ?
                 "" :
                 "hidden") + 
@@ -102,9 +102,9 @@
                 "" :
                 "hidden") + 
               "\">\n<i class=\"fa fa-lock\"></i>\n<span>[[topic:locked]]</span>\n</span>\n<span component=\"topic/moved\" class=\"badge border border-gray-300 text-body " + 
-              ((!guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['oldCid'] : null) || (guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['oldCid'] : null) == "-1")) ?
-                "hidden" :
-                "") + 
+              (guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['oldCid'] : null) ?
+                "" :
+                "hidden") + 
               "\">\n<i class=\"fa fa-arrow-circle-right\"></i>\n<span>[[topic:moved]]</span>\n</span>\n" + 
               iter(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['icons'] : null), function each(key1, index, length, value) {
                 var key = key1;
@@ -163,7 +163,7 @@
               __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['slug'] : null)) + 
               "\" class=\"d-none d-lg-block badge bg-transparent text-muted fw-normal timeago\" title=\"" + 
               __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['timestampISO'] : null)) + 
-              "\"></a>\n</span>\n" + 
+              "\"></a>\n</div>\n" + 
               (guard((context != null) ? context['showSelect'] : null) ?
                 "\n<div class=\"checkbox position-absolute top-0 end-0 m-0 d-flex d-lg-none\" style=\"max-width:max-content\">\n<i component=\"topic/select\" class=\"fa fa-square-o text-muted pointer p-1\"></i>\n</div>\n" :
                 "") + 
@@ -188,24 +188,24 @@
               "\n</div>\n<div class=\"d-flex p-0 col-lg-5 col-12 align-content-stretch\">\n<div class=\"meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted\" style=\"grid-template-columns: 1fr 1fr 1fr;\">\n" + 
               (guard((context != null) ? context['reputation:disabled'] : null) ?
                 "" :
-                "\n<div class=\"stats-votes card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center\">\n<span class=\"fs-5 ff-secondary lh-1\" title=\"" + 
+                "\n<div class=\"stats-votes overflow-hidden d-flex flex-column align-items-center\">\n<span class=\"fs-4\" title=\"" + 
                   __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['votes'] : null)) + 
                   "\">" + 
                   __escape(helper(context, helpers, 'humanReadableNumber', [guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['votes'] : null), guard((context != null) ? context['0'] : null)])) + 
-                  "</span>\n<span class=\"d-none d-xl-flex text-lowercase text-xs\">[[global:votes]]</span>\n<i class=\"d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-chevron-up\"></i>\n</div>\n") + 
-              "\n<div class=\"stats-postcount card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center\">\n<span class=\"fs-5 ff-secondary lh-1\" title=\"" + 
+                  "</span>\n<span class=\"d-none d-xl-flex text-uppercase text-xs\">[[global:votes]]</span>\n<i class=\"d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-chevron-up\"></i>\n</div>\n") + 
+              "\n<div class=\"stats-postcount overflow-hidden d-flex flex-column align-items-center\">\n<span class=\"fs-4\" title=\"" + 
               __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['postcount'] : null)) + 
               "\">" + 
               __escape(helper(context, helpers, 'humanReadableNumber', [guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['postcount'] : null), guard((context != null) ? context['0'] : null)])) + 
-              "</span>\n<span class=\"d-none d-xl-flex text-lowercase text-xs\">[[global:posts]]</span>\n<i class=\"d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message\"></i>\n</div>\n<div class=\"stats-viewcount card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center\">\n<span class=\"fs-5 ff-secondary lh-1\" title=\"" + 
+              "</span>\n<span class=\"d-none d-xl-flex text-uppercase text-xs\">[[global:posts]]</span>\n<i class=\"d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message\"></i>\n</div>\n<div class=\"stats-viewcount overflow-hidden d-flex flex-column align-items-center\">\n<span class=\"fs-4\" title=\"" + 
               __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['viewcount'] : null)) + 
               "\">" + 
               __escape(helper(context, helpers, 'humanReadableNumber', [guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['viewcount'] : null), guard((context != null) ? context['0'] : null)])) + 
-              "</span>\n<span class=\"d-none d-xl-flex text-lowercase text-xs\">[[global:views]]</span>\n<i class=\"d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-eye\"></i>\n</div>\n</div>\n<div component=\"topic/teaser\" class=\"meta teaser ps-5 ps-lg-0 col-lg-6 col-12 " + 
+              "</span>\n<span class=\"d-none d-xl-flex text-uppercase text-xs\">[[global:views]]</span>\n<i class=\"d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-eye\"></i>\n</div>\n</div>\n<div component=\"topic/teaser\" class=\"meta teaser col-lg-6 col-12 " + 
               (guard((context != null && context['config'] != null && context['config']['theme'] != null) ? context['config']['theme']['mobileTopicTeasers'] : null) ?
                 "" :
                 "d-none d-lg-block") + 
-              "\">\n<div class=\"lastpost border-start border-2 lh-sm h-100 d-flex flex-column gap-1\" style=\"border-color: " + 
+              "\">\n<div class=\"lastpost border-start border-4 lh-sm h-100 d-flex flex-column gap-1\" style=\"border-color: " + 
               __escape(guard((context != null && context['topics'] != null && context['topics'][key0] != null && context['topics'][key0]['category'] != null) ? context['topics'][key0]['category']['bgColor'] : null)) + 
               "!important;\">\n" + 
               (guard((context != null && context['topics'] != null && context['topics'][key0] != null) ? context['topics'][key0]['unreplied'] : null) ?

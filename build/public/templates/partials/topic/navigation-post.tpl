@@ -1,10 +1,11 @@
-<div class="d-flex gap-2 mb-2 align-items-center flex-nowrap text-sm">
-<div>
-{buildAvatar(post.user, "24px", true)}
+<div class="clearfix">
+<div class="icon float-start">
+<a href="<!-- IF post.user.userslug -->{config.relative_path}/user/{post.user.userslug}<!-- ELSE -->#<!-- ENDIF post.user.userslug -->">
+{buildAvatar(post.user, "24px", true, "", "user/picture")} {post.user.username}
+</a>
 </div>
-<div class="text-truncate">
-<a href="{{{ if post.user.userslug }}}{config.relative_path}/user/{post.user.userslug}{{{else }}}#{{{ end }}}">{post.user.displayname}</a>
+<small class="float-end">
+<span class="timeago" title="{post.timestampISO}"></span>
+</small>
 </div>
-<span class="timeago text-nowrap text-muted" title="{post.timestampISO}"></span>
-</div>
-<div class="text-sm">{post.content}</div>
+<div>{post.content}</div>

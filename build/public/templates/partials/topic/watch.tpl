@@ -1,20 +1,16 @@
 {{{ if config.loggedIn }}}
-<div class="btn-group bottom-sheet" component="topic/watch">
-<button class="btn btn-ghost btn-sm ff-secondary d-flex gap-2 dropdown-toggle text-truncate" data-bs-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
-<span component="topic/following/menu" class="d-flex gap-2 align-items-center{{{ if !isFollowing }}} hidden{{{ end }}}">
-<i class="flex-shrink-0 fa fa-fw fa-bell-o text-primary"></i>
-<span class="d-none d-md-inline fw-semibold text-truncate text-nowrap">[[topic:watching]]</span>
-</span>
-<span component="topic/not-following/menu" class="d-flex gap-2 align-items-center{{{ if !isNotFollowing}}} hidden{{{ end }}}">
-<i class="flex-shrink-0 fa fa-fw fa-bell-slash-o text-primary"></i>
-<span class="d-none d-md-inline fw-semibold text-truncate text-nowrap">[[topic:not-watching]]</span>
-</span>
-<span component="topic/ignoring/menu" class="d-flex gap-2 align-items-center{{{ if !isIgnoring }}} hidden{{{ end }}}">
-<i class="flex-shrink-0 fa fa-fw fa-eye-slash text-primary"></i>
-<span class="d-none d-md-inline fw-semibold text-truncate text-nowrap">[[topic:ignoring]]</span>
-</span>
+<div class="btn-group bottom-sheet" component="topic/watch"
+data-bs-toggle="tooltip"
+{{{if isFollowing}}}title="[[topic:watching]]"{{{end}}}
+{{{if isNotFollowing}}}title="[[topic:not-watching]]"{{{end}}}
+{{{if isIgnoring}}}title="[[topic:ignoring]]"{{{end}}}
+>
+<button class="btn btn-sm btn-ghost dropdown-toggle text-secondary" data-bs-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
+<span component="topic/following/menu" <!-- IF !isFollowing -->class="hidden"<!-- ENDIF !isFollowing -->><i class="fa fa-fw fa-bell-o"></i></span>
+<span component="topic/not-following/menu" <!-- IF !isNotFollowing -->class="hidden"<!-- ENDIF !isNotFollowing -->><i class="fa fa-fw fa-bell-slash-o"></i></span>
+<span component="topic/ignoring/menu" <!-- IF !isIgnoring -->class="hidden"<!-- ENDIF !isIgnoring -->><i class="fa fa-fw fa-eye-slash"></i></span>
 </button>
-<ul class="dropdown-menu p-1 text-sm" role="menu">
+<ul class="dropdown-menu dropdown-menu-end p-1 text-sm" role="menu">
 <li>
 <a class="dropdown-item rounded-1 d-flex align-items-center gap-2 p-2" href="#" component="topic/following" role="menuitem">
 <div class="flex-grow-1 d-flex flex-column">

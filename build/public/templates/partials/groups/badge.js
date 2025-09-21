@@ -13,7 +13,7 @@
       __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
       "/groups/" + 
       __escape(guard((context != null) ? context['slug'] : null)) + 
-      "\" class=\"badge rounded-1 text-uppercase text-truncate text-decoration-none\" style=\"max-width: 150px;color:" + 
+      "\" class=\"badge rounded-1 text-uppercase text-truncate\" style=\"max-width: 150px;color:" + 
       __escape(guard((context != null) ? context['textColor'] : null)) + 
       ";background-color: " + 
       __escape(guard((context != null) ? context['labelColor'] : null)) + 
@@ -24,7 +24,7 @@
             " me-1" :
             "") :
         "hidden") + 
-      "\"></i><span class=\"badge-text align-text-bottom\">" + 
+      "\"></i><span class=\"badge-text\">" + 
       (guard((context != null) ? context['userTitle'] : null) ?
         __escape(guard((context != null) ? context['userTitle'] : null)) :
         "") + 

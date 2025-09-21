@@ -10,7 +10,7 @@
     var __escape = helpers.__escape;
     var value = context;
     return (guard((context != null && context['privileges'] != null) ? context['privileges']['view_thread_tools'] : null) ?
-        "\n<div class=\"btn-group thread-tools bottom-sheet\">\n<button class=\"btn btn-ghost btn-sm ff-secondary d-flex align-items-center gap-2 dropdown-toggle text-truncate\" data-bs-toggle=\"dropdown\" type=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n<i class=\"fa fa-fw fa-gear text-primary\"></i>\n<span class=\"d-none d-md-inline fw-semibold text-truncate text-nowrap\">[[topic:thread-tools.title]]</span>\n</button>\n<ul class=\"dropdown-menu p-1 text-sm\" role=\"menu\"></ul>\n</div>\n" :
+        "\n<div title=\"[[topic:thread-tools.title]]\" class=\"btn-group thread-tools bottom-sheet\">\n<button class=\"btn btn-sm btn-ghost dropdown-toggle\" data-bs-toggle=\"dropdown\" type=\"button\" aria-haspopup=\"true\" aria-expanded=\"false\">\n<i class=\"fa fa-fw fa-gear text-secondary\"></i>\n</button>\n<ul class=\"dropdown-menu dropdown-menu-end p-1\" role=\"menu\"></ul>\n</div>\n" :
         "");
   }
 

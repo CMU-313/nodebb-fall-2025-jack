@@ -1,92 +1,108 @@
-{{{ if breadcrumbs.length }}}
-<ol class="breadcrumb mb-0 {{{ if config.theme.centerHeaderElements }}}justify-content-center{{{ end }}}" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
-{{{ each breadcrumbs }}}
-<li{{{ if @last }}} component="breadcrumb/current"{{{ end }}} itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item {{{ if @last }}}active{{{ end }}}">
-<meta itemprop="position" content="{increment(@index, "1")}" />
-{{{ if ./url }}}<a href="{./url}" itemprop="item">{{{ end }}}
-<span class="fw-semibold" itemprop="name">{./text}</span>
+<!-- IF breadcrumbs.length -->
+<ol class="breadcrumb" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
+{{{each breadcrumbs}}}
+<li<!-- IF @last --> component="breadcrumb/current"<!-- ENDIF @last --> itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item <!-- IF @last -->active<!-- ENDIF @last -->">
+<meta itemprop="position" content="{@index}" />
+{{{ if ./url }}}<a href="{breadcrumbs.url}" itemprop="item">{{{ end }}}
+<span itemprop="name">
+{breadcrumbs.text}
+<!-- IF @last -->
+<!-- IF !feeds:disableRSS -->
+<!-- IF rssFeedUrl --><a target="_blank" href="{rssFeedUrl}" itemprop="item"><i class="fa fa-rss-square"></i></a><!-- ENDIF rssFeedUrl --><!-- ENDIF !feeds:disableRSS -->
+<!-- ENDIF @last -->
+</span>
 {{{ if ./url }}}</a>{{{ end }}}
 </li>
-{{{ end }}}
+{{{end}}}
 </ol>
-{{{ end }}}
-<div class="users flex-fill">
-<div id="users-container" class="users-container row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-{{{ each users }}}
-<div>
-<a href="{config.relative_path}/user/{./userslug}" class="btn btn-ghost gap-2 ff-base d-flex align-items-start justify-content-start p-2 text-start">
-{buildAvatar(@value, "48px", true, "flex-shrink-0")}
-<div class="d-flex flex-column gap-1 text-truncate">
-<div class="fw-semibold text-truncate" title="{./displayname}">{./displayname}</div>
-<div class="text-xs text-muted text-truncate">@{./username}</div>
-{{{ if section_online }}}
-<div class="text-xs text-muted text-truncate">
-<span class="timeago" title="{./lastonlineISO}"></span>
+<!-- ENDIF breadcrumbs.length -->
+<div class="users">
+<ul id="users-container" class="users-container list-unstyled d-flex flex-wrap gap-2">
+{{{each users}}}
+<li class="users-box registered-user text-center pb-3" data-uid="{users.uid}" style="width: 102px;">
+<a href="{config.relative_path}/user/{users.userslug}">{buildAvatar(users, "64px", true)}</a>
+<div class="user-info">
+<div class="text-nowrap text-truncate">
+<a href="{config.relative_path}/user/{users.userslug}">{users.username}</a>
 </div>
-{{{ end }}}
-{{{ if section_joindate }}}
-<div class="text-xs text-muted text-truncate">
-<span class="timeago" title="{./joindateISO}"></span>
+<!-- IF section_online -->
+<div class="lastonline">
+<span class="timeago" title="{users.lastonlineISO}"></span>
 </div>
-{{{ end }}}
-{{{ if section_sort-reputation }}}
-<div class="text-xs text-muted text-truncate">
-<span>{formattedNumber(./reputation)}</span>
+<!-- ENDIF section_online -->
+<!-- IF section_joindate -->
+<div class="joindate">
+<span class="timeago" title="{users.joindateISO}"></span>
 </div>
-{{{ end }}}
-{{{ if section_sort-posts }}}
-<div class="text-xs text-muted text-truncate">
-<span>{formattedNumber(./postcount)}</span>
+<!-- ENDIF section_joindate -->
+<!-- IF section_sort-reputation -->
+<div class="reputation">
+<i class="fa fa-star"></i>
+<span>{formattedNumber(users.reputation)}</span>
 </div>
-{{{ end }}}
-{{{ if section_flagged }}}
-<div class="text-xs text-muted text-truncate">
-<span>{formattedNumber(./flags)}</span>
+<!-- ENDIF section_sort-reputation -->
+<!-- IF section_sort-posts -->
+<div class="post-count">
+<i class="fa fa-pencil"></i>
+<span>{formattedNumber(users.postcount)}</span>
 </div>
-{{{ end }}}
+<!-- ENDIF section_sort-posts -->
+<!-- IF section_flagged -->
+<div class="flag-count">
+<i class="fa fa-flag"></i>
+<span><a href="{config.relative_path}/flags?targetUid={users.uid}">{users.flags}</a></span>
 </div>
-</a>
+<!-- ENDIF section_flagged -->
 </div>
-{{{ end }}}
+</li>
+{{{end}}}
+<!-- IF anonymousUserCount -->
+<li class="users-box anon-user text-center pb-3" style="width: 102px;">
+<span class="avatar avatar-rounded text-bg-secondary" component="avatar/icon" style="--avatar-size: 64px;">G</span>
+<br/>
+<div class="user-info">
+<span id="online_anon_count">{anonymousUserCount}</span>
+<span>[[global:guests]]</span>
 </div>
-<nav component="pagination" class="pagination-container mt-3{{{ if !pagination.pages.length }}} hidden{{{ end }}}" aria-label="[[global:pagination]]">
-<ul class="pagination pagination-sm gap-1 hidden-xs hidden-sm justify-content-center">
-<li class="page-item previous {{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+</li>
+<!-- ENDIF anonymousUserCount -->
+</ul>
+<nav component="pagination" class="pagination-container<!-- IF !pagination.pages.length --> hidden<!-- ENDIF !pagination.pages.length -->" aria-label="[[global:pagination]]">
+<ul class="pagination hidden-xs justify-content-center">
+<li class="page-item previous float-start<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 {{{each pagination.pages}}}
-{{{ if ./separator }}}
+<!-- IF pagination.pages.separator -->
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link rounded fw-secondary px-3" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
 </li>
-{{{ else }}}
-<li class="page-item page{{{ if ./active }}} active{{{ end }}}" >
-<a class="page-link rounded fw-secondary px-3" href="?{./qs}" data-page="{./page}" aria-label="[[global:pagination.page-x, {./page}]]">{./page}</a>
+<!-- ELSE -->
+<li class="page-item page<!-- IF pagination.pages.active --> active<!-- ENDIF pagination.pages.active -->" >
+<a class="page-link" href="?{pagination.pages.qs}" data-page="{pagination.pages.page}" aria-label="[[global:pagination.page-x, {./page}]]">{pagination.pages.page}</a>
 </li>
-{{{ end }}}
+<!-- ENDIF pagination.pages.separator -->
 {{{end}}}
-<li class="page-item next {{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next float-end<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
 </ul>
-{{{ if !template.topic }}}
-<ul class="pagination pagination-sm hidden-md hidden-lg justify-content-center">
-<li class="page-item first{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
+<ul class="pagination hidden-sm hidden-md hidden-lg justify-content-center">
+<li class="page-item first<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
 </li>
-<li class="page-item previous{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+<li class="page-item previous<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link fw-secondary" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
 </li>
-<li class="page-item next{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
-<li class="page-item last{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary"  href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
+<li class="page-item last<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
 </li>
 </ul>
-{{{ end }}}
 </nav>
 </div>

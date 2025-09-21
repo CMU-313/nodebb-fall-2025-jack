@@ -9,49 +9,55 @@
   function compiled(helpers, context, guard, iter, helper) {
     var __escape = helpers.__escape;
     var value = context;
-    return "<div>\n<a href=\"" + 
+    return "<li class=\"users-box registered-user text-center pb-3\" data-uid=\"" + 
+      __escape(guard((context != null && context['users'] != null) ? context['users']['uid'] : null)) + 
+      "\" style=\"width: 102px;\">\n<a href=\"" + 
       __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
       "/user/" + 
-      __escape(guard((context != null) ? context['userslug'] : null)) + 
-      "\" class=\"btn btn-ghost gap-2 ff-base d-flex align-items-start justify-content-start p-2 text-start\">\n" + 
-      __escape(helper(context, helpers, 'buildAvatar', [guard(value), "48px", guard((context != null) ? context['true'] : null), "flex-shrink-0"])) + 
-      "\n<div class=\"d-flex flex-column gap-1 text-truncate\">\n<div class=\"fw-semibold text-truncate\" title=\"" + 
-      __escape(guard((context != null) ? context['displayname'] : null)) + 
+      __escape(guard((context != null && context['users'] != null) ? context['users']['userslug'] : null)) + 
       "\">" + 
-      __escape(guard((context != null) ? context['displayname'] : null)) + 
-      "</div>\n<div class=\"text-xs text-muted text-truncate\">@" + 
-      __escape(guard((context != null) ? context['username'] : null)) + 
-      "</div>\n" + 
+      __escape(helper(context, helpers, 'buildAvatar', [guard((context != null) ? context['users'] : null), "64px", guard((context != null) ? context['true'] : null)])) + 
+      "</a>\n<div class=\"user-info\">\n<div class=\"text-nowrap text-truncate\">\n<a href=\"" + 
+      __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
+      "/user/" + 
+      __escape(guard((context != null && context['users'] != null) ? context['users']['userslug'] : null)) + 
+      "\">" + 
+      __escape(guard((context != null && context['users'] != null) ? context['users']['username'] : null)) + 
+      "</a>\n</div>\n" + 
       (guard((context != null) ? context['section_online'] : null) ?
-        "\n<div class=\"text-xs text-muted text-truncate\">\n<span class=\"timeago\" title=\"" + 
-          __escape(guard((context != null) ? context['lastonlineISO'] : null)) + 
+        "\n<div class=\"lastonline\">\n<span class=\"timeago\" title=\"" + 
+          __escape(guard((context != null && context['users'] != null) ? context['users']['lastonlineISO'] : null)) + 
           "\"></span>\n</div>\n" :
         "") + 
       "\n" + 
       (guard((context != null) ? context['section_joindate'] : null) ?
-        "\n<div class=\"text-xs text-muted text-truncate\">\n<span class=\"timeago\" title=\"" + 
-          __escape(guard((context != null) ? context['joindateISO'] : null)) + 
+        "\n<div class=\"joindate\">\n<span class=\"timeago\" title=\"" + 
+          __escape(guard((context != null && context['users'] != null) ? context['users']['joindateISO'] : null)) + 
           "\"></span>\n</div>\n" :
         "") + 
       "\n" + 
       (guard((context != null) ? context['section_sort-reputation'] : null) ?
-        "\n<div class=\"text-xs text-muted text-truncate\">\n<span>" + 
-          __escape(helper(context, helpers, 'formattedNumber', [guard((context != null) ? context['reputation'] : null)])) + 
+        "\n<div class=\"reputation\">\n<i class=\"fa fa-star\"></i>\n<span>" + 
+          __escape(helper(context, helpers, 'formattedNumber', [guard((context != null && context['users'] != null) ? context['users']['reputation'] : null)])) + 
           "</span>\n</div>\n" :
         "") + 
       "\n" + 
       (guard((context != null) ? context['section_sort-posts'] : null) ?
-        "\n<div class=\"text-xs text-muted text-truncate\">\n<span>" + 
-          __escape(helper(context, helpers, 'formattedNumber', [guard((context != null) ? context['postcount'] : null)])) + 
+        "\n<div class=\"post-count\">\n<i class=\"fa fa-pencil\"></i>\n<span>" + 
+          __escape(helper(context, helpers, 'formattedNumber', [guard((context != null && context['users'] != null) ? context['users']['postcount'] : null)])) + 
           "</span>\n</div>\n" :
         "") + 
       "\n" + 
       (guard((context != null) ? context['section_flagged'] : null) ?
-        "\n<div class=\"text-xs text-muted text-truncate\">\n<span>" + 
-          __escape(helper(context, helpers, 'formattedNumber', [guard((context != null) ? context['flags'] : null)])) + 
-          "</span>\n</div>\n" :
+        "\n<div class=\"flag-count\">\n<i class=\"fa fa-flag\"></i>\n<span><a href=\"" + 
+          __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
+          "/flags?targetUid=" + 
+          __escape(guard((context != null && context['users'] != null) ? context['users']['uid'] : null)) + 
+          "\">" + 
+          __escape(guard((context != null && context['users'] != null) ? context['users']['flags'] : null)) + 
+          "</a></span>\n</div>\n" :
         "") + 
-      "\n</div>\n</a>\n</div>";
+      "\n</div>\n</li>";
   }
 
   compiled.blocks = {

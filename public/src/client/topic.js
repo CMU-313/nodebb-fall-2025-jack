@@ -481,30 +481,26 @@ define('forum/topic', [
 	}
 	
 	function addResolvedStatus() {
-		console.log('check resolved/unresolved status');
+		// iterate through each topic post and add unresolved status with checkmark
 		$('[component="post"]').each(function (i) {
-			// 
+			// this current post
 			const post_elem = $(this);
-			console.log('Found post:', i, post_elem);
-			
-			
 			const isResolved = false;
-			
 			const currStatus = $(`
 				<div class="post-toggle" style="cursor: pointer; padding: 5px; margin: 5px; display: flex; align-items: center; gap: 8px;">
-					<div class="checkbox" style="width: 16px; height: 16px; border: 2px solid #ccc; display: inline-block; text-align: center; line-height: 12px; font-size: 12px;">
+					<div class="checkbox" style="width: 15px; height: 15px; border: 2px solid #999; display: inline-block; text-align: center; line-height: 12px; font-size: 12px;">
 						${isResolved ? '✓' : ''}
 					</div>
-					<span class="status-text" style="color: ${isResolved ? 'green' : 'red'}">
+					<span class="current_status" style="color: ${isResolved ? 'green' : 'red'}">
 						${isResolved ? 'resolved' : 'unresolved'}
 					</span>
 				</div>
 			`);
 
-
+			//change status if clicked on
 			currStatus.on('click', function () {
-				const checkbox_elem = $(this).find('.checkbox');
-				const statusText_elem = $(this).find('.status-text');
+				const checkbox_elem = $(this).find('.checkbox'); //finds any element with checkbox class
+				const statusText_elem = $(this).find('.current_status'); //finds any eleemnt with current status class
 				const currentStatus = checkbox_elem.text().trim() === '✓';
 				const updatedStatus = !currentStatus;
 				
@@ -514,8 +510,7 @@ define('forum/topic', [
 				// Update status text and color
 				statusText_elem.text(updatedStatus ? 'resolved' : 'unresolved');
 				statusText_elem.css('color', updatedStatus ? 'green' : 'red');
-				
-				console.log('Status toggled to:', updatedStatus ? 'resolved' : 'unresolved');
+			
 				// later update to only course staff can check
 			});
 			

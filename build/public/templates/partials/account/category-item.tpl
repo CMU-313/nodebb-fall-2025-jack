@@ -3,15 +3,21 @@
 <div class="content depth-{./depth} d-flex gap-2">
 <div class="flex-grow-1 align-items-start d-flex gap-2">
 <div>
-{buildCategoryIcon(@value, "24px", "rounded-1")}
+{buildCategoryIcon(@value, "24px", "rounded-circle")}
 </div>
 <div class="d-grid gap-0">
 <div class="title fw-semibold">
-{{{ if ./isSection }}}
-{./name}
-{{{ else }}}
-<a class="text-reset" href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" itemprop="url">{../name}</a>
-{{{ end }}}
+<!-- IF ../isSection -->
+{../name}
+<!-- ELSE -->
+<!-- IF ../link -->
+<a href="{../link}" itemprop="url">
+<!-- ELSE -->
+<a href="{config.relative_path}/category/{../slug}" itemprop="url">
+<!-- ENDIF ../link -->
+{../name}
+</a>
+<!-- ENDIF ../isSection -->
 </div>
 {{{ if ./descriptionParsed }}}
 <div class="description text-muted text-xs w-100">{./descriptionParsed}</div>

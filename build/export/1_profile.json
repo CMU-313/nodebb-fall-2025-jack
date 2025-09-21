@@ -1,0 +1,102 @@
+{
+    "user": {
+        "username": "admin",
+        "userslug": "admin",
+        "joindate": "1758125047165",
+        "lastonline": "1758221902864",
+        "status": "online",
+        "uid": "1",
+        "password:shaWrapped": "1",
+        "email": "admin@admin.admin",
+        "email:confirmed": "1",
+        "groupTitle": "[\"administrators\"]",
+        "topiccount": "7",
+        "lastposttime": "1758147850582",
+        "postcount": "9",
+        "rss_token": "915e9925-13e7-4f14-81c7-0ef45907bee0"
+    },
+    "settings": null,
+    "ips": [
+        "127.0.0.1"
+    ],
+    "sessions": [
+        {
+            "ip": "127.0.0.1",
+            "uuid": "b7b4c9a2-4ada-4ba7-ab6b-6a4257263582",
+            "datetime": 1758126935309,
+            "platform": "Microsoft Windows",
+            "browser": "Edge",
+            "version": "140.0.0.0",
+            "current": false,
+            "datetimeISO": "2025-09-17T16:35:35.309Z"
+        }
+    ],
+    "usernames": [
+        {
+            "value": "admin",
+            "timestamp": 1758125047165,
+            "timestampISO": "2025-09-17T16:04:07.165Z",
+            "byUid": ""
+        }
+    ],
+    "emails": [
+        {
+            "value": "admin@admin.admin",
+            "timestamp": 1758125047512,
+            "timestampISO": "2025-09-17T16:04:07.512Z",
+            "byUid": "1",
+            "byUser": {
+                "uid": 1,
+                "username": "admin",
+                "userslug": "admin",
+                "picture": null,
+                "displayname": "admin",
+                "icon:bgColor": "#673ab7",
+                "icon:text": "A",
+                "isLocal": true
+            }
+        }
+    ],
+    "messages": [],
+    "bookmarks": [],
+    "watchedTopics": [
+        {
+            "tid": "1",
+            "title": "Welcome to your NodeBB!",
+            "timestamp": "1758125047591"
+        },
+        {
+            "tid": "2",
+            "title": "hello",
+            "timestamp": "1758144550325"
+        },
+        {
+            "tid": "3",
+            "title": "fdsdffds",
+            "timestamp": "1758144715883"
+        },
+        {
+            "tid": "4",
+            "title": "jfdskljfkdslfjkldsjfdsl",
+            "timestamp": "1758144762176"
+        },
+        {
+            "tid": "5",
+            "title": "fdsdf",
+            "timestamp": "1758145778653"
+        },
+        {
+            "tid": "6",
+            "title": "fdsfsfdsfs",
+            "timestamp": "1758146179178"
+        },
+        {
+            "tid": "7",
+            "title": "fdsfdssdf",
+            "timestamp": "1758147850582"
+        }
+    ],
+    "upvoted": [],
+    "downvoted": [],
+    "following": []
+}

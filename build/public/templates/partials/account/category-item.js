@@ -20,21 +20,25 @@
       "\">\n<div class=\"content depth-" + 
       __escape(guard((context != null) ? context['depth'] : null)) + 
       " d-flex gap-2\">\n<div class=\"flex-grow-1 align-items-start d-flex gap-2\">\n<div>\n" + 
-      __escape(helper(context, helpers, 'buildCategoryIcon', [guard(value), "24px", "rounded-1"])) + 
+      __escape(helper(context, helpers, 'buildCategoryIcon', [guard(value), "24px", "rounded-circle"])) + 
       "\n</div>\n<div class=\"d-grid gap-0\">\n<div class=\"title fw-semibold\">\n" + 
       (guard((context != null) ? context['isSection'] : null) ?
         "\n" + 
           __escape(guard((context != null) ? context['name'] : null)) + 
           "\n" :
-        "\n<a class=\"text-reset\" href=\"" + 
+        "\n" + 
           (guard((context != null) ? context['link'] : null) ?
-            __escape(guard((context != null) ? context['link'] : null)) :
-            __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
+            "\n<a href=\"" + 
+              __escape(guard((context != null) ? context['link'] : null)) + 
+              "\" itemprop=\"url\">\n" :
+            "\n<a href=\"" + 
+              __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
               "/category/" + 
-              __escape(guard((context != null) ? context['slug'] : null))) + 
-          "\" itemprop=\"url\">" + 
+              __escape(guard((context != null) ? context['slug'] : null)) + 
+              "\" itemprop=\"url\">\n") + 
+          "\n" + 
           __escape(guard((context != null) ? context['name'] : null)) + 
-          "</a>\n") + 
+          "\n</a>\n") + 
       "\n</div>\n" + 
       (guard((context != null) ? context['descriptionParsed'] : null) ?
         "\n<div class=\"description text-muted text-xs w-100\">" + 

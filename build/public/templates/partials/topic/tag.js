@@ -13,7 +13,7 @@
       __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
       "/tags/" + 
       __escape(guard((context != null) ? context['valueEncoded'] : null)) + 
-      "\"><span class=\"badge border border-gray-300 text-xs tag tag-class-" + 
+      "\"><span class=\"badge border border-gray-300 fw-normal tag tag-class-" + 
       __escape(guard((context != null) ? context['class'] : null)) + 
       "\" data-tag=\"" + 
       __escape(guard((context != null) ? context['value'] : null)) + 

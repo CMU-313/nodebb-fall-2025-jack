@@ -9,7 +9,7 @@
   function compiled(helpers, context, guard, iter, helper) {
     var __escape = helpers.__escape;
     var value = context;
-    return "<div class=\"lastpost border-start border-2 lh-sm h-100\" style=\"border-color: " + 
+    return "<div class=\"lastpost border-start border-4 lh-sm h-100\" style=\"border-color: " + 
       __escape(guard((context != null) ? context['bgColor'] : null)) + 
       "!important;\">\n" + 
       compiled.blocks['./posts'](helpers, context, guard, iter, helper) + 

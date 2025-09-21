@@ -29,7 +29,7 @@
 {{{ else }}}
 <ul component="category" class="topics-list list-unstyled" itemscope itemtype="http://www.schema.org/ItemList" data-nextstart="{nextStart}" data-set="{set}">
 {{{ each topics }}}
-<li component="category/topic" class="category-item hover-parent border-bottom py-3 py-lg-4 d-flex flex-column flex-lg-row align-items-start {function.generateTopicClass}" data-tid="{topics.tid}" data-index="{topics.index}" data-cid="{topics.cid}" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+<li component="category/topic" class="category-item hover-parent py-2 mb-2 d-flex flex-column flex-lg-row align-items-start {function.generateTopicClass}" data-tid="{topics.tid}" data-index="{topics.index}" data-cid="{topics.cid}" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
 <link itemprop="url" content="{config.relative_path}/topic/{./slug}" />
 <meta itemprop="name" content="{function.stripTags, ./title}" />
 <meta itemprop="itemListOrder" content="descending" />
@@ -41,7 +41,7 @@
 {buildAvatar(./user, "40px", true)}
 </a>
 {{{ if showSelect }}}
-<div class="checkbox position-absolute top-100 start-50 translate-middle-x pt-2 m-0 d-none d-lg-flex" style="max-width:max-content">
+<div class="checkbox position-absolute top-100 start-50 translate-middle-x m-0 d-none d-lg-flex" style="max-width:max-content">
 <i component="topic/select" class="fa text-muted pointer fa-square-o p-1 hover-visible"></i>
 </div>
 {{{ end }}}
@@ -50,7 +50,7 @@
 <h3 component="topic/header" class="title text-break fs-5 fw-semibold m-0 tracking-tight w-100 {{{ if showSelect }}}me-4 me-lg-0{{{ end }}}">
 <a class="text-reset" href="{{{ if topics.noAnchor }}}#{{{ else }}}{config.relative_path}/topic/{./slug}{{{ if ./bookmark }}}/{./bookmark}{{{ end }}}{{{ end }}}">{./title}</a>
 </h3>
-<span component="topic/labels" class="d-flex flex-wrap gap-1 w-100">
+<div component="topic/labels" class="d-flex flex-wrap gap-1 w-100 align-items-center">
 <span component="topic/watched" class="badge border border-gray-300 text-body {{{ if !./followed }}}hidden{{{ end }}}">
 <i class="fa fa-bell-o"></i>
 <span>[[topic:watching]]</span>
@@ -71,13 +71,13 @@
 <i class="fa fa-lock"></i>
 <span>[[topic:locked]]</span>
 </span>
-<span component="topic/moved" class="badge border border-gray-300 text-body {{{ if (!./oldCid || (./oldCid == "-1")) }}}hidden{{{ end }}}">
+<span component="topic/moved" class="badge border border-gray-300 text-body {{{ if !./oldCid }}}hidden{{{ end }}}">
 <i class="fa fa-arrow-circle-right"></i>
 <span>[[topic:moved]]</span>
 </span>
 {{{each ./icons}}}<span class="lh-1">{@value}</span>{{{end}}}
 {{{ if !template.category }}}
-{buildCategoryLabel(./category, "a", "border")}
+{function.buildCategoryLabel, ./category, "a", "border"}
 {{{ end }}}
 <span data-tid="{./tid}" component="topic/tags" class="lh-1 tag-list d-flex flex-wrap gap-1 {{{ if !./tags.length }}}hidden{{{ end }}}">
 {{{ each ./tags }}}
@@ -92,7 +92,7 @@
 <a href="{config.relative_path}/topic/{./slug}{{{ if (./teaser.timestampISO && !config.theme.mobileTopicTeasers) }}}/{./teaser.index}{{{ end }}}" class="border badge bg-transparent text-muted fw-normal timeago" title="{{{ if (./teaser.timestampISO && !config.theme.mobileTopicTeasers) }}}{./teaser.timestampISO}{{{ else }}}{./timestampISO}{{{ end }}}"></a>
 </div>
 <a href="{config.relative_path}/topic/{./slug}" class="d-none d-lg-block badge bg-transparent text-muted fw-normal timeago" title="{./timestampISO}"></a>
-</span>
+</div>
 {{{ if showSelect }}}
 <div class="checkbox position-absolute top-0 end-0 m-0 d-flex d-lg-none" style="max-width:max-content">
 <i component="topic/select" class="fa fa-square-o text-muted pointer p-1"></i>
@@ -109,25 +109,25 @@
 <div class="d-flex p-0 col-lg-5 col-12 align-content-stretch">
 <div class="meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted" style="grid-template-columns: 1fr 1fr 1fr;">
 {{{ if !reputation:disabled }}}
-<div class="stats-votes card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
-<span class="fs-5 ff-secondary lh-1" title="{./votes}">{humanReadableNumber(./votes, 0)}</span>
-<span class="d-none d-xl-flex text-lowercase text-xs">[[global:votes]]</span>
+<div class="stats-votes overflow-hidden d-flex flex-column align-items-center">
+<span class="fs-4" title="{./votes}">{humanReadableNumber(./votes, 0)}</span>
+<span class="d-none d-xl-flex text-uppercase text-xs">[[global:votes]]</span>
 <i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-chevron-up"></i>
 </div>
 {{{ end }}}
-<div class="stats-postcount card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
-<span class="fs-5 ff-secondary lh-1" title="{./postcount}">{humanReadableNumber(./postcount, 0)}</span>
-<span class="d-none d-xl-flex text-lowercase text-xs">[[global:posts]]</span>
+<div class="stats-postcount overflow-hidden d-flex flex-column align-items-center">
+<span class="fs-4" title="{./postcount}">{humanReadableNumber(./postcount, 0)}</span>
+<span class="d-none d-xl-flex text-uppercase text-xs">[[global:posts]]</span>
 <i class="d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message"></i>
 </div>
-<div class="stats-viewcount card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
-<span class="fs-5 ff-secondary lh-1" title="{./viewcount}">{humanReadableNumber(./viewcount, 0)}</span>
-<span class="d-none d-xl-flex text-lowercase text-xs">[[global:views]]</span>
+<div class="stats-viewcount overflow-hidden d-flex flex-column align-items-center">
+<span class="fs-4" title="{./viewcount}">{humanReadableNumber(./viewcount, 0)}</span>
+<span class="d-none d-xl-flex text-uppercase text-xs">[[global:views]]</span>
 <i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-eye"></i>
 </div>
 </div>
-<div component="topic/teaser" class="meta teaser ps-5 ps-lg-0 col-lg-6 col-12 {{{ if !config.theme.mobileTopicTeasers }}}d-none d-lg-block{{{ end }}}">
-<div class="lastpost border-start border-2 lh-sm h-100 d-flex flex-column gap-1" style="border-color: {./category.bgColor}!important;">
+<div component="topic/teaser" class="meta teaser col-lg-6 col-12 {{{ if !config.theme.mobileTopicTeasers }}}d-none d-lg-block{{{ end }}}">
+<div class="lastpost border-start border-4 lh-sm h-100 d-flex flex-column gap-1" style="border-color: {./category.bgColor}!important;">
 {{{ if ./unreplied }}}
 <div class="ps-2 text-xs">
 [[category:no-replies]]

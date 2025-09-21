@@ -18,17 +18,23 @@
       var value = context;
       return iter(guard((context != null) ? context['tags'] : null), function each(key0, index, length, value) {
         var key = key0;
-        return "\n<div>\n<a href=\"" + 
+        return "\n<h5 class=\"float-start tag-container me-5 mb-5 fw-bold\">\n<a href=\"" + 
           __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
           "/tags/" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEncoded'] : null)) + 
           "\" data-tag=\"" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEscaped'] : null)) + 
-          "\" class=\"btn btn-ghost ff-base d-flex flex-column gap-1 align-items-start justify-content-start text-truncate p-2\">\n<div class=\"fw-semibold text-nowrap tag-item w-100 text-start text-truncate\">" + 
+          "\"><span class=\"tag-item text-muted text-uppercase text-nowrap tag-class-" + 
+          __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['class'] : null)) + 
+          " me-2\" data-tag=\"" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEscaped'] : null)) + 
-          "</div>\n<div class=\"text-xs text-muted text-nowrap tag-topic-count\">[[global:x-topics, " + 
-          __escape(helper(context, helpers, 'txEscape', [helper(context, helpers, 'formattedNumber', [guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['score'] : null)])])) + 
-          "]]</div>\n</a>\n</div>\n";
+          "\">" + 
+          __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEscaped'] : null)) + 
+          "</span><span class=\"tag-topic-count text-primary text-nowrap\" title=\"" + 
+          __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['score'] : null)) + 
+          "\">" + 
+          __escape(helper(context, helpers, 'formattedNumber', [guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['score'] : null)])) + 
+          "</span></a>\n</h5>\n";
       }, function alt() {
         return "";
       });

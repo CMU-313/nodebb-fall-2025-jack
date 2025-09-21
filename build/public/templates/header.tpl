@@ -10,7 +10,7 @@ var config = JSON.parse('{{configJSON}}');
 var app = {
 user: JSON.parse('{{userJSON}}')
 };
-document.documentElement.style.setProperty('--panel-offset', `0px`);
+document.documentElement.style.setProperty('--panel-offset', `${localStorage.getItem('panelOffset') || 0}px`);
 </script>
 {{{if useCustomHTML}}}
 {{customHTML}}
@@ -20,91 +20,161 @@ document.documentElement.style.setProperty('--panel-offset', `0px`);
 {{{end}}}
 </head>
 <body class="{bodyClass} skin-{{{if bootswatchSkin}}}{bootswatchSkin}{{{else}}}noskin{{{end}}}">
-<a class="visually-hidden-focusable position-absolute top-0 start-0 p-3 m-3 bg-body" style="z-index: 1021;" href="#content">[[global:skip-to-content]]</a>
-{{{ if config.theme.topMobilebar }}}
-<div component="bottombar" class="bottombar d-flex flex-column d-lg-none ff-secondary gap-1 align-items-center sticky-top" style="transition: top 150ms linear;">
-<div class="bottombar-nav p-2 text-dark bg-light d-flex justify-content-between align-items-center w-100">
-<div class="bottombar-nav-left d-flex gap-3 align-items-center">
-<div>
-<a href="#" role="button" class="nav-link d-flex justify-content-between align-items-center position-relative" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<span class="position-relative">
-<i class="fa fa-fw fa-lg fa-bars"></i>
-<span component="unread/count" data-unread-url="{unreadCount.unreadUrl}" class="position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary {{{ if !unreadCount.mobileUnread }}}hidden{{{ end }}}">{unreadCount.mobileUnread}</span>
-</span>
-</a>
-<ul class="navigation-dropdown dropdown-menu" role="menu">
-{{{ each navigation }}}
-{{{ if displayMenuItem(@root, @index) }}}
-<li class="nav-item {./class}{{{ if ./dropdown }}} dropend{{{ end }}}" title="{./title}">
-<a class="nav-link navigation-link px-3 py-2 {{{ if ./dropdown }}}dropdown-toggle{{{ end }}}" {{{ if ./dropdown }}} href="#" role="button" data-bs-toggle="collapse" data-bs-target="#collapse-target-{@index}" onclick="event.stopPropagation();" {{{ else }}} href="{./route}"{{{ end }}} {{{ if ./id }}}id="{./id}"{{{ end }}}{{{ if ./targetBlank }}} target="_blank"{{{ end }}}>
-<span class="d-inline-flex justify-content-between align-items-center w-100">
-<span class="text-nowrap">
-{{{ if ./iconClass }}}
-<i class="fa fa-fw {./iconClass}" data-content="{./content}"></i>
-{{{ end }}}
-{{{ if ./text }}}<span class="nav-text px-2 fw-semibold">{./text}</span>{{{ end }}}
-</span>
-<span component="navigation/count" class="badge rounded-1 bg-primary {{{ if !./content }}}hidden{{{ end }}}">{./content}</span>
-</span>
-</a>
-{{{ if ./dropdown }}}
-<div class="ps-3">
-<ul id="collapse-target-{@index}" class="collapse list-unstyled ps-3">
-{./dropdownContent}
-</ul>
-</div>
-{{{ end }}}
+<nav id="menu" class="slideout-menu hidden">
+<section class="menu-section" data-section="navigation">
+<ul class="menu-section-list text-bg-dark list-unstyled"></ul>
+</section>
+</nav>
+<nav id="chats-menu" class="slideout-menu hidden">
+{{{ if config.loggedIn }}}
+<ul class="nav nav-pills">
+<li class="nav-item">
+<a class="nav-link text-decoration-none" href="#" data-bs-target="#notifications" data-bs-toggle="tab"><span class="counter unread-count" component="notifications/icon" data-content="{unreadCount.notification}"></span> <i class="fa fa-fw fa-bell"></i></a>
+</li>
+{{{ if !config.disableChat }}}
+<li class="nav-item">
+<a class="nav-link text-decoration-none" href="#" data-bs-target="#chats" data-bs-toggle="tab"><i class="counter unread-count" component="chat/icon" data-content="{unreadCount.chat}"></i> <i class="fa fa-fw fa-comment"></i></a>
 </li>
 {{{ end }}}
-{{{ end }}}
-</ul>
-</div>
-</div>
-<div class="bottombar-nav-right d-flex gap-3 align-items-center">
-<div>
-{{{ if config.loggedIn }}}
-<ul id="logged-in-menu" class="list-unstyled d-flex align-items-center w-100 gap-3 mb-0">
-{{{ if config.searchEnabled }}}
-<li component="sidebar/search" class="nav-item m-0 search">
-<a component="search/button" id="search-button" href="#" role="button" class="nav-link text-truncate" data-bs-toggle="dropdown" title="[[global:header.search]]" aria-haspopup="true" aria-expanded="false">
-<i class="fa fa-search fa-fw"></i>
-<span class="nav-text visible-open px-2 fw-semibold">[[global:search]]</span>
+<li class="nav-item">
+<a class="nav-link active text-decoration-none" href="#" data-bs-target="#profile" data-bs-toggle="tab">
+{buildAvatar(user, "24px", true, "user-icon")}
 </a>
-<div class="search-dropdown dropdown-menu p-2 shadow" role="menu">
+</li>
+</ul>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="profile">
+<section class="menu-section" data-section="profile">
+<ul class="menu-section-list dropdown-menu show text-bg-dark w-100 border-0" component="header/usercontrol"></ul>
+</section>
+</div>
+<div class="tab-pane fade" id="notifications">
+<section class="menu-section text-bg-dark px-1" data-section="notifications">
+<ul class="menu-section-list notification-list-mobile list-unstyled" component="notifications/list"></ul>
+<div class="menu-section-list text-center p-3"><a href="{relative_path}/notifications">[[notifications:see-all]]</a></div>
+</section>
+</div>
+{{{ if !config.disableChat }}}
+<div class="tab-pane fade" id="chats">
+<section class="menu-section text-bg-dark px-1" data-section="chats">
+<ul class="menu-section-list chat-list list-unstyled" component="chat/list">
+</ul>
+<div class="menu-section-list text-center p-3"><a class="navigation-link" href="{relative_path}/user/{user.userslug}/chats">[[modules:chat.see-all]]</a></div>
+</section>
+</div>
+{{{ end }}}
+</div>
+{{{ end }}}
+</nav>
+<main id="panel" class="slideout-panel">
+<nav class="navbar sticky-top navbar-expand-lg bg-light header border-bottom py-0" id="header-menu" component="navbar">
+<div class="container-lg justify-content-start flex-nowrap">
+<div class="d-flex align-items-center me-auto" style="min-width: 0px;">
+<button type="button" class="navbar-toggler border-0" id="mobile-menu">
+<i class="fa fa-lg fa-fw fa-bars unread-count" ></i>
+<span component="unread/icon" class="notification-icon fa fa-fw fa-book unread-count" data-content="{unreadCount.mobileUnread}" data-unread-url="{unreadCount.unreadUrl}"></span>
+</button>
+<div class="d-inline-flex align-items-center" style="min-width: 0px;">
+{{{ if brand:logo }}}
+<a class="navbar-brand" href="{{{ if brand:logo:url }}}{brand:logo:url}{{{ else }}}{relative_path}/{{{ end }}}">
+<img alt="{brand:logo:alt}" class="{brand:logo:display} forum-logo d-inline-block align-text-bottom" src="{brand:logo}?{config.cache-buster}" />
+</a>
+{{{ end }}}
+{{{ if config.showSiteTitle }}}
+<a class="navbar-brand text-truncate" href="{{{ if title:url }}}{title:url}{{{ else }}}{relative_path}/{{{ end }}}">
+{config.siteTitle}
+</a>
+{{{ end }}}
+</div>
+</div>
+{{{ if (config.searchEnabled && user.privileges.search:content) }}}
+<div class="navbar-search visible-xs">
+<form action="{config.relative_path}/search" method="GET">
+<button type="button" class="btn btn-link"><i class="fa fa-lg fa-fw fa-search" title="[[global:header.search]]"></i></button>
+<input autocomplete="off" type="text" class="form-control hidden" name="term" placeholder="[[global:search]]"/>
+<button class="btn btn-primary hidden" type="submit"></button>
+<input type="text" class="hidden" name="in" value="{config.searchDefaultInQuick}" />
+</form>
+<div class="quick-search-container dropdown-menu d-block mt-2 hidden">
+<div class="quick-search-results-container"></div>
+</div>
+</div>
+{{{ end }}}
+{{{ if config.loggedIn }}}
+<button type="button" class="navbar-toggler border-0" id="mobile-chats">
+<span component="notifications/icon" class="notification-icon fa fa-fw fa-bell-o unread-count" data-content="{unreadCount.notification}"></span>
+<span component="chat/icon" class="notification-icon fa fa-fw fa-comments unread-count" data-content="{unreadCount.chat}"></span>
+{buildAvatar(user, "32px", true)}
+</button>
+{{{ end }}}
+<div component="navbar/title" class="visible-xs hidden">
+<span></span>
+</div>
+<div id="nav-dropdown" class="collapse navbar-collapse d-none d-lg-block">
+<ul id="main-nav" class="navbar-nav me-auto mb-2 mb-lg-0">
+{{{each navigation}}}
+<!-- IF function.displayMenuItem, @index -->
+<li class="nav-item {navigation.class}{{{ if navigation.dropdown }}} dropdown{{{ end }}}" title="{navigation.title}">
+<a class="nav-link navigation-link {{{ if navigation.dropdown }}}dropdown-toggle{{{ end }}}"
+{{{ if navigation.dropdown }}} href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{{ else }}} href="{navigation.route}"{{{ end }}} {{{ if navigation.id }}}id="{navigation.id}"{{{ end }}}{{{ if navigation.targetBlank }}} target="_blank"{{{ end }}}>
+{{{ if navigation.iconClass }}}
+<i class="fa fa-fw {navigation.iconClass}" data-content="{navigation.content}"></i>
+{{{ end }}}
+{{{ if navigation.text }}}
+<span class="{navigation.textClass}">{navigation.text}</span>
+{{{ end }}}
+{{{ if navigation.dropdown}}}
+<i class="fa fa-caret-down"></i>
+{{{ end }}}
+</a>
+{{{ if navigation.dropdown }}}
+<ul class="dropdown-menu p-1" role="menu">
+{navigation.dropdownContent}
+</ul>
+{{{ end }}}
+</li>
+<!-- ENDIF function.displayMenuItem -->
+{{{end}}}
+</ul>
+<ul class="navbar-nav mb-2 mb-lg-0 hidden-xs">
+<li class="nav-item">
+<a href="#" id="reconnect" class="nav-link hide" title="[[global:reconnecting-message, {config.siteTitle}]]">
+<i class="fa fa-check"></i>
+</a>
+</li>
+</ul>
+{{{ if (config.searchEnabled && user.privileges.search:content) }}}
+<div class="navbar-nav mb-2 mb-lg-0 position-relative">
 <form component="search/form" id="search-form" class="d-flex justify-content-end align-items-center" role="search" method="GET">
-<div component="search/fields" class="d-flex flex-column w-100 {{{ if config.theme.topMobilebar }}}flex-column-reverse gap-2{{{ end }}}" id="search-fields">
-<div id="quick-search-container" class="quick-search-container d-block hidden">
-<div class="form-check filter-category mb-2 ms-2">
+<div component="search/fields" class="hidden" id="search-fields">
+<div class="input-group flex-nowrap">
+<input autocomplete="off" type="text" class="form-control" placeholder="[[global:search]]" name="query" value="">
+<a href="{config.relative_path}/search" class="btn btn-outline-secondary" aria-label="[[search:type-to-search]]">
+<i class="fa fa-gears fa-fw"></i>
+</a>
+</div>
+<div id="quick-search-container" class="quick-search-container dropdown-menu d-block mt-2 hidden">
+<div class="form-check filter-category mb-2 ms-4">
 <input class="form-check-input" type="checkbox" checked>
 <label class="form-check-label name"></label>
 </div>
 <div class="text-center loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
 <div class="quick-search-results-container"></div>
 </div>
-<div class="d-flex gap-1 input-container">
-<input autocomplete="off" type="text" class="form-control" placeholder="[[global:search]]" name="query" value="" aria-label="[[search:type-to-search]]">
-<a class="nav-link d-flex justify-content-center align-items-center advanced-search-link" href="{config.relative_path}/search" title="[[search:advanced-search]]">
-<i class="fa fa-gears fa-fw text-muted"></i>
-</a>
-</div>
 <button type="submit" class="btn btn-outline-secondary hide">[[global:search]]</button>
 </div>
+<div class="nav-item" title="[[global:search]]"><a component="search/button" id="search-button" href="#" class="nav-link" aria-label="[[global:search]]"><i class="fa fa-search fa-fw"></i></a></div>
 </form>
 </div>
-</li>
 {{{ end }}}
-<li component="notifications" class="nav-item m-0 notifications">
-<a data-bs-toggle="dropdown" href="#" role="button" class="nav-link d-flex gap-2 justify-content-between align-items-center position-relative" aria-haspopup="true" aria-expanded="false" aria-label="[[global:header.notifications]]">
-<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
-<span class="position-relative">
+{{{ if !maintenanceHeader }}}
+{{{ if config.loggedIn }}}
+<ul id="logged-in-menu" class="navbar-nav me-0 mb-2 mb-lg-0 align-items-center">
+<li class="nav-item notifications dropdown d-none d-sm-block" component="notifications" title="[[global:header.notifications]]">
+<a data-bs-toggle="dropdown" href="#" role="button" class="nav-link position-relative" aria-haspopup="true" aria-expanded="false" aria-label="[[global:header.notifications]]">
 <i component="notifications/icon" class="fa fa-fw {{{ if unreadCount.notification}}}fa-bell{{{ else }}}fa-bell-o{{{ end }}} unread-count" data-content="{unreadCount.notification}"></i>
-<span component="notifications/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary {{{ if !unreadCount.notification }}}hidden{{{ end }}}">{unreadCount.notification}</span>
-</span>
-<span class="nav-text small visible-open fw-semibold truncate-text">[[global:header.notifications]]</span>
-</span>
-<span component="notifications/count" class="visible-open badge rounded-1 bg-primary {{{ if !unreadCount.notification }}}hidden{{{ end }}}">{unreadCount.notification}</span>
 </a>
-<ul class="notifications-dropdown dropdown-menu p-1 shadow" role="menu">
+<ul class="notifications-dropdown dropdown-menu dropdown-menu-end p-1 shadow" role="menu">
 <li>
 <div component="notifications/list" class="list-container notification-list overscroll-behavior-contain pe-1 ff-base ghost-scrollbar">
 <div class="mb-2 p-1">
@@ -145,20 +215,13 @@ document.documentElement.style.setProperty('--panel-offset', `0px`);
 </ul>
 </li>
 {{{ if canChat }}}
-<li class="nav-item m-0 chats">
-<a data-bs-toggle="dropdown" href="#" role="button" class="nav-link d-flex gap-2 justify-content-between align-items-center position-relative" component="chat/dropdown" aria-haspopup="true" aria-expanded="false" aria-label="[[global:header.chats]]">
-<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
-<span class="position-relative">
-<i component="chat/icon" class="fa fa-fw {{{ if unreadCount.chat}}}fa-comment{{{ else }}}fa-comment-o{{{ end }}} unread-count" data-content="{unreadCount.chat}"></i>
-<span component="chat/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary {{{ if !unreadCount.chat }}}hidden{{{ end }}}">{unreadCount.chat}</span>
-</span>
-<span class="nav-text small visible-open fw-semibold">[[global:header.chats]]</span>
-</span>
-<span component="chat/count" class="visible-open badge rounded-1 bg-primary {{{ if !unreadCount.chat }}}hidden{{{ end }}}">{unreadCount.chat}</span>
+<li class="nav-item chats dropdown" title="[[global:header.chats]]">
+<a class="nav-link" data-bs-toggle="dropdown" href="{relative_path}/user/{user.userslug}/chats" data-ajaxify="false" id="chat_dropdown" component="chat/dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+<i component="chat/icon" class="fa {{{ if unreadCount.chat}}}fa-comment{{{ else }}}fa-comment-o{{{ end }}} fa-fw unread-count" data-content="{unreadCount.chat}"></i> <span class="d-inline d-sm-none">[[global:header.chats]]</span>
 </a>
-<ul class="chats-dropdown dropdown-menu p-1 shadow" role="menu">
+<ul class="dropdown-menu dropdown-menu-end p-1" aria-labelledby="chat_dropdown" role="menu">
 <li>
-<div component="chat/list" class="list-container chats-list overscroll-behavior-contain p-0 pe-1 ff-base ghost-scrollbar">
+<ul component="chat/list" class="list-unstyled chat-list chats-list ghost-scrollbar pe-1">
 <div class="rounded-1">
 <div class="d-flex gap-1 justify-content-between">
 <div class="dropdown-item p-2 d-flex gap-2 placeholder-wave">
@@ -178,89 +241,25 @@ document.documentElement.style.setProperty('--panel-offset', `0px`);
 </div>
 </div>
 </div>
-</div>
+</ul>
 </li>
 <li class="dropdown-divider"></li>
 <li>
 <div class="d-flex justify-content-center gap-1 flex-wrap">
-<a component="chats/mark-all-read" role="button" href="#" class="btn btn-sm btn-light mark-all-read flex-fill text-nowrap text-truncate ff-secondary"><i class="fa fa-check-double"></i> [[modules:chat.mark-all-read]]</a>
-<!-- on md and up see all chats button goes to last room -->
-<a class="d-none d-md-inline btn btn-sm btn-primary flex-fill text-nowrap text-truncate ff-secondary" href="{relative_path}/user/{user.userslug}/chats{{{ if user.lastRoomId }}}/{user.lastRoomId}{{{ end }}}"><i class="fa fa-list"></i> [[modules:chat.see-all]]</a>
-<!-- on xs&sm the see all chats button goes to the list of chats -->
-<a class="d-inline d-md-none btn btn-sm btn-primary flex-fill text-nowrap text-truncate ff-secondary" href="{relative_path}/user/{user.userslug}/chats"><i class="fa fa-list"></i> [[modules:chat.see-all]]</a>
+<a class="btn btn-light btn-sm mark-all-read flex-fill text-nowrap" href="#" component="chats/mark-all-read"><i class="fa fa-check-double"></i> [[modules:chat.mark-all-read]]</a>
+<a class="btn btn-primary btn-sm flex-fill text-nowrap" href="{relative_path}/user/{user.userslug}/chats"><i class="fa fa-comments"></i> [[modules:chat.see-all]]</a>
 </div>
 </li>
 </ul>
 </li>
 {{{ end }}}
-<li component="sidebar/drafts" class="hidden nav-item m-0 drafts">
-<a data-bs-toggle="dropdown" href="#" role="button" class="nav-link d-flex gap-2 justify-content-between align-items-center position-relative" aria-haspopup="true" aria-expanded="false" aria-label="[[global:header.drafts]]">
-<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
-<span class="position-relative">
-<i component="drafts/icon" class="fa fa-fw fa-pen-to-square unread-count"></i>
-<span component="drafts/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden">0</span>
-</span>
-<span class="nav-text small visible-open fw-semibold">[[global:header.drafts]]</span>
-</span>
-<span component="drafts/count" class="visible-open badge rounded-1 bg-primary hidden">0</span>
+<li id="user_label" class="nav-item dropdown px-3" title="[[global:header.profile]]">
+<a href="#" for="user-control-list-check" data-bs-toggle="dropdown" id="user_dropdown" role="button" component="header/avatar" aria-haspopup="true" aria-expanded="false">
+{buildAvatar(user, "32px", true)}
+<span id="user-header-name" class="d-block d-sm-none">{user.username}</span>
 </a>
-<ul class="drafts-dropdown dropdown-menu p-1 shadow" role="menu">
-<li>
-<div component="drafts/list" class="list-container draft-list list-unstyled d-flex flex-column overscroll-behavior-contain gap-1 pe-1 ghost-scrollbar">
-<div class="dropdown-item rounded-1 p-2 d-flex gap-2 placeholder-wave">
-<div class="d-flex flex-grow-1 flex-column w-100">
-<div class="text-xs placeholder col-3">&nbsp;</div>
-<div class="text-sm placeholder col-11">&nbsp;</div>
-<div class="text-xs placeholder col-4">&nbsp;</div>
-</div>
-</div>
-<div class="hidden no-drafts text-center p-4 d-flex flex-column">
-<div class="p-4"><i class="fa-solid fa-wind fs-2 text-muted"></i></div>
-<div class="text-xs fw-semibold text-muted">[[modules:composer.no-drafts]]</div>
-</div>
-<div class="draft-item-container">
-{{{ each drafts }}}
-{{{ if !@first}}}
-<hr class="my-1"/>
-{{{ end }}}
-<div data-save-id="{./save_id}">
-<div class="d-flex gap-1 justify-content-between ff-base">
-<a href="#" class="d-flex flex-column flex-grow-1 gap-2 justify-content-start align-items-start btn btn-ghost btn-sm ff-sans text-start" component="drafts/open" data-save-id="{./save_id}" role="menuitem">
-{{{ if (./action == "topics.post") }}}
-{{{ if ./title}}}
-<div class="text text-xs fw-semibold line-clamp-2 text-break">{./title}</div>
-{{{ end }}}
-{{{ end }}}
-{{{ if (./action == "posts.reply") }}}
-<div class="text text-xs fw-semibold line-clamp-2 text-break">[[topic:composer.replying-to, "{./title}"]]</div>
-{{{ end }}}
-{{{ if (./action == "posts.edit") }}}
-<div class="text text-xs fw-semibold line-clamp-2">[[topic:composer.editing-in, "{./title}"]]</div>
-{{{ end }}}
-{{{ if ./text }}}
-<div class="text text-sm line-clamp-3 text-break">{./text}</div>
-{{{ end }}}
-<div class="timeago text-xs text-muted" title="{./timestampISO}"></div>
-</a>
-<div>
-<button component="drafts/delete" data-save-id="{./save_id}" class="btn btn-light btn-sm">
-<i class="unread fa fa-xs fa-trash text-secondary"></i>
-</button>
-</div>
-</div>
-</div>
-{{{ end }}}
-</div>
-</div>
-</li>
-</ul>
-</li>
-<li id="user_label" class="nav-item m-0 usermenu">
-<a component="header/avatar" id="user_dropdown" href="#" role="button" class="nav-link d-flex gap-2 align-items-center text-truncate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="[[user:user-menu]]">
-{buildAvatar(user, "20px", true)}
-<span id="user-header-name" class="nav-text small visible-open fw-semibold">{user.username}</span>
-</a>
-<ul id="user-control-list" component="header/usercontrol" class="overscroll-behavior-contain user-dropdown dropdown-menu shadow p-1 text-sm ff-base" role="menu">
+<input type="checkbox" class="hidden" id="user-control-list-check" aria-hidden="true">
+<ul id="user-control-list" component="header/usercontrol" class="overscroll-behavior-contain user-dropdown dropdown-menu dropdown-menu-end shadow p-1 text-sm ff-base" role="menu">
 <li>
 <a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="header/profilelink" href="{relative_path}/user/{user.userslug}" role="menuitem" aria-label="[[user:profile]]">
 <span component="user/status" class="flex-shrink-0 border border-white border-2 rounded-circle status {user.status}"><span class="visually-hidden">[[global:{user.status}]]</span></span>
@@ -273,87 +272,83 @@ document.documentElement.style.setProperty('--panel-offset', `0px`);
 <a href="#" class="dropdown-item rounded-1 user-status d-flex align-items-center gap-2 {{{ if user.online }}}selected{{{ end }}}" data-status="online" role="menuitem">
 <span component="user/status" class="flex-shrink-0 border border-white border-2 rounded-circle status online"></span>
 <span class="flex-grow-1">[[global:online]]</span>
-<i class="fa-solid fa-check text-secondary flex-shrink-0" aria-label="[[global:selected]]"></i>
 </a>
 </li>
 <li>
 <a href="#" class="dropdown-item rounded-1 user-status d-flex align-items-center gap-2 {{{ if user.away }}}selected{{{ end }}}" data-status="away" role="menuitem">
 <span component="user/status" class="flex-shrink-0 border border-white border-2 rounded-circle status away"></span>
 <span class="flex-grow-1">[[global:away]]</span>
-<i class="fa-solid fa-check text-secondary flex-shrink-0"><span class="visually-hidden">[[global:selected]]</span></i>
 </a>
 </li>
 <li>
 <a href="#" class="dropdown-item rounded-1 user-status d-flex align-items-center gap-2 {{{ if user.dnd }}}selected{{{ end }}}" data-status="dnd" role="menuitem">
 <span component="user/status" class="flex-shrink-0 border border-white border-2 rounded-circle status dnd"></span>
 <span class="flex-grow-1">[[global:dnd]]</span>
-<i class="fa-solid fa-check text-secondary flex-shrink-0"></i>
 </a>
 </li>
 <li>
 <a href="#" class="dropdown-item rounded-1 user-status d-flex align-items-center gap-2 {{{ if user.offline }}}selected{{{ end }}}" data-status="offline" role="menuitem">
 <span component="user/status" class="flex-shrink-0 border border-white border-2 rounded-circle status offline"></span>
 <span class="flex-grow-1">[[global:invisible]]</span>
-<i class="fa-solid fa-check text-secondary flex-shrink-0"></i>
 </a>
 </li>
 <li role="presentation" class="dropdown-divider"></li>
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="{relative_path}/user/{user.userslug}/bookmarks" role="menuitem">
-<i class="fa fa-fw fa-bookmark text-secondary"></i> <span>[[user:bookmarks]]</span>
+<a class="dropdown-item" href="{relative_path}/user/{user.userslug}/bookmarks" role="menuitem">
+<i class="fa fa-fw fa-bookmark"></i> <span>[[user:bookmarks]]</span>
 </a>
 </li>
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="header/profilelink/edit" href="{relative_path}/user/{user.userslug}/edit" role="menuitem">
-<i class="fa fa-fw fa-edit text-secondary"></i> <span>[[user:edit-profile]]</span>
+<a class="dropdown-item" component="header/profilelink/edit" href="{relative_path}/user/{user.userslug}/edit" role="menuitem">
+<i class="fa fa-fw fa-edit"></i> <span>[[user:edit-profile]]</span>
 </a>
 </li>
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="header/profilelink/settings" href="{relative_path}/user/{user.userslug}/settings" role="menuitem">
-<i class="fa fa-fw fa-gear text-secondary"></i> <span>[[user:settings]]</span>
+<a class="dropdown-item" component="header/profilelink/settings" href="{relative_path}/user/{user.userslug}/settings" role="menuitem">
+<i class="fa fa-fw fa-gear"></i> <span>[[user:settings]]</span>
 </a>
 </li>
 {{{ if showModMenu }}}
 <li role="presentation" class="dropdown-divider"></li>
-<li><h6 class="dropdown-header text-xs">[[pages:moderator-tools]]</h6></li>
+<li><h6 class="dropdown-header">[[pages:moderator-tools]]</h6></li>
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="{relative_path}/flags" role="menuitem">
-<i class="fa fa-fw fa-flag text-secondary"></i> <span>[[pages:flagged-content]]</span>
+<a class="dropdown-item" href="{relative_path}/flags" role="menuitem">
+<i class="fa fa-fw fa-flag"></i> <span>[[pages:flagged-content]]</span>
 </a>
 </li>
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="{relative_path}/post-queue" role="menuitem">
-<i class="fa fa-fw fa-list-alt text-secondary"></i> <span>[[pages:post-queue]]</span>
+<a class="dropdown-item" href="{relative_path}/post-queue" role="menuitem">
+<i class="fa fa-fw fa-list-alt"></i> <span>[[pages:post-queue]]</span>
 </a>
 </li>
 {{{ if registrationQueueEnabled }}}
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="{relative_path}/registration-queue" role="menuitem">
-<i class="fa fa-fw fa-list-alt text-secondary"></i> <span>[[pages:registration-queue]]</span>
+<a class="dropdown-item" href="{relative_path}/registration-queue" role="menuitem">
+<i class="fa fa-fw fa-list-alt"></i> <span>[[pages:registration-queue]]</span>
 </a>
 </li>
 {{{ end }}}
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="{relative_path}/ip-blacklist" role="menuitem">
-<i class="fa fa-fw fa-ban text-secondary"></i> <span>[[pages:ip-blacklist]]</span>
+<a class="dropdown-item" href="{relative_path}/ip-blacklist" role="menuitem">
+<i class="fa fa-fw fa-ban"></i> <span>[[pages:ip-blacklist]]</span>
 </a>
 </li>
 {{{ else }}}
 {{{ if postQueueEnabled }}}
 <li>
-<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="{relative_path}/post-queue" role="menuitem">
-<i class="fa fa-fw fa-list-alt text-secondary"></i> <span>[[pages:post-queue]]</span>
+<a class="dropdown-item" href="{relative_path}/post-queue" role="menuitem">
+<i class="fa fa-fw fa-list-alt"></i> <span>[[pages:post-queue]]</span>
 </a>
 </li>
 {{{ end }}}
 {{{ end }}}
 <li role="presentation" class="dropdown-divider"></li>
 <li component="user/logout">
-<form method="post" action="{relative_path}/logout" role="menuitem">
+<form method="post" action="{relative_path}/logout">
 <input type="hidden" name="_csrf" value="{config.csrf_token}">
 <input type="hidden" name="noscript" value="true">
-<button type="submit" class="dropdown-item rounded-1 d-flex align-items-center gap-2">
-<i class="fa fa-fw fa-sign-out text-secondary"></i><span>[[global:logout]]</span>
+<button type="submit" class="dropdown-item" role="menuitem">
+<i class="fa fa-fw fa-sign-out"></i><span> [[global:logout]]</span>
 </button>
 </form>
 </li>
@@ -361,180 +356,42 @@ document.documentElement.style.setProperty('--panel-offset', `0px`);
 </li>
 </ul>
 {{{ else }}}
-<ul id="logged-out-menu" class="list-unstyled d-flex w-100 gap-3 mb-0 logged-out-menu">
-{{{ if (config.searchEnabled && user.privileges.search:content) }}}
-<li component="sidebar/search" class="nav-item mx-2 search">
-<a component="search/button" id="search-button" href="#" role="button" class="nav-link text-truncate" data-bs-toggle="dropdown" title="[[global:header.search]]" aria-haspopup="true" aria-expanded="false">
-<i class="fa fa-search fa-fw"></i>
-<span class="nav-text visible-open px-2 fw-semibold">[[global:search]]</span>
-</a>
-<div class="search-dropdown dropdown-menu p-2 shadow" role="menu">
-<form component="search/form" id="search-form" class="d-flex justify-content-end align-items-center" role="search" method="GET">
-<div component="search/fields" class="d-flex flex-column w-100 {{{ if config.theme.topMobilebar }}}flex-column-reverse gap-2{{{ end }}}" id="search-fields">
-<div id="quick-search-container" class="quick-search-container d-block hidden">
-<div class="form-check filter-category mb-2 ms-2">
-<input class="form-check-input" type="checkbox" checked>
-<label class="form-check-label name"></label>
-</div>
-<div class="text-center loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
-<div class="quick-search-results-container"></div>
-</div>
-<div class="d-flex gap-1 input-container">
-<input autocomplete="off" type="text" class="form-control" placeholder="[[global:search]]" name="query" value="" aria-label="[[search:type-to-search]]">
-<a class="nav-link d-flex justify-content-center align-items-center advanced-search-link" href="{config.relative_path}/search" title="[[search:advanced-search]]">
-<i class="fa fa-gears fa-fw text-muted"></i>
-</a>
-</div>
-<button type="submit" class="btn btn-outline-secondary hide">[[global:search]]</button>
-</div>
-</form>
-</div>
-</li>
-{{{ end }}}
+<ul id="logged-out-menu" class="navbar-nav me-0 mb-2 mb-lg-0 align-items-center">
 {{{ if allowRegistration }}}
-<li class="nav-item mx-2" title="[[global:register]]">
+<li class="nav-item">
 <a class="nav-link" href="{relative_path}/register">
-<i class="fa fa-fw fa-user-plus"></i>
+<i class="fa fa-pencil fa-fw d-inline-block d-sm-none"></i>
+<span>[[global:register]]</span>
 </a>
 </li>
 {{{ end }}}
-<li class="nav-item mx-2" title="[[global:login]]">
+<li class="nav-item">
 <a class="nav-link" href="{relative_path}/login">
-<i class="fa fa-fw fa-sign-in"></i>
+<i class="fa fa-sign-in fa-fw d-inline-block d-sm-none"></i>
+<span>[[global:login]]</span>
 </a>
 </li>
 </ul>
 {{{ end }}}
-</div>
-</div>
-</div>
-</div>
-<script>
-const headerEl = document.querySelector('[component="bottombar"]');
-if (headerEl && headerEl.classList.contains('sticky-top')) {
-const rect = headerEl.getBoundingClientRect();
-const offset = Math.max(0, rect.bottom);
-document.documentElement.style.setProperty('--panel-offset', offset + `px`);
-} else {
-document.documentElement.style.setProperty('--panel-offset', `0px`);
-}
-</script>
-{{{ end }}}
-<div class="layout-container d-flex justify-content-between pb-4 pb-md-0">
-<nav component="sidebar/left" class="{{{ if config.theme.openSidebars}}}open{{{ end }}} text-dark bg-light sidebar sidebar-left start-0 border-end vh-100 d-none d-lg-flex flex-column justify-content-between sticky-top">
-<ul id="main-nav" class="list-unstyled d-flex flex-column w-100 gap-2 mt-2 overflow-y-auto">
-{{{ each navigation }}}
-{{{ if displayMenuItem(@root, @index) }}}
-<li class="nav-item mx-2 {./class}{{{ if ./dropdown }}} dropend{{{ end }}}" title="{./title}">
-<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center {{{ if ./dropdown }}}dropdown-toggle{{{ end }}}" {{{ if ./dropdown }}} href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{{ else }}} href="{./route}"{{{ end }}} {{{ if ./id }}}id="{./id}"{{{ end }}}{{{ if ./targetBlank }}} target="_blank"{{{ end }}} {{{ if ./text }}}aria-label="{./text}"{{{ end }}}>
-<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
-<span class="position-relative">
-{{{ if ./iconClass }}}
-<i class="fa fa-fw {./iconClass}" data-content="{./content}"></i>
-<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary {{{ if !./content }}}hidden{{{ end }}}">{./content}</span>
-{{{ end }}}
-</span>
-{{{ if ./text }}}<span class="nav-text small visible-open fw-semibold text-truncate">{./text}</span>{{{ end }}}
-</span>
-<span component="navigation/count" class="visible-open badge rounded-1 bg-primary {{{ if !./content }}}hidden{{{ end }}}">{./content}</span>
+{{{ else }}}
+<ul class="navbar-nav me-0 mb-2 mb-lg-0"></ul>
+<li class="nav-item">
+<a href="{relative_path}/login">
+<i class="fa fa-sign-in fa-fw d-block d-sm-none"></i>
+<span>[[global:login]]</span>
 </a>
-{{{ if ./dropdown }}}
-<ul class="dropdown-menu p-1 shadow" role="menu">
-{./dropdownContent}
+</li>
 </ul>
 {{{ end }}}
-</li>
-{{{ end }}}
-{{{ end }}}
-</ul>
-<div class="sidebar-toggle-container align-self-start">
-{{{ if !config.disableCustomUserSkins }}}
-<div class="dropend m-2" component="skinSwitcher" title="[[themes/harmony:skins]]">
-<a data-bs-toggle="dropdown" href="#" role="button" class="nav-link position-relative" aria-haspopup="true" aria-expanded="false" aria-label="[[themes/harmony:skins]]">
-<span class="justify-content-between w-100">
-<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
-<span>
-<i component="skinSwitcher/icon" class="fa fa-fw fa-paintbrush"></i>
-</span>
-<span class="nav-text small visible-open fw-semibold">[[themes/harmony:skins]]</span>
-</span>
-</span>
-</a>
-<ul class="dropdown-menu p-1 text-sm overflow-auto p-1" role="menu">
-<div class="d-flex">
-<div>
-<li class="dropdown-header">Light</li>
-<div class="d-grid" style="grid-template-columns: 1fr 1fr;">
-{{{ each bootswatchSkinOptions.light }}}
-<li>
-<a href="#" class="dropdown-item rounded-1" data-value="{./value}" role="menuitem">{./name} <i class="fa fa-fw fa-check {{{ if !./selected }}} invisible {{{ end }}}"></i></a>
-</li>
-{{{ end }}}
-</div>
-</div>
-<div>
-<li class="dropdown-header">Dark</li>
-{{{ each bootswatchSkinOptions.dark }}}
-<li>
-<a href="#" class="dropdown-item rounded-1" data-value="{./value}" role="menuitem">{./name} <i class="fa fa-fw fa-check {{{ if !./selected }}} invisible {{{ end }}}"></i></a>
-</li>
-{{{ end }}}
-</div>
-</div>
-<hr class="my-1"/>
-<div class="d-grid" style="grid-template-columns: 1fr 1fr;">
-{{{ each bootswatchSkinOptions.default }}}
-<li>
-<a href="#" class="dropdown-item rounded-1" data-value="{./value}" role="menuitem">{./name} <i class="fa fa-fw fa-check {{{ if !./selected }}} invisible {{{ end }}}"></i></a>
-</li>
-{{{ end }}}
-{{{ each bootswatchSkinOptions.custom }}}
-<li>
-<a href="#" class="dropdown-item rounded-1" data-value="{./value}" role="menuitem">{./name} <i class="fa fa-fw fa-check {{{ if !./selected }}} invisible {{{ end }}}"></i></a>
-</li>
-{{{ end }}}
-</div>
-</ul>
-</div>
-{{{ end }}}
-<div class="sidebar-toggle m-2 d-none d-lg-block">
-<a href="#" role="button" component="sidebar/toggle" class="nav-link d-flex gap-2 align-items-center p-2 pointer w-100 text-nowrap" title="[[themes/harmony:expand]]" aria-label="[[themes/harmony:sidebar-toggle]]">
-<i class="fa fa-fw fa-angles-right"></i>
-<i class="fa fa-fw fa-angles-left"></i>
-<span class="nav-text visible-open fw-semibold small lh-1">[[themes/harmony:collapse]]</span>
-</a>
 </div>
 </div>
 </nav>
-<main id="panel" class="d-flex flex-column gap-3 flex-grow-1 mt-3" style="min-width: 0;">
-{{{ if (brand:logo || (config.showSiteTitle || widgets.brand-header.length)) }}}
-<div class="container-lg px-md-4 brand-container">
-<div class="col-12 d-flex border-bottom pb-3 {{{ if config.theme.centerHeaderElements }}}justify-content-center{{{ end }}}">
-{{{ if (brand:logo || config.showSiteTitle) }}}
-<div component="brand/wrapper" class="d-flex align-items-center gap-3 p-2 rounded-1 align-content-stretch ">
-{{{ if brand:logo }}}
-<a component="brand/anchor" href="{{{ if brand:logo:url }}}{brand:logo:url}{{{ else }}}{relative_path}/{{{ end }}}" title="[[global:header.brand-logo]]">
-<img component="brand/logo" alt="{{{ if brand:logo:alt }}}{brand:logo:alt}{{{ else }}}[[global:header.brand-logo]]{{{ end }}}" class="{brand:logo:display}" src="{brand:logo}?{config.cache-buster}" />
-</a>
-{{{ end }}}
-{{{ if config.showSiteTitle }}}
-<a component="siteTitle" class="text-truncate align-self-stretch align-items-center d-flex" href="{{{ if title:url }}}{title:url}{{{ else }}}{relative_path}/{{{ end }}}">
-<h1 class="fs-6 fw-bold text-body mb-0">{config.siteTitle}</h1>
-</a>
-{{{ end }}}
-</div>
-{{{ end }}}
-{{{ if widgets.brand-header.length }}}
-<div data-widget-area="brand-header" class="flex-fill gap-3 p-2 align-self-center">
-{{{each widgets.brand-header}}}
-{{./html}}
-{{{end}}}
-</div>
-{{{ end }}}
-</div>
-</div>
-{{{ end }}}
-<div class="container-lg px-md-4 d-flex flex-column gap-3 h-100 mb-5 mb-lg-0" id="content">
+<script>
+const rect = document.getElementById('header-menu').getBoundingClientRect();
+const offset = Math.max(0, rect.bottom);
+document.documentElement.style.setProperty('--panel-offset', offset + `px`);
+</script>
+<div class="container-lg pt-3" id="content">
 <noscript>
 <div class="alert alert-danger">
 <p>

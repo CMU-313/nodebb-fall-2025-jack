@@ -18,14 +18,6 @@
             "#") + 
           "\">\n" + 
           __escape(helper(context, helpers, 'buildAvatar', [guard((context != null) ? context['loggedInUser'] : null), "48px", guard((context != null) ? context['true'] : null), "", "user/picture"])) + 
-          "\n" + 
-          (guard((context != null && context['loggedInUser'] != null) ? context['loggedInUser']['status'] : null) ?
-            "<span component=\"user/status\" class=\"position-absolute top-100 start-100 border border-white border-2 rounded-circle status " + 
-              __escape(guard((context != null && context['loggedInUser'] != null) ? context['loggedInUser']['status'] : null)) + 
-              "\"><span class=\"visually-hidden\">[[global:" + 
-              __escape(guard((context != null && context['loggedInUser'] != null) ? context['loggedInUser']['status'] : null)) + 
-              "]]</span></span>" :
-            "") + 
           "\n</a>\n</div>\n<form class=\"flex-grow-1 d-flex flex-column gap-2\" method=\"post\" action=\"" + 
           __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
           "/compose\">\n<input type=\"hidden\" name=\"tid\" value=\"" + 

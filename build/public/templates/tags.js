@@ -9,17 +9,18 @@
   function compiled(helpers, context, guard, iter, helper) {
     var __escape = helpers.__escape;
     var value = context;
-    return "<div data-widget-area=\"header\">\n" + 
+    return (guard((context != null && context['breadcrumbs'] != null) ? context['breadcrumbs']['length'] : null) ?
+        "\n<ol class=\"breadcrumb\" itemscope=\"itemscope\" itemprop=\"breadcrumb\" itemtype=\"http://schema.org/BreadcrumbList\">\n" + 
+          compiled.blocks['breadcrumbs'](helpers, context, guard, iter, helper) + 
+          "\n</ol>\n" :
+        "") + 
+      "\n<div data-widget-area=\"header\">\n" + 
       compiled.blocks['widgets.header'](helpers, context, guard, iter, helper) + 
-      "\n</div>\n<div class=\"row flex-fill\">\n<div class=\"tags " + 
-      (guard((context != null && context['widgets'] != null && context['widgets']['sidebar'] != null) ? context['widgets']['sidebar']['length'] : null) ?
-        "col-lg-9 col-sm-12" :
-        "col-lg-12") + 
-      "\">\n<h3 class=\"fw-semibold\">[[pages:tags]]</h3>\n" + 
+      "\n</div>\n<div class=\"tags\">\n" + 
       (guard((context != null) ? context['displayTagSearch'] : null) ?
         "\n" + 
           (guard((context != null && context['tags'] != null) ? context['tags']['length'] : null) ?
-            "\n<div class=\"row justify-content-end mb-3\">\n<div class=\"col-lg-6\">\n<div class=\"d-flex justify-content-end\">\n<div>\n<div class=\"input-group\">\n<input type=\"text\" class=\"form-control form-control-sm\" placeholder=\"[[global:search]]\" id=\"tag-search\">\n<button class=\"btn btn-primary btn-sm\" type=\"button\">\n<i class=\"fa fa-search\"></i>\n</button>\n</div>\n</div>\n</div>\n</div>\n</div>\n" :
+            "\n<div class=\"d-flex justify-content-end mb-3\">\n<div class=\"search\">\n<div class=\"input-group\">\n<input type=\"text\" class=\"form-control form-control-sm\" placeholder=\"[[global:search]]\" id=\"tag-search\">\n<button class=\"btn btn-sm btn-primary\" type=\"button\">\n<i class=\"fa fa-search\"></i>\n</button>\n</div>\n</div>\n</div>\n" :
             "") + 
           "\n" :
         "") + 
@@ -27,22 +28,59 @@
       (guard((context != null && context['tags'] != null) ? context['tags']['length'] : null) ?
         "" :
         "\n<div class=\"alert alert-warning\">[[tags:no-tags]]</div>\n") + 
-      "\n<div class=\"category\">\n<div class=\"tag-list row row-cols-2 row-cols-lg-4 row-cols-xl-5 gx-3 gy-2\" data-nextstart=\"" + 
+      "\n<div class=\"category row\">\n<div class=\"col-md-12 clearfix tag-list\" data-nextstart=\"" + 
       __escape(guard((context != null) ? context['nextStart'] : null)) + 
       "\">\n" + 
       compiled.blocks['tags'](helpers, context, guard, iter, helper) + 
-      "\n</div>\n</div>\n</div>\n<div data-widget-area=\"sidebar\" class=\"col-lg-3 col-sm-12 " + 
-      (guard((context != null && context['widgets'] != null && context['widgets']['sidebar'] != null) ? context['widgets']['sidebar']['length'] : null) ?
-        "" :
-        "hidden") + 
-      "\">\n" + 
-      compiled.blocks['widgets.sidebar'](helpers, context, guard, iter, helper) + 
-      "\n</div>\n</div>\n<div data-widget-area=\"footer\">\n" + 
-      compiled.blocks['widgets.footer'](helpers, context, guard, iter, helper) + 
-      "\n</div>";
+      "\n</div>\n</div>\n</div>";
   }
 
   compiled.blocks = {
+    'breadcrumbs': function breadcrumbs(helpers, context, guard, iter, helper) {
+      var __escape = helpers.__escape;
+      var value = context;
+      return iter(guard((context != null) ? context['breadcrumbs'] : null), function each(key0, index, length, value) {
+        var key = key0;
+        return "\n<li" + 
+          (index === length - 1 ?
+            " component=\"breadcrumb/current\"" :
+            "") + 
+          " itemscope=\"itemscope\" itemprop=\"itemListElement\" itemtype=\"http://schema.org/ListItem\" class=\"breadcrumb-item " + 
+          (index === length - 1 ?
+            "active" :
+            "") + 
+          "\">\n<meta itemprop=\"position\" content=\"" + 
+          __escape(index) + 
+          "\" />\n" + 
+          (guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['url'] : null) ?
+            "<a href=\"" + 
+              __escape(guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['url'] : null)) + 
+              "\" itemprop=\"item\">" :
+            "") + 
+          "\n<span itemprop=\"name\">\n" + 
+          __escape(guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['text'] : null)) + 
+          "\n" + 
+          (index === length - 1 ?
+            "\n" + 
+              (guard((context != null) ? context['feeds:disableRSS'] : null) ?
+                "" :
+                "\n" + 
+                  (guard((context != null) ? context['rssFeedUrl'] : null) ?
+                    "<a target=\"_blank\" href=\"" + 
+                      __escape(guard((context != null) ? context['rssFeedUrl'] : null)) + 
+                      "\" itemprop=\"item\"><i class=\"fa fa-rss-square\"></i></a>" :
+                    "")) + 
+              "\n" :
+            "") + 
+          "\n</span>\n" + 
+          (guard((context != null && context['breadcrumbs'] != null && context['breadcrumbs'][key0] != null) ? context['breadcrumbs'][key0]['url'] : null) ?
+            "</a>" :
+            "") + 
+          "\n</li>\n";
+      }, function alt() {
+        return "";
+      });
+    },
     'widgets.header': function widgetsheader(helpers, context, guard, iter, helper) {
       var __escape = helpers.__escape;
       var value = context;
@@ -60,41 +98,23 @@
       var value = context;
       return iter(guard((context != null) ? context['tags'] : null), function each(key0, index, length, value) {
         var key = key0;
-        return "\n<div>\n<a href=\"" + 
+        return "\n<h5 class=\"float-start tag-container me-5 mb-5 fw-bold\">\n<a href=\"" + 
           __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
           "/tags/" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEncoded'] : null)) + 
           "\" data-tag=\"" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEscaped'] : null)) + 
-          "\" class=\"btn btn-ghost ff-base d-flex flex-column gap-1 align-items-start justify-content-start text-truncate p-2\">\n<div class=\"fw-semibold text-nowrap tag-item w-100 text-start text-truncate\">" + 
+          "\"><span class=\"tag-item text-muted text-uppercase text-nowrap tag-class-" + 
+          __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['class'] : null)) + 
+          " me-2\" data-tag=\"" + 
           __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEscaped'] : null)) + 
-          "</div>\n<div class=\"text-xs text-muted text-nowrap tag-topic-count\">[[global:x-topics, " + 
-          __escape(helper(context, helpers, 'txEscape', [helper(context, helpers, 'formattedNumber', [guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['score'] : null)])])) + 
-          "]]</div>\n</a>\n</div>\n";
-      }, function alt() {
-        return "";
-      });
-    },
-    'widgets.sidebar': function widgetssidebar(helpers, context, guard, iter, helper) {
-      var __escape = helpers.__escape;
-      var value = context;
-      return iter(guard((context != null && context['widgets'] != null) ? context['widgets']['sidebar'] : null), function each(key0, index, length, value) {
-        var key = key0;
-        return "\n" + 
-          guard((context != null && context['widgets'] != null && context['widgets']['sidebar'] != null && context['widgets']['sidebar'][key0] != null) ? context['widgets']['sidebar'][key0]['html'] : null) + 
-          "\n";
-      }, function alt() {
-        return "";
-      });
-    },
-    'widgets.footer': function widgetsfooter(helpers, context, guard, iter, helper) {
-      var __escape = helpers.__escape;
-      var value = context;
-      return iter(guard((context != null && context['widgets'] != null) ? context['widgets']['footer'] : null), function each(key0, index, length, value) {
-        var key = key0;
-        return "\n" + 
-          guard((context != null && context['widgets'] != null && context['widgets']['footer'] != null && context['widgets']['footer'][key0] != null) ? context['widgets']['footer'][key0]['html'] : null) + 
-          "\n";
+          "\">" + 
+          __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['valueEscaped'] : null)) + 
+          "</span><span class=\"tag-topic-count text-primary text-nowrap\" title=\"" + 
+          __escape(guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['score'] : null)) + 
+          "\">" + 
+          __escape(helper(context, helpers, 'formattedNumber', [guard((context != null && context['tags'] != null && context['tags'][key0] != null) ? context['tags'][key0]['score'] : null)])) + 
+          "</span></a>\n</h5>\n";
       }, function alt() {
         return "";
       });

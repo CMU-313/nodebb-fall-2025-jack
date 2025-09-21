@@ -1078,300 +1078,539 @@ require(['translator', 'bootbox'], function (shim, bootbox) {
 
 ;'use strict';
 
-$(document).ready(function () {
-	setupSkinSwitcher();
-	setupNProgress();
-	setupMobileMenu();
-	setupSearch();
-	setupDrafts();
-	handleMobileNavigator();
-	setupNavTooltips();
-	fixPlaceholders();
-	fixSidebarOverflow();
+(function () {
+	require(['markdown', 'components'], (markdown, components) => {
+		async function initHljs() {
+			if (window.hljs) {
+				return;
+			}
+			console.debug('[plugin/markdown] Initializing highlight.js');
+			let hljs;
+			let list;
+			if (config.markdown.hljsLanguages.includes('common')) {
+				({ default: hljs} = await import(`highlight.js/lib/common`));
+				list = 'common';
+			} else if (config.markdown.hljsLanguages.includes('all')) {
+				({ default: hljs} = await import(`highlight.js`));
+				list = 'all';
+			} else {
+				({ default: hljs} = await import(`highlight.js/lib/core`));
+				list = 'core';
+			}
 
-	function setupSkinSwitcher() {
-		$('[component="skinSwitcher"]').on('click', '.dropdown-item', function () {
-			const skin = $(this).attr('data-value');
-			$('[component="skinSwitcher"] .dropdown-item .fa-check').addClass('invisible');
-			$(this).find('.fa-check').removeClass('invisible');
-			require(['forum/account/settings', 'hooks'], function (accountSettings, hooks) {
-				hooks.one('action:skin.change', function () {
-					$('[component="skinSwitcher"] [component="skinSwitcher/icon"]').removeClass('fa-fade');
-				});
-				$('[component="skinSwitcher"] [component="skinSwitcher/icon"]').addClass('fa-fade');
-				accountSettings.changeSkin(skin);
-			});
+			console.debug(`[plugins/markdown] Loaded ${list} hljs library`);
+
+			if (list !== 'all') {
+				await Promise.all(config.markdown.hljsLanguages.map(async (language) => {
+					if (['common', 'all'].includes(language)) {
+						return;
+					}
+
+					console.debug(`[plugins/markdown] Loading ${language} support`);
+					const { default: lang } = await import('../../node_modules/highlight.js/lib/languages/' + language + '.js');
+					hljs.registerLanguage(language, lang);
+				}));
+			}
+			window.hljs = hljs;
+			markdown.buildAliasMap();
+		}
+
+		$(window).on('action:composer.enhanced', function (evt, data) {
+			var textareaEl = data.postContainer.find('textarea');
+			markdown.capturePaste(textareaEl);
+			markdown.prepareFormattingTools();
 		});
-	}
 
-	require(['hooks'], function (hooks) {
-		$(window).on('action:composer.resize action:sidebar.toggle', function () {
-			const isRtl = $('html').attr('data-dir') === 'rtl';
-			const css = {
-				width: $('#panel').width(),
-			};
-			const sidebarEl = $('.sidebar-left');
-			css[isRtl ? 'right' : 'left'] = sidebarEl.is(':visible') ? sidebarEl.outerWidth(true) : 0;
-			$('[component="composer"]').css(css);
+		$(window).on('action:composer.preview', {
+			selector: '.composer .preview pre code',
+		}, async (params) => {
+			await initHljs();
+			markdown.highlight(params);
 		});
 
-		hooks.on('filter:chat.openChat', function (hookData) {
-			// disables chat modals & goes straight to chat page based on user setting
-			hookData.modal = config.theme.chatModals && !utils.isMobile();
-			return hookData;
+		$(window).on('action:posts.loaded action:topic.loaded action:posts.edited', async function (ev, data) {
+			await initHljs();
+			markdown.highlight(components.get('post/content').find('pre code'));
+			markdown.enhanceCheckbox(ev, data);
+			markdown.markExternalLinks();
 		});
 	});
+}());
 
-	function setupMobileMenu() {
-		require(['hooks', 'api', 'navigator'], function (hooks, api, navigator) {
-			$('[component="sidebar/toggle"]').on('click', async function () {
-				const sidebarEl = $('.sidebar');
-				sidebarEl.toggleClass('open');
-				if (app.user.uid) {
-					await api.put(`/users/${app.user.uid}/settings`, {
-						settings: {
-							openSidebars: sidebarEl.hasClass('open') ? 'on' : 'off',
-						},
+;/* eslint-disable */
+/*
+ *  Bootstrap Auto-Hiding Navbar - v4.0.0
+ *  An extension for Bootstrap's fixed navbar which hides the navbar while the page is scrolling downwards and shows it the other way. The plugin is able to show/hide the navbar programmatically as well.
+ *  http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/
+ *
+ *  Made by István Ujj-Mészáros
+ *  Under Apache License v2.0 License
+ */
+;(function($, window, document, undefined) {
+    var pluginName = 'autoHidingNavbar',
+        $window = $(window),
+        $document = $(document),
+        _scrollThrottleTimer = null,
+        _resizeThrottleTimer = null,
+        _throttleDelay = 70,
+        _lastScrollHandlerRun = 0,
+        _previousScrollTop = null,
+        _windowHeight = $window.height(),
+        _visible = true,
+        _hideOffset,
+        defaults = {
+          disableAutohide: false,
+          showOnUpscroll: true,
+          showOnBottom: true,
+          hideOffset: 'auto', // "auto" means the navbar height
+          animationDuration: 200,
+          navbarOffset: 0
+        };
+
+    function AutoHidingNavbar(element, options) {
+      this.element = $(element);
+      this.settings = $.extend({}, defaults, options);
+      this._defaults = defaults;
+      this._name = pluginName;
+      this.init();
+    }
+
+    function hide(autoHidingNavbar) {
+      if (!_visible) {
+        return;
+      }
+
+      autoHidingNavbar.element.addClass('navbar-hidden').animate({
+        top: -1 * parseInt(autoHidingNavbar.element.css('height'), 10) + autoHidingNavbar.settings.navbarOffset
+      }, {
+        queue: false,
+        duration: autoHidingNavbar.settings.animationDuration
+      });
+
+      try {
+        $('.dropdown.open .dropdown-toggle, .dropdown.show .dropdown-toggle', autoHidingNavbar.element).dropdown('toggle');
+      }
+      catch(e) {}
+
+      _visible = false;
+
+      autoHidingNavbar.element.trigger('hide.autoHidingNavbar');
+    }
+
+    function show(autoHidingNavbar) {
+      if (_visible) {
+        return;
+      }
+
+      autoHidingNavbar.element.removeClass('navbar-hidden').animate({
+        top: 0
+      }, {
+        queue: false,
+        duration: autoHidingNavbar.settings.animationDuration
+      });
+      _visible = true;
+
+      autoHidingNavbar.element.trigger('show.autoHidingNavbar');
+    }
+
+    function detectState(autoHidingNavbar) {
+      var scrollTop = $window.scrollTop(),
+          scrollDelta = scrollTop - _previousScrollTop;
+
+      _previousScrollTop = scrollTop;
+
+      if (scrollDelta < 0) {
+        if (_visible) {
+          return;
+        }
+
+        if (autoHidingNavbar.settings.showOnUpscroll || scrollTop <= _hideOffset) {
+          show(autoHidingNavbar);
+        }
+      }
+      else if (scrollDelta > 0) {
+        if (!_visible) {
+          if (autoHidingNavbar.settings.showOnBottom && scrollTop + _windowHeight === $document.height()) {
+            show(autoHidingNavbar);
+          }
+          return;
+        }
+
+        if (scrollTop >= _hideOffset) {
+          hide(autoHidingNavbar);
+        }
+      }
+
+    }
+
+    function scrollHandler(autoHidingNavbar) {
+      if (autoHidingNavbar.settings.disableAutohide) {
+        return;
+      }
+
+      _lastScrollHandlerRun = new Date().getTime();
+
+      detectState(autoHidingNavbar);
+    }
+
+    function bindEvents(autoHidingNavbar) {
+      $document.on('scroll.' + pluginName, function() {
+        if (new Date().getTime() - _lastScrollHandlerRun > _throttleDelay) {
+          scrollHandler(autoHidingNavbar);
+        }
+        else {
+          clearTimeout(_scrollThrottleTimer);
+          _scrollThrottleTimer = setTimeout(function() {
+            scrollHandler(autoHidingNavbar);
+          }, _throttleDelay);
+        }
+      });
+
+      $window.on('resize.' + pluginName, function() {
+        clearTimeout(_resizeThrottleTimer);
+        _resizeThrottleTimer = setTimeout(function() {
+          _windowHeight = $window.height();
+        }, _throttleDelay);
+      });
+    }
+
+    function unbindEvents() {
+      $document.off('.' + pluginName);
+
+      $window.off('.' + pluginName);
+    }
+
+    AutoHidingNavbar.prototype = {
+      init: function() {
+        this.elements = {
+          navbar: this.element
+        };
+
+        this.setDisableAutohide(this.settings.disableAutohide);
+        this.setShowOnUpscroll(this.settings.showOnUpscroll);
+        this.setShowOnBottom(this.settings.showOnBottom);
+        this.setHideOffset(this.settings.hideOffset);
+        this.setAnimationDuration(this.settings.animationDuration);
+
+        _hideOffset = this.settings.hideOffset === 'auto' ? parseInt(this.element.css('height'), 10) : this.settings.hideOffset;
+        bindEvents(this);
+
+        return this.element;
+      },
+      setDisableAutohide: function(value) {
+        this.settings.disableAutohide = value;
+        return this.element;
+      },
+      setShowOnUpscroll: function(value) {
+        this.settings.showOnUpscroll = value;
+        return this.element;
+      },
+      setShowOnBottom: function(value) {
+        this.settings.showOnBottom = value;
+        return this.element;
+      },
+      setHideOffset: function(value) {
+        this.settings.hideOffset = value;
+        return this.element;
+      },
+      setAnimationDuration: function(value) {
+        this.settings.animationDuration = value;
+        return this.element;
+      },
+      show: function() {
+        show(this);
+        return this.element;
+      },
+      hide: function() {
+        hide(this);
+        return this.element;
+      },
+      destroy: function() {
+        unbindEvents(this);
+        show(this);
+        $.data(this, 'plugin_' + pluginName, null);
+        return this.element;
+      }
+    };
+
+    $.fn[pluginName] = function(options) {
+      var args = arguments;
+
+      if (options === undefined || typeof options === 'object') {
+        return this.each(function() {
+          if (!$.data(this, 'plugin_' + pluginName)) {
+            $.data(this, 'plugin_' + pluginName, new AutoHidingNavbar(this, options));
+          }
+        });
+      } else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
+        var returns;
+
+        this.each(function() {
+          var instance = $.data(this, 'plugin_' + pluginName);
+
+          if (instance instanceof AutoHidingNavbar && typeof instance[options] === 'function') {
+            returns = instance[options].apply(instance, Array.prototype.slice.call(args, 1));
+          }
+        });
+
+        return returns !== undefined ? returns : this;
+      }
+
+    };
+
+  })(jQuery, window, document);
+;'use strict';
+
+$(document).ready(function () {
+	setupNProgress();
+	setupTaskbar();
+	setupEditedByIcon();
+	setupMobileMenu();
+	configureNavbarHiding();
+
+	$(window).on('resize', utils.debounce(configureNavbarHiding, 200));
+	$(window).on('resize', updatePanelOffset);
+
+	function updatePanelOffset() {
+		const header = document.getElementById('header-menu');
+
+		if (!header) {
+			console.warn('[persona/updatePanelOffset] Could not find #header-menu, panel offset unchanged.');
+			return;
+		}
+
+		const rect = header.getBoundingClientRect();
+		const offset = Math.max(0, rect.bottom);
+		document.documentElement.style.setProperty('--panel-offset', `${offset}px`);
+	}
+
+	var lastBSEnv = '';
+	function configureNavbarHiding() {
+		if (!$.fn.autoHidingNavbar) {
+			return;
+		}
+
+		require(['hooks', 'storage'], (hooks, Storage) => {
+			let preference = ['xs', 'sm'];
+
+			try {
+				preference = JSON.parse(Storage.getItem('persona:navbar:autohide')) || preference;
+			} catch (e) {
+				console.warn('[persona/settings] Unable to parse value for navbar autohiding');
+			}
+			var env = utils.findBootstrapEnvironment();
+			// if env didn't change don't destroy and recreate
+			if (env === lastBSEnv) {
+				return;
+			}
+			lastBSEnv = env;
+			var navbarEl = $('[component="navbar"]');
+			navbarEl.autoHidingNavbar('destroy').removeData('plugin_autoHidingNavbar');
+			navbarEl.css('top', '');
+
+			hooks
+				.on('filter:navigator.scroll', (data) => {
+					navbarEl.autoHidingNavbar('setDisableAutohide', true);
+					return data;
+				})
+				.on('action:navigator.scrolled', () => {
+					navbarEl.autoHidingNavbar('setDisableAutohide', false);
+				});
+
+			hooks.fire('filter:persona.configureNavbarHiding', {
+				resizeEnvs: preference,
+			}).then(({ resizeEnvs }) => {
+				if (resizeEnvs.includes(env)) {
+					navbarEl.autoHidingNavbar({
+						showOnBottom: false,
 					});
 				}
-				$(window).trigger('action:sidebar.toggle');
-				if (ajaxify.data.template.topic) {
-					hooks.fire('action:navigator.update', { newIndex: navigator.getIndex() });
-				}
-			});
 
-			const bottomBar = $('[component="bottombar"]');
-			let stickyTools = null;
-			const location = config.theme.topMobilebar ? 'top' : 'bottom';
-			const $body = $('body');
-			const $window = $(window);
-			$body.on('shown.bs.dropdown hidden.bs.dropdown', '.sticky-tools', function () {
-				bottomBar.toggleClass('hidden', $(this).find('.dropdown-menu.show').length);
-			});
-			function isSearchVisible() {
-				return !!$('[component="bottombar"] [component="sidebar/search"] .search-dropdown.show').length;
-			}
-
-			let lastScrollTop = $window.scrollTop();
-			let newPostsLoaded = false;
-
-			function onWindowScroll() {
-				const st = $window.scrollTop();
-				if (newPostsLoaded) {
-					newPostsLoaded = false;
-					lastScrollTop = st;
-					return;
-				}
-				if (st !== lastScrollTop && !navigator.scrollActive && !isSearchVisible()) {
-					const diff = Math.abs(st - lastScrollTop);
-					const scrolledDown = st > lastScrollTop;
-					const scrolledUp = st < lastScrollTop;
-					const isHiding = !scrolledUp && scrolledDown;
-					if (diff > 10) {
-						bottomBar.css({
-							[location]: isHiding ?
-								-bottomBar.find('.bottombar-nav').outerHeight(true) :
-								0,
-						});
-						if (stickyTools && config.theme.topMobilebar && config.theme.autohideBottombar) {
-							stickyTools.css({
-								top: isHiding ? 0 : 'var(--panel-offset)',
-							});
+				function fixTopCss(topValue) {
+					if (ajaxify.data.template.topic) {
+						$('.topic .topic-header').css({ top: topValue });
+					} else {
+						var topicListHeader = $('.topic-list-header');
+						if (topicListHeader.length) {
+							topicListHeader.css({ top: topValue });
 						}
 					}
 				}
-				lastScrollTop = st;
-			}
 
-			const delayedScroll = utils.throttle(onWindowScroll, 250);
-			function enableAutohide() {
-				$window.off('scroll', delayedScroll);
-				if (config.theme.autohideBottombar) {
-					lastScrollTop = $window.scrollTop();
-					$window.on('scroll', delayedScroll);
-				}
-			}
+				navbarEl.off('show.autoHidingNavbar')
+					.on('show.autoHidingNavbar', function () {
+						fixTopCss('');
+					});
 
-			hooks.on('action:posts.loading', function () {
-				$window.off('scroll', delayedScroll);
+				navbarEl.off('hide.autoHidingNavbar')
+					.on('hide.autoHidingNavbar', function () {
+						fixTopCss('0px');
+					});
 			});
-			hooks.on('action:posts.loaded', function () {
-				newPostsLoaded = true;
-				setTimeout(enableAutohide, 250);
-			});
-			hooks.on('action:ajaxify.end', function () {
-				bottomBar.removeClass('hidden');
-				const { template } = ajaxify.data;
-				stickyTools = (template.category || template.topic) ? $('.sticky-tools') : null;
-				$window.off('scroll', delayedScroll);
-				if (config.theme.autohideBottombar) {
-					bottomBar.css({ [location]: 0 });
-					setTimeout(enableAutohide, 250);
-				}
-			});
-		});
-	}
-
-	function setupSearch() {
-		$('[component="sidebar/search"]').on('shown.bs.dropdown', function () {
-			$(this).find('[component="search/fields"] input[name="query"]').trigger('focus');
-		});
-	}
-
-	function setupDrafts() {
-		require(['composer/drafts', 'bootbox'], function (drafts, bootbox) {
-			const draftsEl = $('[component="sidebar/drafts"]');
-
-			function updateBadgeCount() {
-				const count = drafts.getAvailableCount();
-				if (count > 0) {
-					draftsEl.removeClass('hidden');
-				}
-				$('[component="drafts/count"]').toggleClass('hidden', count <= 0).text(count);
-			}
-
-			async function renderDraftList() {
-				const draftListEl = $('[component="drafts/list"]');
-				const draftItems = drafts.listAvailable();
-				if (!draftItems.length) {
-					draftListEl.find('.no-drafts').removeClass('hidden');
-					draftListEl.find('.placeholder-wave').addClass('hidden');
-					draftListEl.find('.draft-item-container').html('');
-					return;
-				}
-				draftItems.reverse().forEach((draft) => {
-					if (draft) {
-						if (draft.title) {
-							draft.title = utils.escapeHTML(String(draft.title));
-						}
-						draft.text = utils.escapeHTML(
-							draft.text
-						).replace(/(?:\r\n|\r|\n)/g, '<br>');
-					}
-				});
-
-				const html = await app.parseAndTranslate('partials/sidebar/drafts', 'drafts', { drafts: draftItems });
-				draftListEl.find('.no-drafts').addClass('hidden');
-				draftListEl.find('.placeholder-wave').addClass('hidden');
-				draftListEl.find('.draft-item-container').html(html).find('.timeago').timeago();
-			}
-
-
-			draftsEl.on('shown.bs.dropdown', renderDraftList);
-
-			draftsEl.on('click', '[component="drafts/open"]', function () {
-				drafts.open($(this).attr('data-save-id'));
-			});
-
-			draftsEl.on('click', '[component="drafts/delete"]', function () {
-				const save_id = $(this).attr('data-save-id');
-				bootbox.confirm('[[modules:composer.discard-draft-confirm]]', function (ok) {
-					if (ok) {
-						drafts.removeDraft(save_id);
-						renderDraftList();
-					}
-				});
-				return false;
-			});
-
-			$(window).on('action:composer.drafts.save', updateBadgeCount);
-			$(window).on('action:composer.drafts.remove', updateBadgeCount);
-			updateBadgeCount();
 		});
 	}
 
 	function setupNProgress() {
 		require(['nprogress'], function (NProgress) {
-			window.nprogress = NProgress;
-			if (NProgress) {
-				$(window).on('action:ajaxify.start', function () {
-					NProgress.set(0.7);
-				});
-
-				$(window).on('action:ajaxify.end', function () {
-					NProgress.done(true);
-				});
-			}
-		});
-	}
-
-	function handleMobileNavigator() {
-		const paginationBlockEl = $('.pagination-block');
-		require(['hooks'], function (hooks) {
-			hooks.on('action:ajaxify.end', function () {
-				paginationBlockEl.find('.dropdown-menu.show').removeClass('show');
-			});
-			hooks.on('filter:navigator.scroll', function (hookData) {
-				paginationBlockEl.find('.dropdown-menu.show').removeClass('show');
-				return hookData;
-			});
-		});
-	}
-
-	function setupNavTooltips() {
-		// remove title from user icon in sidebar to prevent double tooltip
-		$('.sidebar [component="header/avatar"] .avatar').removeAttr('title');
-		const tooltipEls = $('.sidebar [title]');
-		const lefttooltipEls = $('.sidebar-left [title]');
-		const rightooltipEls = $('.sidebar-right [title]');
-		const isRtl = $('html').attr('data-dir') === 'rtl';
-		lefttooltipEls.tooltip({
-			trigger: 'manual',
-			animation: false,
-			placement: isRtl ? 'left' : 'right',
-		});
-		rightooltipEls.tooltip({
-			trigger: 'manual',
-			animation: false,
-			placement: isRtl ? 'right' : 'left',
-		});
-
-		tooltipEls.on('mouseenter', function (ev) {
-			const target = $(ev.target);
-			const isDropdown = target.hasClass('dropdown-menu') || !!target.parents('.dropdown-menu').length;
-			if (!$('.sidebar').hasClass('open') && !isDropdown) {
-				$(this).tooltip('show');
-			}
-		});
-		tooltipEls.on('click mouseleave', function () {
-			$(this).tooltip('hide');
-		});
-	}
-
-	function fixPlaceholders() {
-		if (!config.loggedIn) {
-			return;
-		}
-		['notifications', 'chat'].forEach((type) => {
-			const countEl = $(`nav.sidebar [component="${type}/count"]`).first();
-			if (!countEl.length) {
+			if (typeof NProgress === 'undefined') {
 				return;
 			}
-			const count = parseInt(countEl.text(), 10);
-			if (count > 1) {
-				const listEls = $(`.dropdown-menu [component="${type}/list"]`);
-				listEls.each((index, el) => {
-					const placeholder = $(el).children().first();
-					for (let x = 0; x < count - 1; x++) {
-						const cloneEl = placeholder.clone(true);
-						cloneEl.insertAfter(placeholder);
-					}
-				});
+
+			$(window).on('action:ajaxify.start', function () {
+				NProgress.set(0.7);
+			});
+
+			$(window).on('action:ajaxify.end', function (ev, data) {
+				NProgress.done();
+				setupHoverCards();
+
+				if (data.url && data.url.match('user/')) {
+					setupFavouriteButtonOnProfile();
+				}
+			});
+		});
+	}
+
+	function setupTaskbar() {
+		require(['persona/taskbar'], function (taskbar) {
+			taskbar.init();
+		});
+	}
+
+	function setupEditedByIcon() {
+		function activateEditedTooltips() {
+			$('[data-pid] [component="post/editor"]').each(function () {
+				var el = $(this);
+				var icon;
+
+				if (!el.attr('data-editor')) {
+					return;
+				}
+
+				icon = el.closest('[data-pid]').find('.edit-icon').first();
+				icon.prop('title', el.text()).tooltip().removeClass('hidden');
+			});
+		}
+
+		$(window).on('action:posts.edited', function (ev, data) {
+			var parent = $('[data-pid="' + data.post.pid + '"]');
+			var icon = parent.find('.edit-icon').filter(function (index, el) {
+				return parseInt($(el).closest('[data-pid]').attr('data-pid'), 10) === parseInt(data.post.pid, 10);
+			});
+			var el = parent.find('[component="post/editor"]').first();
+			icon.prop('title', el.text()).tooltip().removeClass('hidden');
+		});
+
+		$(window).on('action:topic.loaded', activateEditedTooltips);
+		$(window).on('action:posts.loaded', activateEditedTooltips);
+	}
+
+	function setupMobileMenu() {
+		require(['persona/mobile-menu'], function (mobileMenu) {
+			mobileMenu.init();
+		});
+	}
+
+	function setupHoverCards() {
+		require(['components'], function (components) {
+			components.get('topic')
+				.on('click', '[component="user/picture"],[component="user/status"]', generateUserCard);
+		});
+
+		$(window).on('action:posts.loading', function (ev, data) {
+			for (var i = 0, ii = data.posts.length; i < ii; i++) {
+				(ajaxify.data.topics || ajaxify.data.posts)[data.posts[i].index] = data.posts[i];
 			}
 		});
 	}
 
-	function fixSidebarOverflow() {
-		// overflow-y-auto needs to be removed on main-nav when dropdowns are opened
-		const mainNavEl = $('#main-nav');
-		function toggleOverflow() {
-			mainNavEl.toggleClass(
-				'overflow-y-auto',
-				!mainNavEl.find('.dropdown-menu.show').length
-			);
+	function generateUserCard(ev) {
+		var avatar = $(this);
+		var uid = avatar.parents('[data-uid]').attr('data-uid');
+		const topicOrPost = (ajaxify.data.topics || ajaxify.data.posts || []).find(d => String(d.uid) === String(uid));
+		if (!topicOrPost) return;
+		const user = topicOrPost.user;
+
+		$('.persona-usercard').remove();
+
+		if (!user.userslug) {
+			return false;
 		}
-		mainNavEl.on('shown.bs.dropdown', toggleOverflow)
-			.on('hidden.bs.dropdown', toggleOverflow);
+
+		socket.emit('user.isFollowing', { uid: user.uid }, function (err, isFollowing) {
+			if (err) {
+				return err;
+			}
+
+			app.parseAndTranslate('modules/usercard', user, function (html) {
+				var card = $(html);
+				avatar.parents('a').after(card.hide());
+
+				if (String(app.user.uid) === String(user.uid) || !app.user.uid) {
+					card.find('.btn-morph').hide();
+				} else {
+					const uid = isFinite(user.uid) ? user.uid : encodeURIComponent(user.userslug);
+					setupFavouriteMorph(card, uid, user.username);
+
+					if (isFollowing) {
+						$('.btn-morph').addClass('heart');
+					} else {
+						$('.btn-morph').addClass('plus');
+					}
+				}
+
+				setupCardRemoval(card);
+				card.fadeIn();
+			});
+		});
+
+		ev.preventDefault();
+		return false;
+	}
+
+	function setupFavouriteButtonOnProfile() {
+		const uid = isFinite(ajaxify.data.uid) ? ajaxify.data.uid : encodeURIComponent(ajaxify.data.userslug);
+		setupFavouriteMorph($('[component="account/cover"]'), uid, ajaxify.data.username);
+	}
+
+	function setupCardRemoval(card) {
+		function removeCard(ev) {
+			if ($(ev.target).closest('.persona-usercard').length === 0) {
+				card.fadeOut(function () {
+					card.remove();
+				});
+
+				$(document).off('click', removeCard);
+			}
+		}
+
+		$(document).on('click', removeCard);
+	}
+
+	function setupFavouriteMorph(parent, uid, username) {
+		require(['api', 'alerts'], function (api, alerts) {
+			parent.find('.btn-morph').click(function (ev) {
+				var type = $(this).hasClass('plus') ? 'follow' : 'unfollow';
+				var method = $(this).hasClass('plus') ? 'put' : 'del';
+
+				api[method]('/users/' + uid + '/follow').then(() => {
+					alerts.success('[[global:alert.' + type + ', ' + username + ']]');
+				});
+
+				$(this).toggleClass('plus').toggleClass('heart');
+				$(this).translateAttr('title', type === 'follow' ? '[[global:unfollow]]' : '[[global:follow]]');
+
+				if ($(this).find('b.drop').length === 0) {
+					$(this).prepend('<b class="drop"></b>');
+				}
+
+				var drop = $(this).find('b.drop').removeClass('animate');
+				var x = ev.pageX - (drop.width() / 2) - $(this).offset().left;
+				var y = ev.pageY - (drop.height() / 2) - $(this).offset().top;
+
+				drop.css({ top: y + 'px', left: x + 'px' }).addClass('animate');
+			});
+		});
 	}
 });
 
@@ -1649,267 +1888,3 @@ $(document).ready(function () {
 		window.screenfull = screenfull;
 	}
 })();
-
-;'use strict';
-
-(function () {
-	require(['markdown', 'components'], (markdown, components) => {
-		async function initHljs() {
-			if (window.hljs) {
-				return;
-			}
-			console.debug('[plugin/markdown] Initializing highlight.js');
-			let hljs;
-			let list;
-			if (config.markdown.hljsLanguages.includes('common')) {
-				({ default: hljs} = await import(`highlight.js/lib/common`));
-				list = 'common';
-			} else if (config.markdown.hljsLanguages.includes('all')) {
-				({ default: hljs} = await import(`highlight.js`));
-				list = 'all';
-			} else {
-				({ default: hljs} = await import(`highlight.js/lib/core`));
-				list = 'core';
-			}
-
-			console.debug(`[plugins/markdown] Loaded ${list} hljs library`);
-
-			if (list !== 'all') {
-				await Promise.all(config.markdown.hljsLanguages.map(async (language) => {
-					if (['common', 'all'].includes(language)) {
-						return;
-					}
-
-					console.debug(`[plugins/markdown] Loading ${language} support`);
-					const { default: lang } = await import('../../node_modules/highlight.js/lib/languages/' + language + '.js');
-					hljs.registerLanguage(language, lang);
-				}));
-			}
-			window.hljs = hljs;
-			markdown.buildAliasMap();
-		}
-
-		$(window).on('action:composer.enhanced', function (evt, data) {
-			var textareaEl = data.postContainer.find('textarea');
-			markdown.capturePaste(textareaEl);
-			markdown.prepareFormattingTools();
-		});
-
-		$(window).on('action:composer.preview', {
-			selector: '.composer .preview pre code',
-		}, async (params) => {
-			await initHljs();
-			markdown.highlight(params);
-		});
-
-		$(window).on('action:posts.loaded action:topic.loaded action:posts.edited', async function (ev, data) {
-			await initHljs();
-			markdown.highlight(components.get('post/content').find('pre code'));
-			markdown.enhanceCheckbox(ev, data);
-			markdown.markExternalLinks();
-		});
-	});
-}());
-
-;
-'use strict';
-
-$(document).ready(function () {
-	let groupList = [];
-	let categoryList;
-	const categorySlugMap = new Map();
-	let localUserList = [];
-
-	$(window).on('composer:autocomplete:init chat:autocomplete:init', function (ev, data) {
-		loadTopicUsers(data.element);
-
-		if (!groupList.length) {
-			loadGroupList();
-		}
-
-		if (!categoryList) {
-			loadCategoryList();
-		}
-
-		let slugify;
-		const strategy = {
-			match: /\B@([^\s\n]*)?$/,
-			search: function (term, callback) {
-				require(['composer', 'helpers', 'slugify'], function (composer, helpers, _slugify) {
-					slugify = _slugify;
-					let mentions = [];
-					if (!term) {
-						mentions = entriesToMentions(sortEntries(localUserList), helpers);
-						return callback(mentions);
-					}
-
-					// Get composer metadata
-					const uuid = data.options.className && data.options.className.match(/dropdown-(.+?)\s/)[1];
-					socket.emit('plugins.mentions.userSearch', {
-						query: term,
-						composerObj: composer.posts[uuid],
-					}, function (err, users) {
-						if (err) {
-							require(['alerts'], function (alerts) {
-								alerts.alert({
-									id: 'mention-error',
-									type: 'danger',
-									message: err.message,
-									timeout: 5000,
-								});
-							});
-							return callback([]);
-						}
-						const termLowerCase = term.toLocaleLowerCase();
-						const localMatches = localUserList.filter(
-							u => u.username.toLocaleLowerCase().startsWith(termLowerCase)
-						);
-						const categoryMatches = categoryList.filter(c => c && c.handle && c.handle.startsWith(termLowerCase));
-
-						// remove local matches from search results, add category matches
-						users = users.filter(u => !localMatches.find(lu => lu.uid === u.uid));
-						users = sortEntries(localMatches).concat(sortEntries([...users, ...categoryMatches]));
-						mentions = entriesToMentions(users, helpers);
-
-						// Add groups that start with the search term
-						const groupMentions = groupList.filter(function (groupName) {
-							return groupName.toLocaleLowerCase().startsWith(termLowerCase);
-						}).sort(function (a, b) {
-							return a.toLocaleLowerCase() > b.toLocaleLowerCase() ? 1 : -1;
-						});
-						// Add group mentions at the bottom of dropdown
-						mentions = mentions.concat(groupMentions);
-
-						callback(mentions);
-					});
-				});
-			},
-			index: 1,
-			replace: function (mention) {
-				// Strip (fullname) part from mentions
-				mention = mention.replace(/ \(.+\)$/, '');
-				mention = $('<div/>').html(mention);
-				// Strip letter avatar
-				mention.find('span').remove();
-
-				const text = mention.text().trim();
-				const categoryHandle = categorySlugMap.get(text.toLowerCase());
-				if (categoryHandle) {
-					return `@${categoryHandle}`;
-				}
-
-				return '@' + slugify(text, true) + ' ';
-			},
-			cache: true,
-		};
-
-		data.strategies.push(strategy);
-	});
-
-	$(window).on('action:composer.loaded', function (ev, data) {
-		const composer = $('#cmp-uuid-' + data.post_uuid + ' .write');
-		composer.attr('data-mentions', '1');
-	});
-
-	function sortEntries(entries) {
-		return entries.sort(function (entry1, entry2) {
-			const comparator1 = entry1.username || entry1.name;
-			const comparator2 = entry2.username || entry2.name;
-			return comparator1.toLocaleLowerCase() > comparator2.toLocaleLowerCase() ? 1 : -1;
-		});
-	}
-
-	function entriesToMentions(entries, helpers) {
-		return entries.reduce(function (carry, entry) {
-			// Don't add current user to suggestions
-			if (app.user.username && app.user.username === entry.username) {
-				return carry;
-			}
-
-			// Format suggestions as 'avatar username/name (fullname)'
-			const avatar = entry.uid ? helpers.buildAvatar(entry, '24px', true) : '';
-			const fullname = entry.fullname ? `(${entry.fullname})` : '';
-			carry.push(`${avatar} ${entry.username || entry.name} ${helpers.escape(fullname)}`);
-
-			return carry;
-		}, []);
-	}
-
-	function loadTopicUsers(element) {
-		require(['composer', 'alerts'], function (composer, alerts) {
-			function findTid() {
-				const composerEl = element.parents('.composer').get(0);
-				if (composerEl) {
-					const uuid = composerEl.getAttribute('data-uuid');
-					const composerObj = composer.posts[uuid];
-					if (composerObj && composerObj.tid) {
-						return composerObj.tid;
-					}
-				}
-				if (ajaxify.data.template.topic) {
-					return ajaxify.data.tid;
-				}
-				return null;
-			}
-
-			const tid = findTid();
-			if (!tid) {
-				localUserList = [];
-				return;
-			}
-			socket.emit('plugins.mentions.getTopicUsers', {
-				tid: tid,
-			}, function (err, users) {
-				if (err) {
-					return alerts.error(err);
-				}
-				localUserList = users;
-			});
-		});
-	}
-
-	function loadGroupList() {
-		socket.emit('plugins.mentions.listGroups', function (err, groupNames) {
-			if (err) {
-				require(['alerts'], function (alerts) {
-					alerts.error(err);
-				});
-				return;
-			}
-			groupList = groupNames;
-		});
-	}
-
-	function loadCategoryList() {
-		require(['api'], async (api) => {
-			const { categories } = await api.get('/categories');
-			categoryList = categories;
-			categories.forEach((category) => {
-				categorySlugMap.set(category.name.toLowerCase(), category.handle);
-			});
-		});
-	}
-});
-
-;/* eslint-disable */
-
-require(['emoji'], function (emoji) {
-  $(window).on('composer:autocomplete:init chat:autocomplete:init', function (e, data) {
-    emoji.init();
-    data.strategies.push(emoji.strategy);
-  });
-
-  $(window).on('action:chat.loaded', (ev, container) => {
-    const containerEl = $(container);
-    const textarea = containerEl.find('[component="chat/input"]')[0];
-    const addEmojiBtn = containerEl.find('[data-action="emoji"]');
-
-    addEmojiBtn.on('click', (ev) => {
-      require([
-        'emoji-dialog'
-      ], function (emojiDialog) {
-          emojiDialog.toggleForInsert(textarea, 0, 0, ev);
-      });
-    });
-  });
-});

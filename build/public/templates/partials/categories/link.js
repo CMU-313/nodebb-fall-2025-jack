@@ -13,15 +13,19 @@
         "\n" + 
           __escape(guard((context != null) ? context['name'] : null)) + 
           "\n" :
-        "\n<a class=\"text-reset\" href=\"" + 
+        "\n" + 
           (guard((context != null) ? context['link'] : null) ?
-            __escape(guard((context != null) ? context['link'] : null)) :
-            __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
+            "\n<a href=\"" + 
+              __escape(guard((context != null) ? context['link'] : null)) + 
+              "\" itemprop=\"url\">\n" :
+            "\n<a href=\"" + 
+              __escape(guard((context != null && context['config'] != null) ? context['config']['relative_path'] : null)) + 
               "/category/" + 
-              __escape(guard((context != null) ? context['slug'] : null))) + 
-          "\" itemprop=\"url\">" + 
+              __escape(guard((context != null) ? context['slug'] : null)) + 
+              "\" itemprop=\"url\">\n") + 
+          "\n" + 
           __escape(guard((context != null) ? context['name'] : null)) + 
-          "</a>\n");
+          "\n</a>\n");
   }
 
   compiled.blocks = {

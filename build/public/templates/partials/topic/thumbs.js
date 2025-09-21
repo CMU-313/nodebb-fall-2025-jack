@@ -20,7 +20,7 @@
         var key = key0;
         return "\n<a class=\"d-inline-block\" href=\"" + 
           __escape(guard((context != null && context['thumbs'] != null && context['thumbs'][key0] != null) ? context['thumbs'][key0]['url'] : null)) + 
-          "\">\n<img class=\"rounded-1 bg-light\" style=\"width:auto; max-width: 5.33rem; height: 3.33rem; object-fit: contain;\" src=\"" + 
+          "\">\n<img class=\"rounded-1 bg-light\" style=\"width:auto; max-width: 4rem; height: 3.33rem;object-fit: contain;\" src=\"" + 
           __escape(guard((context != null && context['thumbs'] != null && context['thumbs'][key0] != null) ? context['thumbs'][key0]['url'] : null)) + 
           "\" />\n</a>\n";
       }, function alt() {

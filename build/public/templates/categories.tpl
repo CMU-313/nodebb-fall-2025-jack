@@ -1,9 +1,27 @@
+<!-- IF breadcrumbs.length -->
+<ol class="breadcrumb" itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
+{{{each breadcrumbs}}}
+<li<!-- IF @last --> component="breadcrumb/current"<!-- ENDIF @last --> itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item <!-- IF @last -->active<!-- ENDIF @last -->">
+<meta itemprop="position" content="{@index}" />
+{{{ if ./url }}}<a href="{breadcrumbs.url}" itemprop="item">{{{ end }}}
+<span itemprop="name">
+{breadcrumbs.text}
+<!-- IF @last -->
+<!-- IF !feeds:disableRSS -->
+<!-- IF rssFeedUrl --><a target="_blank" href="{rssFeedUrl}" itemprop="item"><i class="fa fa-rss-square"></i></a><!-- ENDIF rssFeedUrl --><!-- ENDIF !feeds:disableRSS -->
+<!-- ENDIF @last -->
+</span>
+{{{ if ./url }}}</a>{{{ end }}}
+</li>
+{{{end}}}
+</ol>
+<!-- ENDIF breadcrumbs.length -->
 <div data-widget-area="header">
 {{{ each widgets.header }}}
 {{widgets.header.html}}
 {{{ end }}}
 </div>
-<div class="row flex-fill py-2">
+<div class="row">
 <div class="{{{ if widgets.sidebar.length }}}col-lg-9 col-sm-12{{{ else }}}col-lg-12{{{ end }}}">
 {{{ if pagination.pages.length }}}
 <div><div component="category-selector" class="btn-group dropdown-left category-dropdown-container bottom-sheet">
@@ -46,41 +64,40 @@
 </ul>
 </div>
 </div></div>
-{{{ end }}}
-<ul class="categories-list list-unstyled" itemscope itemtype="http://www.schema.org/ItemList">
-{{{ each categories }}}
-<li component="categories/category" data-cid="{./cid}" class="w-100 border-bottom py-3 py-lg-4 gap-lg-0 gap-2 d-flex flex-column flex-lg-row align-items-start category-{./cid} {./unread-class}">
-<meta itemprop="name" content="{./name}">
-<div class="d-flex col-lg-7 gap-2 gap-lg-3">
-<div class="flex-shrink-0">
-{buildCategoryIcon(@value, "40px", "rounded-1")}
-</div>
-<div class="flex-grow-1 d-flex flex-wrap gap-1 me-0 me-lg-2">
-<h2 class="title text-break fs-4 fw-semibold m-0 tracking-tight w-100">
-{{{ if ./isSection }}}
-{./name}
 {{{ else }}}
-<a class="text-reset" href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" itemprop="url">{../name}</a>
+<h1 class="categories-title text-uppercase text-sm mb-2 fw-normal">[[pages:categories]]</h1>
 {{{ end }}}
+<ul class="categories list-unstyled" itemscope itemtype="http://www.schema.org/ItemList">
+{{{ each categories }}}
+<li component="categories/category" data-cid="{./cid}" class="w-100 py-2 mb-2 gap-lg-0 gap-2 d-flex flex-column flex-md-row align-items-start {{{ if !@last }}}border-bottom{{{ end }}} border-bottom-lg-0 category-{./cid} {./unread-class}">
+<meta itemprop="name" content="{./name}">
+<div class="d-flex col-md-7 gap-2 gap-lg-3">
+<div class="flex-shrink-0">
+{buildCategoryIcon(@value, "48px", "rounded-circle")}
+</div>
+<div class="flex-grow-1 d-flex flex-wrap gap-1">
+<h2 class="title text-break fs-4 fw-semibold m-0 tracking-tight w-100">
+<!-- IF ../isSection -->
+{../name}
+<!-- ELSE -->
+<!-- IF ../link -->
+<a href="{../link}" itemprop="url">
+<!-- ELSE -->
+<a href="{config.relative_path}/category/{../slug}" itemprop="url">
+<!-- ENDIF ../link -->
+{../name}
+</a>
+<!-- ENDIF ../isSection -->
 </h2>
 {{{ if ./descriptionParsed }}}
 <div class="description text-muted text-sm w-100 line-clamp-sm-5">
 {./descriptionParsed}
 </div>
 {{{ end }}}
-{{{ if !./link }}}
-<div class="d-flex gap-1 d-block d-lg-none w-100">
-<span class="badge text-body border stats text-xs text-muted">
-<i class="fa fa-fw fa-list"></i>
-<span class="fw-normal">{humanReadableNumber(./totalTopicCount, 0)}</span>
-</span>
-<span class="badge text-body border stats text-xs text-muted">
-<i class="fa-regular fa-fw fa-message"></i>
-<span class="fw-normal">{humanReadableNumber(./totalPostCount, 0)}</span>
-</span>
-{{{ if ./teaser }}}
-<a href="{config.relative_path}{./teaser.url}" class="border badge bg-transparent text-muted fw-normal timeago {{{ if (!./teaser.timestampISO || config.theme.mobileTopicTeasers) }}}hidden{{{ end }}}" title="{./teaser.timestampISO}"></a>
-{{{ end }}}
+{{{ if ./teaser.timestampISO }}}
+<div class="d-block d-md-none">
+<a class="permalink timeago text-muted" title="{../teaser.timestampISO}" href="{../teaser.url}">
+</a>
 </div>
 {{{ end }}}
 {{{ if !config.hideSubCategories }}}
@@ -88,11 +105,9 @@
 <ul class="list-unstyled category-children row row-cols-1 row-cols-md-2 g-2 my-1 w-100">
 {{{ each ./children }}}
 {{{ if !./isSection }}}
-<li data-cid="{./cid}" class="category-children-item small">
-<div class="d-flex gap-1">
-<i class="fa fa-fw fa-caret-right text-primary" style="line-height: var(--bs-body-line-height);"></i>
-<a href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" class="text-reset fw-semibold">{./name}</a>
-</div>
+<li class="category-children-item small d-flex gap-1 align-items-center">
+{buildCategoryIcon(@value, "24px", "rounded-circle")}
+<a href="{{{ if ./link }}}{./link}{{{ else }}}{config.relative_path}/category/{./slug}{{{ end }}}" class="text-reset">{./name}</a>
 </li>
 {{{ end }}}
 {{{ end }}}
@@ -102,22 +117,20 @@
 </div>
 </div>
 {{{ if !./link }}}
-<div class="d-flex col-lg-5 col-12 align-content-stretch">
+<div class="d-flex col-md-5 col-12 align-content-stretch">
 <div class="meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted" style="grid-template-columns: 1fr 1fr;">
-<div class="card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
-<span class="fs-5 ff-secondary lh-1" title="{./totalTopicCount}">{humanReadableNumber(./totalTopicCount, 0)}</span>
-<span class="d-none d-xl-flex text-lowercase text-xs">[[global:topics]]</span>
-<i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-list"></i>
+<div class="overflow-hidden rounded-1 d-flex flex-column align-items-center">
+<span class="fs-4" title="{./totalTopicCount}">{humanReadableNumber(./totalTopicCount, 0)}</span>
+<span class="text-uppercase text-xs">[[global:topics]]</span>
 </div>
-<div class="card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
-<span class="fs-5 ff-secondary lh-1" title="{./totalPostCount}">{humanReadableNumber(./totalPostCount, 0)}</span>
-<span class="d-none d-xl-flex text-lowercase text-xs">[[global:posts]]</span>
-<i class="d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message"></i>
+<div class="overflow-hidden rounded-1 d-flex flex-column align-items-center">
+<span class="fs-4" title="{./totalPostCount}">{humanReadableNumber(./totalPostCount, 0)}</span>
+<span class="text-uppercase text-xs">[[global:posts]]</span>
 </div>
 </div>
 {{{ if !config.hideCategoryLastPost }}}
-<div component="topic/teaser" class="teaser ps-5 ps-lg-0 col-lg-6 col-12 {{{ if !config.theme.mobileTopicTeasers }}}d-none d-lg-block{{{ end }}}">
-<div class="lastpost border-start border-2 lh-sm h-100" style="border-color: {./bgColor}!important;">
+<div component="topic/teaser" class="teaser col-md-6 col-12 d-none d-md-block">
+<div class="lastpost border-start border-4 lh-sm h-100" style="border-color: {./bgColor}!important;">
 {{{ each ./posts }}}
 {{{ if @first }}}
 <div component="category/posts" class="ps-2 text-xs d-flex flex-column h-100 gap-1">
@@ -147,45 +160,43 @@
 </li>
 {{{ end }}}
 </ul>
-<nav component="pagination" class="pagination-container mt-3{{{ if !pagination.pages.length }}} hidden{{{ end }}}" aria-label="[[global:pagination]]">
-<ul class="pagination pagination-sm gap-1 hidden-xs hidden-sm justify-content-center">
-<li class="page-item previous {{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+<nav component="pagination" class="pagination-container<!-- IF !pagination.pages.length --> hidden<!-- ENDIF !pagination.pages.length -->" aria-label="[[global:pagination]]">
+<ul class="pagination hidden-xs justify-content-center">
+<li class="page-item previous float-start<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 {{{each pagination.pages}}}
-{{{ if ./separator }}}
+<!-- IF pagination.pages.separator -->
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link rounded fw-secondary px-3" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]"><i class="fa fa-ellipsis-h"></i></a>
 </li>
-{{{ else }}}
-<li class="page-item page{{{ if ./active }}} active{{{ end }}}" >
-<a class="page-link rounded fw-secondary px-3" href="?{./qs}" data-page="{./page}" aria-label="[[global:pagination.page-x, {./page}]]">{./page}</a>
+<!-- ELSE -->
+<li class="page-item page<!-- IF pagination.pages.active --> active<!-- ENDIF pagination.pages.active -->" >
+<a class="page-link" href="?{pagination.pages.qs}" data-page="{pagination.pages.page}" aria-label="[[global:pagination.page-x, {./page}]]">{pagination.pages.page}</a>
 </li>
-{{{ end }}}
+<!-- ENDIF pagination.pages.separator -->
 {{{end}}}
-<li class="page-item next {{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link rounded fw-secondary px-3" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next float-end<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
 </ul>
-{{{ if !template.topic }}}
-<ul class="pagination pagination-sm hidden-md hidden-lg justify-content-center">
-<li class="page-item first{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
+<ul class="pagination hidden-sm hidden-md hidden-lg justify-content-center">
+<li class="page-item first<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.first.qs}" data-page="1" aria-label="[[global:pagination.firstpage]]"><i class="fa fa-fast-backward"></i> </a>
 </li>
-<li class="page-item previous{{{ if !pagination.prev.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
+<li class="page-item previous<!-- IF !pagination.prev.active --> disabled<!-- ENDIF !pagination.prev.active -->">
+<a class="page-link" href="?{pagination.prev.qs}" data-page="{pagination.prev.page}" aria-label="[[global:pagination.previouspage]]"><i class="fa fa-chevron-left"></i> </a>
 </li>
 <li component="pagination/select-page" class="page-item page select-page">
-<a class="page-link fw-secondary" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
+<a class="page-link" href="#" aria-label="[[global:pagination.go-to-page]]">{pagination.currentPage} / {pagination.pageCount}</a>
 </li>
-<li class="page-item next{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"> <i class="fa fa-chevron-right"></i></a>
+<li class="page-item next<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.next.qs}" data-page="{pagination.next.page}" aria-label="[[global:pagination.nextpage]]"><i class="fa fa-chevron-right"></i></a>
 </li>
-<li class="page-item last{{{ if !pagination.next.active }}} disabled{{{ end }}}">
-<a class="page-link fw-secondary"  href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
+<li class="page-item last<!-- IF !pagination.next.active --> disabled<!-- ENDIF !pagination.next.active -->">
+<a class="page-link" href="?{pagination.last.qs}" data-page="{pagination.pageCount}" aria-label="[[global:pagination.lastpage]]"><i class="fa fa-fast-forward"></i> </a>
 </li>
 </ul>
-{{{ end }}}
 </nav>
 </div>
 <div data-widget-area="sidebar" class="col-lg-3 col-sm-12 {{{ if !widgets.sidebar.length }}}hidden{{{ end }}}">
