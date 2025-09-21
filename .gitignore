@@ -75,3 +75,7 @@ test.sh
 
 .docker/**
 !**/.gitkeep
+
+# added by Cici
+/build/public
+.env
