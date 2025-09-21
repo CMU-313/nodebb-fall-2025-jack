@@ -221,6 +221,8 @@ module.exports = function (Topics) {
 		if (parseInt(uid, 10) || activitypub.helpers.isUri(uid) || meta.config.allowGuestReplyNotifications) {
 			setImmediate(async () => {
 				try {
+					// joon stop 1 <- when a reply is made, the followers are notified.
+					// when followers are notified, notif.create is made -> notif.push is called
 					await Topics.notifyFollowers(postData, uid, {
 						type: 'new-reply',
 						bodyShort: translator.compile('notifications:user-posted-to', postData.user.displayname, postData.topic.title),

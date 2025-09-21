@@ -13,6 +13,7 @@ module.exports = function (Topics) {
 		if (!exists) {
 			throw new Error('[[error:no-topic]]');
 		}
+		// joon stop 2 <- fetches followers, builds notif using 
 		const isFollowing = await Topics.isFollowing([tid], uid);
 		if (isFollowing[0]) {
 			await Topics.unfollow(tid, uid);
@@ -174,5 +175,6 @@ module.exports = function (Topics) {
 			...notifData,
 		});
 		notifications.push(notification, followers);
+		// joon stop 3 <- probably put some kind of "email.push (email, followers), not sure"
 	};
 };

@@ -281,6 +281,10 @@ Emailer.send = async (template, uid, params) => {
 };
 
 Emailer.sendToEmail = async (template, email, language, params) => {
+	// joon stop 5 <- see where cici can edit this part to delete or send api
+	// probably have test console here to see if email is being triggered
+	// if the email is not being triggered, then we need to work on the route.
+	// if the email is being triggered, we need to work on the api
 	const lang = language || meta.config.defaultLang || 'en-GB';
 	const unsubscribable = ['digest', 'notification'];
 
