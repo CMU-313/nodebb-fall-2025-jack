@@ -224,6 +224,12 @@ Emailer.send = async (template, uid, params) => {
 	}
 
 	let userData = await User.getUserFields(uid, ['email', 'username', 'email:confirmed', 'banned']);
+	
+	if (!userData) {
+		throw new Error(`No user found for uid ${uid}`);
+	} else {
+		console.log('Emailer.send called', userData);
+	}
 
 	// 'welcome' and 'verify-email' explicitly used passed-in email address
 	if (['welcome', 'verify-email'].includes(template)) {
@@ -281,6 +287,8 @@ Emailer.send = async (template, uid, params) => {
 };
 
 Emailer.sendToEmail = async (template, email, language, params) => {
+	console.log('SendToEmail called:', {email, params });
+
 	const lang = language || meta.config.defaultLang || 'en-GB';
 	const unsubscribable = ['digest', 'notification'];
 

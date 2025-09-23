@@ -79,3 +79,5 @@ test.sh
 # added by Cici
 /build/public
 .env
+/build/
+/build/!export
