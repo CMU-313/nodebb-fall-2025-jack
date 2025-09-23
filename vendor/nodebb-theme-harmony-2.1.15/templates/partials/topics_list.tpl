@@ -104,7 +104,7 @@
                     <span class="d-none d-xl-flex text-lowercase text-xs">[[global:views]]</span>
                     <i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-eye"></i>
                 </div>
-                <div class="stats-unresolved card card-header border-0 p-2 overflow-visible rounded-1 d-flex flex-column align-items-center">
+                <div class="stats-unresolved card card-header bg-danger-subtle border-0 p-2 overflow-visible rounded-1 d-flex flex-column align-items-center">
                     <span class="fs-5 ff-secondary lh-1" title="placeholder">50</span>
                     <span class="d-none d-xl-flex text-lowercase text-xs">unresolved</span>
                     <i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-question-circle"></i>
