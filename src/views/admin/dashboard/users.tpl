@@ -14,7 +14,7 @@
 				<tbody>
 					{{{ if !users.length}}}
 					<tr>
-						<td colspan=4" class="text-center"><em>[[admin/dashboard:details.no-users]]</em></td>
+						<td colspan=4 class="text-center"><em>[[admin/dashboard:details.no-users]]</em></td>
 					</tr>
 					{{{ end }}}
 					{{{ each users }}}
@@ -28,5 +28,32 @@
 				</tbody>
 			</table>
 		</div>
+
+		<div class="card-header d-flex justify-content-between">Users Activity
+			<div class="table-responsive">
+				<table class="table users-activity text-sm">
+					<thead>
+						<th class="text-muted">[[admin/manage/users:users.uid]]</th>
+						<th class="text-muted">[[admin/manage/users:users.username]]</th>
+						<th class="text-muted">"another stat here"</th>
+						<th class="text-muted">"another stat here"</th>
+					</thead>
+					<tbody>
+						{{{ if !users.length}}}
+						<tr>
+							<td colspan=4 class="text-center"><em>[[admin/dashboard:details.no-users]]</em></td>
+						</tr>
+						{{{ end }}}
+						{{{ each users }}}
+						<tr>
+							<td>{../uid}</td>
+							<td>{../username}</td>
+							<td>{../email}</td>
+						</tr>
+						{{{ end }}}
+					</tbody>
+				</table>
+			</div>
+		<div>
 	</div>
 </div>
