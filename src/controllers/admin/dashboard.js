@@ -391,4 +391,23 @@ dashboardController.getSearches = async (req, res) => {
 		startDate: req.query.start ? validator.escape(String(req.query.start)) : null,
 		endDate: req.query.end ? validator.escape(String(req.query.end)) : null,
 	});
+
+	dashboardController.getSingleUsers = async (req, res, next) => {
+		try {
+			const uid = parseInt(req.params.uid || req.query.uid, 10) || 0;
+			if (!uid) {
+				return next(new Error('[[error:invalide-data]]'));
+			}
+			const userFields = await user.getUserFields(uid, ['uid', 'username', 'userslug']);
+			res.render('admin/dashboard/user_activity', {
+				uid,
+				user: userFields,
+			});
+
+		} catch (err) {
+			return next(err);
+		}
+
+	};
+	
 };

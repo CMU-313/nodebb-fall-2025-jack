@@ -13,7 +13,6 @@ module.exports = function (Topics) {
 		if (!exists) {
 			throw new Error('[[error:no-topic]]');
 		}
-		// joon stop 2 <- fetches followers, builds notif using 
 		const isFollowing = await Topics.isFollowing([tid], uid);
 		if (isFollowing[0]) {
 			await Topics.unfollow(tid, uid);

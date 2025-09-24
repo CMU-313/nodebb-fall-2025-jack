@@ -272,7 +272,6 @@ async function pushToUids(uids, notification) {
 	});
 }
 
-// joon stop 4 <- need to call this func at stop 3
 async function sendEmail({ uids, notification }, mergeId, reason) {
 	if ((reason && reason === 'set') || !uids.length) {
 		return;
