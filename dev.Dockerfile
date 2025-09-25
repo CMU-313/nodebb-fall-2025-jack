@@ -38,14 +38,21 @@ COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/package.json /usr/s
 
 USER ${USER}
 
-# Assuming plugin code is in ./nodebb-plugin-mailgun-delivery
+# Copy plugin
 COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
 
-RUN npm install \
+# Link plugin + install its deps
+WORKDIR /usr/src/app/nodebb-plugin-mailgun-delivery
+RUN npm install --omit=dev && npm link
+
+WORKDIR /usr/src/app
+RUN npm link nodebb-plugin-mailgun-delivery \
+    && npm install dotenv mailgun.js form-data --omit=dev \
+    && npm install --omit=dev \
     && rm -rf .npm
 
-# Install plugin deps explicitly
-RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
+# # Install plugin deps explicitly
+# RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
 
 FROM node:lts-slim AS final
 

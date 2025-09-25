@@ -31,16 +31,21 @@ RUN groupadd --gid ${GID} ${USER} \
 
 USER ${USER}
 
-# Copy plugin separately
+# Copy plugin
 COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
 
-RUN npm install --omit=dev \
-    && rm -rf .npm
-    # TODO: generate lockfiles for each package manager
-    ## pnpm import \
+# Link plugin + install its deps
+WORKDIR /usr/src/app/nodebb-plugin-mailgun-delivery
+RUN npm install --omit=dev && npm link
 
-# Install plugin deps explicitly
-RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
+WORKDIR /usr/src/app
+RUN npm link nodebb-plugin-mailgun-delivery \
+    && npm install dotenv mailgun.js form-data --omit=dev \
+    && npm install --omit=dev \
+    && rm -rf .npm
+
+# # Install plugin deps explicitly
+# RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
 
 FROM node:lts-slim AS final
 
