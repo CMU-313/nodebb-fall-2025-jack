@@ -64,12 +64,21 @@ RUN corepack enable \
     && mkdir -p /usr/src/app/logs/ /opt/config/ \
     && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
 
-# Copy everything EXCEPT node_modules from build stage
+# Copy entrypoint and tini
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json /usr/src/app/install/docker/setup.json
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
-COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
-# But DON'T overwrite /usr/src/app/node_modules
+
+# Copy app source but do NOT overwrite node_modules
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/package*.json /usr/src/app/
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/ /usr/src/app/install/
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/src/ /usr/src/app/src/
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/public/ /usr/src/app/public/
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/nodebb-plugin-mailgun-delivery/ /usr/src/app/nodebb-plugin-mailgun-delivery/
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/config.json /usr/src/app/config.json
+
+# Copy node_modules separately so they’re preserved
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/node_modules /usr/src/app/node_modules
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/tini
@@ -78,7 +87,7 @@ USER ${USER}
 
 EXPOSE 4567
 
-# Protect node_modules, build artifacts, uploads, and config
+# Protect critical paths
 VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
 
 ENTRYPOINT ["tini", "--", "entrypoint.sh"]

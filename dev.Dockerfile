@@ -70,11 +70,21 @@ RUN corepack enable \
     && mkdir -p /usr/src/app/logs/ /opt/config/ \
     && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
 
-# Copy config + entrypoint without overwriting node_modules
+# Copy entrypoint and tini
 COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json /usr/src/app/install/docker/setup.json
 COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --from=git --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
-COPY --from=git --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
+
+# Copy app code (but skip overwriting node_modules)
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/package*.json /usr/src/app/
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/ /usr/src/app/install/
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/src/ /usr/src/app/src/
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/public/ /usr/src/app/public/
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/nodebb-plugin-mailgun-delivery/ /usr/src/app/nodebb-plugin-mailgun-delivery/
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/config.json /usr/src/app/config.json
+
+# Copy node_modules built in node_modules_touch stage
+COPY --from=node_modules_touch --chown=${USER}:${USER} /usr/src/app/node_modules /usr/src/app/node_modules
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/tini
@@ -83,7 +93,7 @@ USER ${USER}
 
 EXPOSE 4567
 
-# Protect node_modules and other runtime dirs
+# Protect critical paths
 VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
 
 ENTRYPOINT ["tini", "--", "entrypoint.sh"]
