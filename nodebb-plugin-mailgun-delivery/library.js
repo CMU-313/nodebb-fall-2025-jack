@@ -1,6 +1,6 @@
 'use strict';
 
-require('dotenv').config();
+// require('dotenv').config();
 
 const Mailgun = require('mailgun.js');
 const FormData = require('form-data');
