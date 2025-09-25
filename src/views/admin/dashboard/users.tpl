@@ -50,7 +50,7 @@
 							<td>{../uid}</td>
 							<td><a href="/admin/dashboard/user-activity/uid">{../postcount}</a></td>
 							<td>10</td>
-							<td>10</td>
+							<td>12</td>
 						</tr>
 						{{{ end }}}
 						

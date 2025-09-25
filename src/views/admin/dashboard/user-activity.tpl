@@ -1,6 +1,5 @@
 <div class="dashboard px-lg-4">
 	<div class="col-12">
-		<!-- IMPORT admin/partials/dashboard/stats.tpl -->
 		<div class="card-header text-start mb-2">User Activity</div>
 			<div class="table-responsive">
 				<table class="table users-activity text-sm">
@@ -22,7 +21,7 @@
 							<td>{../uid}</td>
 							<td><a href="/admin/dashboard/user-activity/uid">{../postcount}</a></td>
 							<td>10</td>
-							<td>10</td>
+							<td>12</td>
 						</tr>
 						{{{ end }}}
 						
