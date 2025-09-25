@@ -91,9 +91,9 @@ jobs:
           jq '. + {
             "test_database": {
               "host": "127.0.0.1",
-              "port": "6379",
+              "port": 6379,
               "password": "",
-              "database": "1"
+              "database": 1
             }
           }' config.json > config.json.tmp && mv config.json.tmp config.json
           echo "✅ Injected test_database into config.json:"
