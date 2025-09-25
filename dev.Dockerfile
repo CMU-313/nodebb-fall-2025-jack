@@ -48,7 +48,6 @@ RUN npm install --omit=dev && npm link
 
 WORKDIR /usr/src/app
 RUN npm link nodebb-plugin-mailgun-delivery \
-    && npm install dotenv mailgun.js form-data --omit=dev \
     && npm install --omit=dev \
     && rm -rf .npm
 
@@ -85,6 +84,9 @@ COPY --from=git --chown=${USER}:${USER} /usr/src/app/config.json /usr/src/app/co
 
 # Copy node_modules built in node_modules_touch stage
 COPY --from=node_modules_touch --chown=${USER}:${USER} /usr/src/app/node_modules /usr/src/app/node_modules
+
+# Ensure runtime deps are available in dev container
+RUN npm install dotenv mailgun.js form-data --omit=dev
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/tini
