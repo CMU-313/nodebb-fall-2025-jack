@@ -520,6 +520,50 @@ define('forum/topic', [
 		});
 	} 
 
+	function addResolvedStatus() {
+		console.log('check resolved/unresolved status');
+		$('[component="post"]').each(function (i) {
+			// 
+			const postEl = $(this);
+			console.log('Found post:', i, postEl);
+			
+			
+			const isResolved = false;
+			
+			const currStatus = $(`
+				<div class="post-toggle" style="cursor: pointer; padding: 5px; margin: 5px; display: flex; align-items: center; gap: 8px;">
+					<div class="checkbox" style="width: 16px; height: 16px; border: 2px solid #ccc; display: inline-block; text-align: center; line-height: 12px; font-size: 12px;">
+						${isResolved ? '✓' : ''}
+					</div>
+					<span class="status-text" style="color: ${isResolved ? 'green' : 'red'}">
+						${isResolved ? 'resolved' : 'unresolved'}
+					</span>
+				</div>
+			`);
+
+
+			currStatus.on('click', function () {
+				const checkbox_elem = $(this).find('.checkbox');
+				const statusText_elem = $(this).find('.status-text');
+				const currentStatus = checkbox_elem.text().trim() === '✓';
+				const updatedStatus = !currentStatus;
+				
+				// Update checkbox
+				checkbox_elem.text(updatedStatus ? '✓' : '');
+				
+				// Update status text and color
+				statusText_elem.text(updatedStatus ? 'resolved' : 'unresolved');
+				statusText_elem.css('color', updatedStatus ? 'green' : 'red');
+				
+				console.log('Status toggled to:', updatedStatus ? 'resolved' : 'unresolved');
+				// later update to only course staff can check
+			});
+			
+			
+			postEl.prepend(currStatus);
+		});
+	}
+
 
 	return Topic;
 });
