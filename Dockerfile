@@ -10,8 +10,11 @@ ENV NODE_ENV=production \
 
 WORKDIR /usr/src/app/
 
-# Copy package manifests first (better Docker cache for npm install)
+# Copy package manifests first for caching
 COPY package*.json ./
+
+# Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
+COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 
 # Install corepack to allow usage of other package managers
 RUN corepack enable
@@ -28,23 +31,14 @@ RUN groupadd --gid ${GID} ${USER} \
 
 USER ${USER}
 
-# Install root deps (includes mailgun.js, dotenv, plugin reference, etc.)
+# Install all dependencies (root + plugin deps, including mailgun.js)
 RUN npm install --omit=dev
 
-# Copy the rest of the source AFTER deps for better caching
+# Copy the rest of the source AFTER installing deps (better layer caching)
 COPY . /usr/src/app/
 
-# Copy custom plugin
-COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
-
-# Install plugin deps and link it
-WORKDIR /usr/src/app/nodebb-plugin-mailgun-delivery
-RUN npm install --omit=dev && npm link
-
-# Back to app root
-WORKDIR /usr/src/app
-RUN npm link nodebb-plugin-mailgun-delivery \
-    && rm -rf .npm
+# Cleanup npm cache
+RUN rm -rf .npm
 
 
 # ---------- Final Runtime Stage ----------
@@ -59,7 +53,7 @@ ENV NODE_ENV=production \
 
 WORKDIR /usr/src/app/
 
-# Enable corepack + create non-root user
+# Enable corepack + create user
 RUN corepack enable \
     && groupadd --gid ${GID} ${USER} \
     && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
@@ -71,7 +65,7 @@ COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
 
-# Copy the whole built app (including node_modules and plugin)
+# Copy everything built (app + node_modules + plugin)
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
 
 # Permissions

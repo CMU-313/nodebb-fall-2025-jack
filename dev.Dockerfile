@@ -41,25 +41,16 @@ RUN corepack enable \
   && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
   && chown -R ${USER}:${USER} /usr/src/app/
 
-# Use package.json from repo
-# COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/package.json /usr/src/app/
+# Copy package.json from repo
 COPY --from=git --chown=${USER}:${USER} /usr/src/app/package*.json /usr/src/app/
+
+# Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
+COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 
 USER ${USER}
 
-# Copy custom plugin
-COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
-
-# Install plugin deps and link it
-WORKDIR /usr/src/app/nodebb-plugin-mailgun-delivery
-RUN npm install --omit=dev && npm link
-
-WORKDIR /usr/src/app
-
-# Install app + runtime deps
-RUN npm link nodebb-plugin-mailgun-delivery \
-    && npm install dotenv mailgun.js form-data --omit=dev \
-    && npm install --omit=dev \
+# Install all deps (root + plugin deps, including mailgun.js)
+RUN npm install --omit=dev \
     && rm -rf .npm
 
 
@@ -87,10 +78,10 @@ COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json /
 COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --from=git --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
 
-# Copy repo code
+# Copy repo code (NodeBB itself)
 COPY --from=git --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
 
-# Copy node_modules prepared earlier
+# Copy prepared node_modules (with plugin + mailgun.js)
 COPY --from=node_modules_touch --chown=${USER}:${USER} /usr/src/app/node_modules /usr/src/app/node_modules
 
 # Set permissions
