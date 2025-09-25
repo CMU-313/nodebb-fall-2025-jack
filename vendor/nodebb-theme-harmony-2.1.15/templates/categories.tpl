@@ -9,6 +9,12 @@
 		<div><!-- IMPORT partials/category/selector-dropdown-left.tpl --></div>
 		{{{ end }}}
 		<ul class="categories-list list-unstyled" itemscope itemtype="http://www.schema.org/ItemList">
+        {{{ if viewAllList.length }}}
+        {{{ each viewAllList }}}
+        <!-- Render synthetic category using the same item template as real categories -->
+        <!-- IMPORT partials/categories/item.tpl -->
+        {{{ end }}}
+        {{{ end }}}
 			{{{ each categories }}}
 			<!-- IMPORT partials/categories/item.tpl -->
 			{{{ end }}}
