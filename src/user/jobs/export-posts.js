@@ -27,7 +27,9 @@ process.on('message', async (msg) => {
 		await db.init();
 
 		const targetUid = msg.uid;
-		const filePath = path.join(__dirname, '../../../build/export', `${targetUid}_posts.csv`);
+		const exportDir = path.join(__dirname, '../../../build/export');
+		await fs.promises.mkdir(exportDir, { recursive: true });
+		const filePath = path.join(exportDir, `${targetUid}_posts.csv`);
 
 		const posts = require('../../posts');
 

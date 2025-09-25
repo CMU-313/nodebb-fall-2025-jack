@@ -39,7 +39,13 @@ categoryController.get = async function (req, res, next) {
 			// Title/breadcrumbs when accessed via category URL
 			data.title = 'View All';
 			data.breadcrumbs = helpers.buildBreadcrumbs([{ text: 'View All' }]);
-
+			if (Array.isArray(data.viewAllList)) {
+				data.viewAllList = data.viewAllList.map(item => ({
+					...item,
+					handle: item.handle || 'viewall',
+				}));
+			}
+	
 			return res.render('recent', data);
 		} catch (err) {
 			return next(err);
