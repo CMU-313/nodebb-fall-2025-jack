@@ -1,0 +1,9 @@
+{
+  "id": "nodebb-plugin-mailgun-delivery",
+  "name": "Mailgun Delivery (API)",
+  "description": "Send all NodeBB emails via the Mailgun HTTP API instead of SMTP.",
+  "library": "./library.js",
+  "hooks": [
+    { "hook": "static:email.send", "method": "sendViaMailgun" }
+  ]
+}
