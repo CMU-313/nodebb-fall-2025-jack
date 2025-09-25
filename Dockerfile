@@ -31,6 +31,9 @@ RUN groupadd --gid ${GID} ${USER} \
 
 USER ${USER}
 
+# Copy plugin separately
+COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
+
 RUN npm install --omit=dev \
     && rm -rf .npm
     # TODO: generate lockfiles for each package manager

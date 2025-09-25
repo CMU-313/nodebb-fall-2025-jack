@@ -38,6 +38,9 @@ COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/package.json /usr/s
 
 USER ${USER}
 
+# Assuming plugin code is in ./nodebb-plugin-mailgun-delivery
+COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
+
 RUN npm install \
     && rm -rf .npm
 
