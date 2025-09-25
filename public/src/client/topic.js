@@ -481,6 +481,7 @@ define('forum/topic', [
 	}
 
 	function addResolvedStatus() {
+		console.log('dead code to see if pr 24 from 9/18 works after doing build');
 		console.log('check resolved/unresolved status');
 		$('[component="post"]').each(function (i) {
 			// 
