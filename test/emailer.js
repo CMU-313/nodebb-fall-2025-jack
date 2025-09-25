@@ -47,7 +47,7 @@ describe('emailer', () => {
 	});
 
 	// TODO: test sendmail here at some point
-
+	
 	it('plugin hook should work', (done) => {
 		const error = new Error();
 		const method = function (data, next) {
