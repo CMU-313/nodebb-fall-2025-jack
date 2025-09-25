@@ -483,7 +483,7 @@ define('forum/topic', [
 	function addResolvedStatus() { 
 		//used claude for base function logic, then I changed more based on my personal goal.
 		// iterate through each topic post and add unresolved status with checkmark
-		$('[component="post"]').each(function (i) {
+		$('[component="post"]').each(function () {
 			// this current post
 			const post_elem = $(this);
 			const isResolved = false;
