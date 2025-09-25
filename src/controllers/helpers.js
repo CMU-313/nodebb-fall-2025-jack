@@ -427,6 +427,10 @@ helpers.getHomePageRoutes = async function (uid) {
 			route: 'recent',
 			name: 'Recent',
 		},
+        {
+            route: 'viewall',
+            name: 'View All',
+        },
 		{
 			route: 'top',
 			name: 'Top',
