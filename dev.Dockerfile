@@ -42,7 +42,8 @@ RUN corepack enable \
   && chown -R ${USER}:${USER} /usr/src/app/
 
 # Use package.json from repo
-COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/package.json /usr/src/app/
+# COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/package.json /usr/src/app/
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/package*.json /usr/src/app/
 
 USER ${USER}
 

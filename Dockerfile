@@ -10,29 +10,29 @@ ENV NODE_ENV=production \
 
 WORKDIR /usr/src/app/
 
-# Copy source
-COPY . /usr/src/app/
+# Copy package manifests first (better Docker cache for npm install)
+COPY package*.json ./
 
 # Install corepack to allow usage of other package managers
 RUN corepack enable
-
-# Remove unnecessary hidden files
-RUN find . -mindepth 1 -maxdepth 1 -name '.*' ! -name '.' ! -name '..' -exec bash -c 'echo "Deleting {}"; rm -rf {}' \;
-
-# Prepare package.json
-RUN cp /usr/src/app/install/package.json /usr/src/app/
 
 # Install tini
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tini \
     && rm -rf /var/lib/apt/lists/*
 
-# Create user
+# Create non-root user
 RUN groupadd --gid ${GID} ${USER} \
     && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
     && chown -R ${USER}:${USER} /usr/src/app/
 
 USER ${USER}
+
+# Install root deps (includes mailgun.js, dotenv, plugin reference, etc.)
+RUN npm install --omit=dev
+
+# Copy the rest of the source AFTER deps for better caching
+COPY . /usr/src/app/
 
 # Copy custom plugin
 COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
@@ -43,12 +43,9 @@ RUN npm install --omit=dev && npm link
 
 # Back to app root
 WORKDIR /usr/src/app
-
-# Link plugin + install runtime deps + install rest
 RUN npm link nodebb-plugin-mailgun-delivery \
-    && npm install dotenv mailgun.js form-data --omit=dev \
-    && npm install --omit=dev \
     && rm -rf .npm
+
 
 # ---------- Final Runtime Stage ----------
 FROM node:lts-slim AS final
@@ -62,7 +59,7 @@ ENV NODE_ENV=production \
 
 WORKDIR /usr/src/app/
 
-# Enable corepack + create user
+# Enable corepack + create non-root user
 RUN corepack enable \
     && groupadd --gid ${GID} ${USER} \
     && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
