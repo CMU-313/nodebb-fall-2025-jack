@@ -20,6 +20,7 @@ RUN git clone --recurse-submodules -j8 --depth 1 https://github.com/NodeBB/NodeB
 
 RUN find . -mindepth 1 -maxdepth 1 -name '.*' ! -name '.' ! -name '..' -exec bash -c 'echo "Deleting {}"; rm -rf {}' \;
 
+
 FROM node:lts AS node_modules_touch
 
 ENV NODE_ENV=development \
@@ -51,8 +52,6 @@ RUN npm link nodebb-plugin-mailgun-delivery \
     && npm install --omit=dev \
     && rm -rf .npm
 
-# # Install plugin deps explicitly
-# RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
 
 FROM node:lts-slim AS final
 
@@ -71,21 +70,20 @@ RUN corepack enable \
     && mkdir -p /usr/src/app/logs/ /opt/config/ \
     && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
 
-COPY --from=git --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/install/docker/setup.json /usr/src/app/
-COPY --from=git --chown=${USER}:${USER} /usr/bin/tini /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/
-COPY --from=node_modules_touch --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
+# Copy config + entrypoint without overwriting node_modules
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json /usr/src/app/install/docker/setup.json
+COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --from=git --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
 COPY --from=git --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/tini
 
-# TODO: Have docker-compose use environment variables to create files like setup.json and config.json.
-# COPY --from=hairyhenderson/gomplate:stable /gomplate /usr/local/bin/gomplate
-
 USER ${USER}
 
 EXPOSE 4567
 
+# Protect node_modules and other runtime dirs
 VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
 
 ENTRYPOINT ["tini", "--", "entrypoint.sh"]

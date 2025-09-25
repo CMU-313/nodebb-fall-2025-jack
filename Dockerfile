@@ -64,24 +64,21 @@ RUN corepack enable \
     && mkdir -p /usr/src/app/logs/ /opt/config/ \
     && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
 
-COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/install/docker/setup.json /usr/src/app/
-COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/
+# Copy everything EXCEPT node_modules from build stage
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json /usr/src/app/install/docker/setup.json
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
+# But DON'T overwrite /usr/src/app/node_modules
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/tini
-
-# TODO: Have docker-compose use environment variables to create files like setup.json and config.json.
-# COPY --from=hairyhenderson/gomplate:stable /gomplate /usr/local/bin/gomplate
 
 USER ${USER}
 
 EXPOSE 4567
 
+# Protect node_modules, build artifacts, uploads, and config
 VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
 
-# Utilising tini as our init system within the Docker container for graceful start-up and termination.
-# Tini serves as an uncomplicated init system, adept at managing the reaping of zombie processes and forwarding signals.
-# This approach is crucial to circumvent issues with unmanaged subprocesses and signal handling in containerised environments.
-# By integrating tini, we enhance the reliability and stability of our Docker containers.
-# Ensures smooth start-up and shutdown processes, and reliable, safe handling of signal processing.
 ENTRYPOINT ["tini", "--", "entrypoint.sh"]
