@@ -23,6 +23,9 @@ const file = require('./file');
 const viewsDir = nconf.get('views_dir');
 const Emailer = module.exports;
 
+// custom plugin code to send emails via Mailgun API
+const mailgunSender = require('../node_modules/nodebb-plugin-mailgun-delivery/library.js');
+
 let prevConfig;
 let app;
 
@@ -368,6 +371,7 @@ Emailer.sendToEmail = async (template, email, language, params) => {
 };
 
 Emailer.sendViaFallback = async (data) => {
+	console.log('[core-emailer] Redirecting email via Mailgun instead of sendmail');
 	// Some minor alterations to the data to conform to nodemailer standard
 	data.text = data.plaintext;
 	delete data.plaintext;
@@ -378,7 +382,10 @@ Emailer.sendViaFallback = async (data) => {
 		address: data.from,
 	};
 	delete data.from_name;
-	await Emailer.fallbackTransport.sendMail(data);
+
+	await mailgunSender.sendViaMailgun(data);
+
+	// await Emailer.fallbackTransport.sendMail(data);
 };
 
 Emailer.renderAndTranslate = async (template, params, lang) => {

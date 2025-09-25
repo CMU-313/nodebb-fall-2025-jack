@@ -21,7 +21,7 @@ function mkClient() {
   const mg = new Mailgun(FormData).client({
     username: 'api',
     key: MAILGUN_API_KEY,
-    url: MAILGUN_API_BASE_URL,
+    url: 'https://api.mailgun.net',
   });
 
   return { mg, domain: MAILGUN_DOMAIN };
@@ -60,6 +60,6 @@ exports.sendViaMailgun = async function sendViaMailgun(data) {
   const result = await mg.messages.create(domain, payload);
 
   // Returning / resolving here tells NodeBB sending succeeded.
-  // If you throw, Emailer will surface the error to the ACP test UI/logs.
+  // If have error, Emailer will surface the error to the ACP test UI/logs.
   return result;
 };
