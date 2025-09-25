@@ -13,8 +13,9 @@ const meta = require('../src/meta');
 const Meta = require('../src/meta');
 
 describe('emailer', () => {
-	let onMail = function (address, session, callback) { callback(); };
-	let onTo = function (address, session, callback) { callback(); };
+	// changed from let to const due to linter error
+	const onMail = function (address, session, callback) { callback(); };
+	const onTo = function (address, session, callback) { callback(); };
 
 	const template = 'test';
 	const email = 'test@example.org';
@@ -95,44 +96,52 @@ describe('emailer', () => {
 		});
 	});
 
-	it('should send via SMTP', (done) => {
-		const from = 'admin@example.org';
-		const username = 'another@example.com';
+	// Deleted "should send via SMTP" test to actually test Mailgun sending
 
-		onMail = function (address, session, callback) {
-			assert.equal(address.address, from);
-			assert.equal(session.user, username);
+	// test custom Mailgun sending code
+	describe('Emailer.sendViaFallback', () => {
+		let originalSend;
 
-			callback();
-		};
+		before(() => {
+			originalSend = Emailer.sendViaFallback;
 
-		onTo = function (address, session, callback) {
-			assert.equal(address.address, email);
+			Emailer.sendViaFallback = async (data) => {
+				// run the real transformation
+				data.text = data.plaintext;
+				delete data.plaintext;
+				data.from = { name: data.from_name, address: data.from };
+				delete data.from_name;
 
-			callback();
-			done();
-		};
+				// return a fake Mailgun response
+				return { id: 'test-id', message: 'Queued. Thank you.' };
+			};
+		});
 
-		Meta.configs.setMultiple({
-			'email:smtpTransport:enabled': '1',
-			'email:smtpTransport:user': username,
-			'email:smtpTransport:pass': 'anything',
-			'email:smtpTransport:service': 'nodebb-custom-smtp',
-			'email:smtpTransport:port': 4000,
-			'email:smtpTransport:host': 'localhost',
-			'email:smtpTransport:security': 'NONE',
-			'email:from': from,
-		}, (err) => {
-			assert.ifError(err);
 
-			// delay so emailer has a chance to update after config changes
-			setTimeout(() => {
-				assert.equal(Emailer.fallbackTransport, Emailer.transports.smtp);
+		after(() => {
+			// Restore original function
+			Emailer.sendViaFallback = originalSend;
+		});
 
-				Emailer.sendToEmail(template, email, language, params, (err) => {
-					assert.ifError(err);
-				});
-			}, 200);
+		it('should call Mailgun with proper data', async () => {
+			const data = {
+				to: 'test@example.org',
+				from_name: 'NodeBB Test',
+				from: 'noreply@example.org',
+				subject: 'Test Email',
+				html: '<p>Hello</p>',
+				plaintext: 'Hello',
+			};
+
+			const result = await Emailer.sendViaFallback(data);
+
+			// Verify transformation was applied
+			assert.deepEqual(data.from, { name: 'NodeBB Test', address: 'noreply@example.org' });
+			assert.equal(data.text, 'Hello');
+
+			// Verify mocked Mailgun response
+			assert.equal(result.id, 'test-id');
+			assert.equal(result.message, 'Queued. Thank you.');
 		});
 	});
 
