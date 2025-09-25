@@ -1,6 +1,4 @@
 'use strict';
-
-
 define('forum/topic', [
 	'forum/infinitescroll',
 	'forum/topic/threadTools',
@@ -38,6 +36,7 @@ define('forum/topic', [
 	});
 
 	Topic.init = async function () {
+		console.log('topic.init is running');
 		const tidChanged = tid === '0' || String(tid) !== String(ajaxify.data.tid);
 		tid = String(ajaxify.data.tid);
 		currentUrl = ajaxify.currentPage;
@@ -481,6 +480,7 @@ define('forum/topic', [
 		}
 	}
 
+
 	function addResolved_Status() { 
 		//used claude for base function logic, then I changed more based on my personal goal.
 		// iterate through each topic post and add unresolved status with checkmark
@@ -522,5 +522,9 @@ define('forum/topic', [
 	} 
 
 
+
+
 	return Topic;
 });
+
+
