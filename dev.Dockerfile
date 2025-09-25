@@ -41,7 +41,7 @@ RUN corepack enable \
   && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
   && chown -R ${USER}:${USER} /usr/src/app/
 
-# Copy package.json from repo
+# Copy package.json (⚠️ should be the one with your plugin + mailgun.js)
 COPY --from=git --chown=${USER}:${USER} /usr/src/app/package*.json /usr/src/app/
 
 # Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
@@ -49,9 +49,8 @@ COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 
 USER ${USER}
 
-# Install all deps (root + plugin deps, including mailgun.js)
-RUN npm install --omit=dev \
-    && rm -rf .npm
+# Single install step: root deps + plugin deps (includes mailgun.js)
+RUN npm install --omit=dev && rm -rf .npm
 
 
 # ---------- Final Runtime Stage ----------

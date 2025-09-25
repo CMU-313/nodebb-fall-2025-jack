@@ -34,8 +34,9 @@ USER ${USER}
 # Install all dependencies (root + plugin deps, including mailgun.js)
 RUN npm install --omit=dev
 
-# Copy the rest of the source AFTER installing deps (better layer caching)
+# Copy source but don't overwrite package.json
 COPY . /usr/src/app/
+COPY package*.json /usr/src/app/
 
 # Cleanup npm cache
 RUN rm -rf .npm
