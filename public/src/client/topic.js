@@ -481,6 +481,7 @@ define('forum/topic', [
 	}
 
 	function addResolvedStatus() {
+		console.log('dead code to check if reverted code still passes github tests');
 		console.log('check resolved/unresolved status');
 		$('[component="post"]').each(function (i) {
 			// 
