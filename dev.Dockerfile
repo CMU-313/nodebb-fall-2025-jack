@@ -41,6 +41,9 @@ USER ${USER}
 # Assuming plugin code is in ./nodebb-plugin-mailgun-delivery
 COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
 
+# Install plugin deps explicitly
+RUN cd /usr/src/app/nodebb-plugin-mailgun-delivery && npm install --omit=dev
+
 RUN npm install \
     && rm -rf .npm
 
