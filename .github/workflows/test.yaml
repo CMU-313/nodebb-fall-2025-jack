@@ -76,6 +76,8 @@ jobs:
               "database": 1,
               "port": 6379
             }
+            MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+            MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
 

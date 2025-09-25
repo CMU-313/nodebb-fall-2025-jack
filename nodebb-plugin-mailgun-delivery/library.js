@@ -5,6 +5,15 @@
 const Mailgun = require('mailgun.js');
 const FormData = require('form-data');
 
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    require('dotenv').config();
+    console.log('[mailgun-plugin] Loaded .env for local development');
+  } catch (err) {
+    console.warn('[mailgun-plugin] dotenv not installed, skipping');
+  }
+}
+
 /**
  * Env you must set:
  *   MAILGUN_API_KEY     -> Private API key (NOT the SMTP password)
@@ -13,6 +22,7 @@ const FormData = require('form-data');
 function mkClient() {
   const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY ?? 'test-api-key';
   const MAILGUN_DOMAIN  = process.env.MAILGUN_DOMAIN  ?? 'mailgun.org';
+  console.log('[mailgun-plugin] Using MAILGUN_DOMAIN:', MAILGUN_DOMAIN);
 
 
   if (!MAILGUN_API_KEY) throw new Error('MAILGUN_API_KEY is missing');
