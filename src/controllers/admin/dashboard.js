@@ -356,18 +356,19 @@ dashboardController.getUserActivity = async (req, res, next) => {
 
 		// preparing permissions + promises, copied from above
         const isAdmin = await user.isAdministrator(req.uid);
-		const promises;
-		if (isAdmin || String(req.uid) === String(targetUid)) {
-			const promises = {
-				posts: db.sortedSetsCardSum(pidsSets),
-				topics: db.sortedSetsCardSum(tidsSets),
-				shares: db.sortedSetCard(`uid:${targetUid}:shares`),
-				uploads: db.sortedSetCard(`uid:${targetUid}:uploads`);
-			};
-		}
+		const promises = {
+            posts: db.sortedSetsCardSum(pidsSets),
+            topics: db.sortedSetsCardSum(tidsSets),
+            shares: db.sortedSetCard(`uid:${targetUid}:shares`),
+        };
+
+        if (isAdmin || String(req.uid) === String(targetUid)) {
+            promises.uploads = db.sortedSetCard(`uid:${targetUid}:uploads`);
+        }
 
 		// desired stats
 		const counts = await utils.promiseParallel(promises);
+
 		const postsCount = parseInt(counts.posts || 0, 10);
 		const topicsCount = parseInt(counts.topics || 0, 10);
 		const repliesCount = Math.max(0, postsCount - topicsCount);
@@ -378,7 +379,7 @@ dashboardController.getUserActivity = async (req, res, next) => {
 			comments: postsCount,
 			replies: repliesCount,
 			shares: parseInt(counts.shares || 0, 10),
-			uploads: parseInt(counts.uploads || 0, 10)
+            uploads: typeof counts.uploads !== 'undefined' ? (parseInt(counts.uploads || 0, 10) : null,
 		});
 	// try catch for errors | not sure what next(err) does but copilot generated
 	} catch (err) {
