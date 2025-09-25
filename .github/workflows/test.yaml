@@ -84,10 +84,10 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      # ✅ Only inject test_database if running inside CI
+      # add test_database to config.json
       - name: Add test_database to config.json
-        if: env.CI == 'true'
         run: |
+          test -f config.json || echo '{}' > config.json
           jq '. + {
             "test_database": {
               "host": "127.0.0.1",
