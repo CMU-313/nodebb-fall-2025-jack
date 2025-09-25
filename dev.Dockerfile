@@ -41,11 +41,11 @@ USER ${USER}
 # Assuming plugin code is in ./nodebb-plugin-mailgun-delivery
 COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
 
-# Install plugin deps explicitly
-RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
-
 RUN npm install \
     && rm -rf .npm
+
+# Install plugin deps explicitly
+RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
 
 FROM node:lts-slim AS final
 

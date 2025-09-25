@@ -34,13 +34,13 @@ USER ${USER}
 # Copy plugin separately
 COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
 
-# Install plugin deps explicitly
-RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
-
 RUN npm install --omit=dev \
     && rm -rf .npm
     # TODO: generate lockfiles for each package manager
     ## pnpm import \
+
+# Install plugin deps explicitly
+RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
 
 FROM node:lts-slim AS final
 
