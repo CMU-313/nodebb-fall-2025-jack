@@ -342,49 +342,35 @@ dashboardController.getTopics = async (req, res) => {
 
 dashboardController.getUserActivity = async (req, res, next) => {
 	try {
-		const targetUid = parseInt(req.query.uid || req.params.uid || req.body.uid, 10);
-		
-		// ensuring we dont get bad data
-		if (!Number.isInteger(targetUid) || targetUid <= 0) {
-			return next(new Error('[[error:invalid-uid]]'));
-		}
+		console.log('data1');
 
-		const categories = require('../../categories');
-		// getting our categories | copilot generated
-		const cids = await categories.getCidsByPrivilege('categories:cid', req.uid, 'topics:read');
-		const pidsSets = cids.map(c => `cid:${c}:uid:${targetUid}:pids`);
-		const tidsSets = cids.map(c => `cid:${c}:uid:${targetUid}:tids`);
-
-		// preparing permissions + promises, copied from above
-		const isAdmin = await user.isAdministrator(req.uid);
-		const promises = {
-			posts: db.sortedSetsCardSum(pidsSets),
-			topics: db.sortedSetsCardSum(tidsSets),
-			shares: db.sortedSetCard(`uid:${targetUid}:shares`),
+		// collecting user information
+		let stats = await getStats();
+		stats = stats.filter(stat => stat.name === '[[admin/dashboard:new-users]]').map(({ ...stat }) => {
+			delete stat.href;
+			return stat;
+		});
+		const summary = {
+			day: stats[0].today,
+			week: stats[0].thisweek,
+			month: stats[0].thismonth,
 		};
 
-		if (isAdmin || String(req.uid) === String(targetUid)) {
-			promises.uploads = db.sortedSetCard(`uid:${targetUid}:uploads`);
-		}
+		const end = parseInt(req.query.until, 10) || Date.now();
+		const start = end - (1000 * 60 * 60 * (req.query.units === 'days' ? 24 : 1) * (req.query.count || (req.query.units === 'days' ? 30 : 24)));
+		const uids = await db.getSortedSetRangeByScore('users:joindate', 0, 500, start, end);
+		const users = await user.getUsersData(uids);
+		console.log(users);
 
-		// desired stats
-		const counts = await utils.promiseParallel(promises);
-
-		const postsCount = parseInt(counts.posts || 0, 10);
-		const topicsCount = parseInt(counts.topics || 0, 10);
-		const repliesCount = Math.max(0, postsCount - topicsCount);
-
-		// output json | copilot generated
-		res.json({
-			uid: targetUid,
-			comments: postsCount,
-			replies: repliesCount,
-			shares: parseInt(counts.shares || 0, 10),
-			uploads: typeof counts.uploads !== 'undefined' ? (parseInt(counts.uploads || 0, 10)) : null,
+		res.render('admin/dashboard/users', {
+			set: 'registrations',
+			query: _.pick(req.query, ['units', 'until', 'count']),
+			stats,
+			summary,
+			users,
 		});
-	// try catch for errors | not sure what next(err) does but copilot generated
 	} catch (err) {
-		return next(err);
+		next(err);
 	}
 };
 
