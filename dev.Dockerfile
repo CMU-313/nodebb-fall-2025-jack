@@ -42,7 +42,7 @@ USER ${USER}
 COPY nodebb-plugin-mailgun-delivery /usr/src/app/nodebb-plugin-mailgun-delivery
 
 # Install plugin deps explicitly
-RUN cd /usr/src/app/nodebb-plugin-mailgun-delivery && npm install --omit=dev
+RUN npm install ./nodebb-plugin-mailgun-delivery --omit=dev
 
 RUN npm install \
     && rm -rf .npm
