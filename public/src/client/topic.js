@@ -487,7 +487,7 @@ define('forum/topic', [
 			const postEl = $(this);
 			console.log('Found post:', i, postEl);
 			
-			
+			console.log('deadcode to see if github tests pass from reverted version');
 			const isResolved = false;
 			
 			const currStatus = $(`
