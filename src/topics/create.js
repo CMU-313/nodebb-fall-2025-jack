@@ -21,7 +21,7 @@ module.exports = function (Topics) {
 	Topics.create = async function (data) {
 		// This is an internal method, consider using Topics.post instead
 		const timestamp = data.timestamp || Date.now();
-
+		const resolved = false
 		const tid = data.tid || await db.incrObjectField('global', 'nextTid');
 
 		let topicData = {
@@ -35,6 +35,7 @@ module.exports = function (Topics) {
 			lastposttime: 0,
 			postcount: 0,
 			viewcount: 0,
+			resolved: 0
 		};
 
 		if (Array.isArray(data.tags) && data.tags.length) {
@@ -90,7 +91,8 @@ module.exports = function (Topics) {
 			privileges.categories.can('topics:tag', data.cid, uid),
 			privileges.users.isAdministrator(uid),
 		]);
-
+		data.resolved = false 
+		data.resolvedAt = null
 		data.title = String(data.title).trim();
 		data.tags = data.tags || [];
 		data.content = String(data.content || '').trimEnd();
@@ -145,6 +147,8 @@ module.exports = function (Topics) {
 		topicData.unreplied = true;
 		topicData.mainPost = postData;
 		topicData.index = 0;
+		topicData.resolved = resolved
+		topicData.resolvedAt = resolvedAt
 		postData.index = 0;
 
 		if (topicData.scheduled) {
