@@ -1,5 +1,9 @@
 <div class="dashboard px-lg-4">
 	<div class="col-12">
+		<div class="card-header text-start mb-2">
+			<a href="/admin/dashboard/users">Back to Users</a>
+		</div>
+
 		<div class="table-responsive">
 			<table class="table users-activity text-sm">
 				<thead>

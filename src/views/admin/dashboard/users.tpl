@@ -3,11 +3,11 @@
 		<!-- IMPORT admin/partials/dashboard/graph.tpl -->
 		<!-- IMPORT admin/partials/dashboard/stats.tpl -->
 
+
+		<div class="card-header text-start mb-2">
+			<a href="/admin/dashboard/user-activity">User Activity</a>
+		</div>
 		<div class="table-responsive">
-			<div class="card-header text-start mb-2">
-				<a href="/admin/dashboard/user-activity">User Activity</a>
-			</div>
-			
 			<table class="table users-list text-sm">
 				<thead>
 					<th class="text-muted">[[admin/manage/users:users.uid]]</th>
