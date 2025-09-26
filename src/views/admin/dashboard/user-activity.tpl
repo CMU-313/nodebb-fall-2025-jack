@@ -4,6 +4,7 @@
 			<table class="table users-activity text-sm">
 				<thead>
 					<th class="text-muted">[[admin/manage/users:users.uid]]</th>
+					<th class="text-muted">[[admin/manage/users:users.username]]</th>
 					<th class="text-muted">Number of Posts</th>
 					<th class="text-muted">Number of Shares</th>
 					<th class="text-muted">Number of Uploads</th>
@@ -18,9 +19,10 @@
 					{{{ each users }}}
 					<tr>
 						<td>{../uid}</td>
+						<td>{../username}</td>
 						<td>{../postcount}</td>
-						<td>15</td>
-						<td>12</td>
+						<td>{../sharesCount}</td>
+						<td>{../uploadsCount}</td>
 					</tr>
 					{{{ end }}}
 					
