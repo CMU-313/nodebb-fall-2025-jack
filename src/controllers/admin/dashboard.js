@@ -15,7 +15,7 @@ const user = require('../../user');
 const topics = require('../../topics');
 const utils = require('../../utils');
 const emailer = require('../../emailer');
-const helpers = require('./accounts/helpers');
+const helpers = require('../accounts/helpers');
 
 const dashboardController = module.exports;
 
