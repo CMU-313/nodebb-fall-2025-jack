@@ -24,7 +24,7 @@
 					{{{ each users }}}
 					<tr>
 						<td>{../uid}</td>
-						<td><a href="/admin/dashboard/user-activity">{../username}</a></td>
+						<td>{../username}</td>
 						<td>{../email}</td>
 						<td><span class="timeago" title="{../joindateISO}"></span></td>
 					</tr>
