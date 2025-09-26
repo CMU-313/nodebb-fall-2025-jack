@@ -4,6 +4,10 @@
 		<!-- IMPORT admin/partials/dashboard/stats.tpl -->
 
 		<div class="table-responsive">
+			<div class="card-header text-start mb-2">
+				<a href="/admin/dashboard/user-activity">User Activity</a>
+			</div>
+			
 			<table class="table users-list text-sm">
 				<thead>
 					<th class="text-muted">[[admin/manage/users:users.uid]]</th>
@@ -20,7 +24,7 @@
 					{{{ each users }}}
 					<tr>
 						<td>{../uid}</td>
-						<td>{../username}</td>
+						<td><a href="/admin/dashboard/user-activity">{../username}</a></td>
 						<td>{../email}</td>
 						<td><span class="timeago" title="{../joindateISO}"></span></td>
 					</tr>
@@ -28,35 +32,5 @@
 				</tbody>
 			</table>
 		</div>
-
-		<div class="card-header text-start mb-2">User Activity</div>
-			<div class="table-responsive">
-				<table class="table users-activity text-sm">
-					<thead>
-						<th class="text-muted">[[admin/manage/users:users.uid]]</th>
-						<th class="text-muted">Number of Posts</th>
-						<th class="text-muted">Number of Shares</th>
-						<th class="text-muted">Number of Uploads</th>
-
-					</thead>
-					<tbody>
-						{{{ if !users.length}}}
-						<tr>
-							<td colspan=4 class="text-center"><em>[[admin/dashboard:details.no-users]]</em></td>
-						</tr>
-						{{{ end }}}
-						{{{ each users }}}
-						<tr>
-							<td>{../uid}</td>
-							<td><a href="/admin/dashboard/user-activity/uid">{../postcount}</a></td>
-							<td>10</td>
-							<td>12</td>
-						</tr>
-						{{{ end }}}
-						
-					</tbody>
-				</table>
-			</div>
-		<div>
 	</div>
 </div>
