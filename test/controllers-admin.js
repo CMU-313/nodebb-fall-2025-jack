@@ -84,13 +84,44 @@ describe('Admin Controllers', () => {
 
 		const dashboards = [
 			'/admin', '/admin/dashboard/logins', '/admin/dashboard/users', '/admin/dashboard/topics',
-			'/admin/dashboard/searches', `/admin/dashboard/searches?start=${start}&end=${end}`,
+			'/admin/dashboard/searches', '/admin/dashboard/user-activity', `/admin/dashboard/searches?start=${start}&end=${end}`,
 		];
 		await async.each(dashboards, async (url) => {
 			const { response, body } = await request.get(`${nconf.get('url')}${url}`, { jar: jar });
 			assert.equal(response.statusCode, 200, url);
 			assert(body);
 		});
+	});
+
+	// cursor generated test
+	it('should load user activity dashboard', async () => {
+		await groups.join('administrators', adminUid);
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/dashboard/user-activity`, { jar: jar });
+		assert.equal(response.statusCode, 200);
+		assert(body);
+		assert(body.includes('users-activity'));
+		assert(body.includes('Number of Posts'));
+		assert(body.includes('Number of Shares'));
+		assert(body.includes('Number of Uploads'));
+	});
+
+	// cursor generated test
+	it('should load user activity dashboard with query parameters', async () => {
+		await groups.join('administrators', adminUid);
+		const today = new Date();
+		const until = today.getTime();
+		const count = 7;
+		
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/dashboard/user-activity?units=days&until=${until}&count=${count}`, { jar: jar });
+		assert.equal(response.statusCode, 200);
+		assert(body);
+	});
+
+	// cursor generated test
+	it('should return 403 for non-admin users on user activity dashboard', async () => {
+		const { jar: regularJar } = await helpers.loginUser('regular', 'regularpwd');
+		const { response } = await request.get(`${nconf.get('url')}/admin/dashboard/user-activity`, { jar: regularJar });
+		assert.equal(response.statusCode, 403);
 	});
 
 	it('should load admin analytics', async () => {

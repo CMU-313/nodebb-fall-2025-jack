@@ -316,6 +316,7 @@ dashboardController.getUsers = async (req, res) => {
 
 dashboardController.getUserActivity = async (req, res) => {
 	// collecting user information
+	console.log('getUserActivity');
 	let stats = await getStats();
 	stats = stats.filter(stat => stat.name === '[[admin/dashboard:new-users]]').map(({ ...stat }) => {
 		delete stat.href;
@@ -331,6 +332,7 @@ dashboardController.getUserActivity = async (req, res) => {
 	const start = end - (1000 * 60 * 60 * (req.query.units === 'days' ? 24 : 1) * (req.query.count || (req.query.units === 'days' ? 30 : 24)));
 	const uids = await db.getSortedSetRangeByScore('users:joindate', 0, 500, start, end);
 	const users = await user.getUsersData(uids);
+	console.log(users);
 
 	const userStats = await Promise.all(users.map(async (userData) => {
 		const userActivity = await helpers.getUserDataByUserSlug(userData.userslug, req.uid);
