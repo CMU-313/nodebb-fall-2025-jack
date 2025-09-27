@@ -25,7 +25,6 @@
 						<td>{../uid}</td>
 						<td>{../username}</td>
 						<td>{../postcount}</td>
-						{* couldn't figure out where they did it for postcount in the backend, so just made a quick frontend fix *}
 						<td>{{{ if ../sharesCount }}}{../sharesCount}{{{ else }}}0{{{ end }}}</td>
     					<td>{{{ if ../uploadsCount }}}{../uploadsCount}{{{ else }}}0{{{ end }}}</td>
 					</tr>
