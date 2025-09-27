@@ -12,7 +12,6 @@
 					<th class="text-muted">Number of Posts</th>
 					<th class="text-muted">Number of Shares</th>
 					<th class="text-muted">Number of Uploads</th>
-
 				</thead>
 				<tbody>
 					{{{ if !users.length}}}
@@ -24,9 +23,9 @@
 					<tr>
 						<td>{../uid}</td>
 						<td>{../username}</td>
-						<td>{../postcount}</td>
-						<td>{{{ if ../sharesCount }}}{../sharesCount}{{{ else }}}0{{{ end }}}</td>
-    					<td>{{{ if ../uploadsCount }}}{../uploadsCount}{{{ else }}}0{{{ end }}}</td>
+						<td>{../postCount}</td>
+						<td>{{{ if ../shareCount }}}{../shareCount}{{{ else }}}0{{{ end }}}</td>
+    					<td>{{{ if ../uploadCount }}}{../uploadCount}{{{ else }}}0{{{ end }}}</td>
 					</tr>
 					{{{ end }}}
 					

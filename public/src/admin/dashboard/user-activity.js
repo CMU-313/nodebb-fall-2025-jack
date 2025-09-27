@@ -9,7 +9,7 @@ define('admin/dashboard/user-activity', [], () => {
 				if (response.ok) {
 					response.json().then(function (payload) {
 						app.parseAndTranslate(ajaxify.data.template.name, 'users', payload, function (html) {
-							const tbodyEl = document.querySelector('.users-list tbody');
+							const tbodyEl = document.querySelector('.users-activity tbody');
 							tbodyEl.innerHTML = '';
 							tbodyEl.append(...html.map((idx, el) => el));
 
