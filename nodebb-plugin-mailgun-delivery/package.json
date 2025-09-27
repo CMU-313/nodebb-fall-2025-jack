@@ -1,0 +1,14 @@
+{
+  "name": "nodebb-plugin-mailgun-delivery",
+  "version": "1.0.0",
+  "description": "Send all NodeBB emails via the Mailgun HTTP API (no SMTP).",
+  "main": "library.js",
+  "keywords": ["nodebb", "plugin", "email", "mailgun"],
+  "license": "MIT",
+  "nbbpm": { "compatibility": "^4.4.6" },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "form-data": "^4.0.0",
+    "mailgun.js": "^12.0.3"
+  }
+}

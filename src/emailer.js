@@ -23,6 +23,9 @@ const file = require('./file');
 const viewsDir = nconf.get('views_dir');
 const Emailer = module.exports;
 
+// custom plugin code to send emails via Mailgun API
+const mailgunSender = require('../nodebb-plugin-mailgun-delivery/library.js');
+
 let prevConfig;
 let app;
 
@@ -224,6 +227,12 @@ Emailer.send = async (template, uid, params) => {
 	}
 
 	let userData = await User.getUserFields(uid, ['email', 'username', 'email:confirmed', 'banned']);
+	
+	if (!userData) {
+		throw new Error(`No user found for uid ${uid}`);
+	} else {
+		console.log('Emailer.send called', userData);
+	}
 
 	// 'welcome' and 'verify-email' explicitly used passed-in email address
 	if (['welcome', 'verify-email'].includes(template)) {
@@ -281,6 +290,8 @@ Emailer.send = async (template, uid, params) => {
 };
 
 Emailer.sendToEmail = async (template, email, language, params) => {
+	console.log('SendToEmail called:', {email, params });
+
 	const lang = language || meta.config.defaultLang || 'en-GB';
 	const unsubscribable = ['digest', 'notification'];
 
@@ -360,6 +371,7 @@ Emailer.sendToEmail = async (template, email, language, params) => {
 };
 
 Emailer.sendViaFallback = async (data) => {
+	console.log('[core-emailer] Redirecting email via Mailgun instead of sendmail');
 	// Some minor alterations to the data to conform to nodemailer standard
 	data.text = data.plaintext;
 	delete data.plaintext;
@@ -370,7 +382,10 @@ Emailer.sendViaFallback = async (data) => {
 		address: data.from,
 	};
 	delete data.from_name;
-	await Emailer.fallbackTransport.sendMail(data);
+
+	await mailgunSender.sendViaMailgun(data);
+
+	// await Emailer.fallbackTransport.sendMail(data);
 };
 
 Emailer.renderAndTranslate = async (template, params, lang) => {

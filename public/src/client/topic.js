@@ -1,6 +1,4 @@
 'use strict';
-
-
 define('forum/topic', [
 	'forum/infinitescroll',
 	'forum/topic/threadTools',
@@ -38,6 +36,7 @@ define('forum/topic', [
 	});
 
 	Topic.init = async function () {
+		console.log('topic.init is running');
 		const tidChanged = tid === '0' || String(tid) !== String(ajaxify.data.tid);
 		tid = String(ajaxify.data.tid);
 		currentUrl = ajaxify.currentPage;
@@ -75,6 +74,7 @@ define('forum/topic', [
 		handleTopicSearch();
 
 		hooks.fire('action:topic.loaded', ajaxify.data);
+		addResolved_Status();
 	};
 
 	function handleTopicSearch() {
@@ -481,5 +481,50 @@ define('forum/topic', [
 	}
 
 
+	function addResolved_Status() { 
+		//used claude for base function logic, then I changed more based on my personal goal.
+		// iterate through each topic post and add unresolved status with checkmark
+		$('[component="post"]').each(function () {
+			// this current post
+			const post_elem = $(this);
+			const isResolved = false;
+			const currStatus = $(`
+				<div class="post-toggle" style="cursor: pointer; padding: 5px; margin: 5px; display: flex; align-items: center; gap: 8px;">
+					<div class="checkbox" style="width: 15px; height: 15px; border: 2px solid #999; display: inline-block; text-align: center; line-height: 12px; font-size: 12px;">
+						${isResolved ? '✓' : ''}
+					</div>
+					<span class="current_status" style="color: ${isResolved ? 'green' : 'red'}">
+						${isResolved ? 'resolved' : 'unresolved'}
+					</span>
+				</div>
+			`);
+
+			//change status if clicked on
+			currStatus.on('click', function () {
+				const checkbox_elem = $(this).find('.checkbox'); //finds any element with checkbox class
+				const statusText_elem = $(this).find('.current_status'); //finds any eleemnt with current status class
+				const currentStatus = checkbox_elem.text().trim() === '✓';
+				const updatedStatus = !currentStatus;
+				
+				// Update checkbox
+				checkbox_elem.text(updatedStatus ? '✓' : '');
+				
+				// Update status text and color
+				statusText_elem.text(updatedStatus ? 'resolved' : 'unresolved');
+				statusText_elem.css('color', updatedStatus ? 'green' : 'red');
+			
+				// later update to only course staff can check
+			});
+			
+			
+			post_elem.prepend(currStatus);
+		});
+	} 
+
+
+
+
 	return Topic;
 });
+
+
