@@ -17,7 +17,71 @@ get:
         application/json:
           schema:
             allOf:
-              - $ref: ../components/schemas/CategoryObject.yaml#/CategoryObject
+              - type: object
+                properties:
+                  cid:
+                    type: number
+                  name:
+                    type: string
+                  handle:
+                    type: string
+                  description:
+                    type: string
+                  descriptionParsed:
+                    type: string
+                  icon:
+                    type: string
+                  bgColor:
+                    type: string
+                  color:
+                    type: string
+                  slug:
+                    type: string
+                  parentCid:
+                    type: number
+                  topic_count:
+                    type: number
+                  post_count:
+                    type: number
+                  disabled:
+                    type: number
+                  order:
+                    type: number
+                  link:
+                    type: string
+                  numRecentReplies:
+                    type: number
+                  class:
+                    type: string
+                  imageClass:
+                    type: string
+                  isSection:
+                    type: number
+                  minTags:
+                    type: number
+                  maxTags:
+                    type: number
+                  postQueue:
+                    type: number
+                  totalPostCount:
+                    type: number
+                  totalTopicCount:
+                    type: number
+                  subCategoriesPerPage:
+                    type: number
+                  backgroundImage:
+                    type: string
+                  teaser:
+                    type: object
+                    nullable: true
+                  children:
+                    type: array
+                    items:
+                      type: object
+                required:
+                  - cid
+                  - name
+                  - handle
               - type: object
                 properties:
                   tagWhitelist:

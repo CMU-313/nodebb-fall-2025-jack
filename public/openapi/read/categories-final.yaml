@@ -1,0 +1,265 @@
+get:
+  tags:
+    - categories
+  summary: Get all categories accessible to user
+  description: |
+    This route is used for rendering the main categories page. It shows all categories
+    that are accessible to the user.
+  responses:
+    "200":
+      description: A list of category objects currently available to the accessing user
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                description: The page title
+                type: string
+              selectCategoryLabel:
+                type: string
+                description: Label to use for the category selector
+              viewAllList:
+                description: Synthetic category list containing an aggregate "View All" category
+                type: array
+                items:
+                  type: object
+                  properties:
+                    cid:
+                      type: number
+                    name:
+                      type: string
+                    handle:
+                      type: string
+                    description:
+                      type: string
+                    descriptionParsed:
+                      type: string
+                    icon:
+                      type: string
+                    bgColor:
+                      type: string
+                    color:
+                      type: string
+                    slug:
+                      type: string
+                    parentCid:
+                      type: number
+                    topic_count:
+                      type: number
+                    post_count:
+                      type: number
+                    disabled:
+                      type: number
+                    order:
+                      type: number
+                    link:
+                      type: string
+                    numRecentReplies:
+                      type: number
+                    class:
+                      type: string
+                    imageClass:
+                      type: string
+                    isSection:
+                      type: number
+                    minTags:
+                      type: number
+                    maxTags:
+                      type: number
+                    postQueue:
+                      type: number
+                    totalPostCount:
+                      type: number
+                    totalTopicCount:
+                      type: number
+                    subCategoriesPerPage:
+                      type: number
+                    backgroundImage:
+                      type: string
+                    teaser:
+                      type: object
+                      nullable: true
+                    children:
+                      type: array
+                      items:
+                        type: object
+                  required:
+                    - cid
+                    - name
+                    - handle
+              viewAllCategory:
+                description: Backward compatibility field for View All category
+                type: object
+                properties:
+                  cid:
+                    type: number
+                  name:
+                    type: string
+                  handle:
+                    type: string
+                  description:
+                    type: string
+                  descriptionParsed:
+                    type: string
+                  icon:
+                    type: string
+                  bgColor:
+                    type: string
+                  color:
+                    type: string
+                  slug:
+                    type: string
+                  parentCid:
+                    type: number
+                  topic_count:
+                    type: number
+                  post_count:
+                    type: number
+                  disabled:
+                    type: number
+                  order:
+                    type: number
+                  link:
+                    type: string
+                  numRecentReplies:
+                    type: number
+                  class:
+                    type: string
+                  imageClass:
+                    type: string
+                  isSection:
+                    type: number
+                  minTags:
+                    type: number
+                  maxTags:
+                    type: number
+                  postQueue:
+                    type: number
+                  totalPostCount:
+                    type: number
+                  totalTopicCount:
+                    type: number
+                  subCategoriesPerPage:
+                    type: number
+                  backgroundImage:
+                    type: string
+                  teaser:
+                    type: object
+                    nullable: true
+                  children:
+                    type: array
+                    items:
+                      type: object
+                required:
+                  - cid
+                  - name
+                  - handle
+              categories:
+                description: A collection of category data objects
+                type: array
+                items:
+                  type: object
+                  properties:
+                    cid:
+                      type: number
+                    name:
+                      type: string
+                    handle:
+                      type: string
+                    description:
+                      type: string
+                    descriptionParsed:
+                      type: string
+                    icon:
+                      type: string
+                    bgColor:
+                      type: string
+                    color:
+                      type: string
+                    slug:
+                      type: string
+                    parentCid:
+                      type: number
+                    topic_count:
+                      type: number
+                    post_count:
+                      type: number
+                    disabled:
+                      type: number
+                    order:
+                      type: number
+                    link:
+                      type: string
+                    numRecentReplies:
+                      type: number
+                    class:
+                      type: string
+                    imageClass:
+                      type: string
+                    isSection:
+                      type: number
+                    minTags:
+                      type: number
+                    maxTags:
+                      type: number
+                    postQueue:
+                      type: number
+                    totalPostCount:
+                      type: number
+                    totalTopicCount:
+                      type: number
+                    subCategoriesPerPage:
+                      type: number
+                    backgroundImage:
+                      type: string
+                    tagWhitelist:
+                      type: array
+                      items:
+                        type: string
+                    unread:
+                      type: boolean
+                    unread-class:
+                      type: string
+                    posts:
+                      type: array
+                      items:
+                        type: object
+                    teaser:
+                      type: object
+                      nullable: true
+                    children:
+                      type: array
+                      items:
+                        type: object
+                  required:
+                    - cid
+                    - name
+                    - handle
+              pagination:
+                type: object
+                properties:
+                  currentPage:
+                    type: number
+                  pageCount:
+                    type: number
+                  first:
+                    type: object
+                    nullable: true
+                  prev:
+                    type: object
+                    nullable: true
+                  next:
+                    type: object
+                    nullable: true
+                  last:
+                    type: object
+                    nullable: true
+                  rel:
+                    type: array
+                    items:
+                      type: object
+              breadcrumbs:
+                type: array
+                items:
+                  type: object

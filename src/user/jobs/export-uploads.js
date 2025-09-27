@@ -28,7 +28,9 @@ process.on('message', async (msg) => {
 
 		const targetUid = msg.uid;
 
-		const archivePath = path.join(__dirname, '../../../build/export', `${targetUid}_uploads.zip`);
+		const exportDir = path.join(__dirname, '../../../build/export');
+		await fs.promises.mkdir(exportDir, { recursive: true });
+		const archivePath = path.join(exportDir, `${targetUid}_uploads.zip`);
 		const rootDirectory = path.join(__dirname, '../../../public/uploads/');
 
 		const user = require('../index');
