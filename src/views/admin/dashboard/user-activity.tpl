@@ -1,18 +1,17 @@
 <div class="dashboard px-lg-4">
 	<div class="col-12">
-		<!-- IMPORT admin/partials/dashboard/graph.tpl -->
-		<!-- IMPORT admin/partials/dashboard/stats.tpl -->
-
 		<div class="card-header text-start mb-2">
-			<a href="/admin/dashboard/user-activity">User Activity</a>
+			<a href="/admin/dashboard/users">Back to Users</a>
 		</div>
+
 		<div class="table-responsive">
-			<table class="table users-list text-sm">
+			<table class="table users-activity text-sm">
 				<thead>
 					<th class="text-muted">[[admin/manage/users:users.uid]]</th>
 					<th class="text-muted">[[admin/manage/users:users.username]]</th>
-					<th class="text-muted">[[admin/manage/users:users.email]]</th>
-					<th data-sort="joindate">[[admin/manage/users:users.joined]]</th>
+					<th class="text-muted">Number of Posts</th>
+					<th class="text-muted">Number of Shares</th>
+					<th class="text-muted">Number of Uploads</th>
 				</thead>
 				<tbody>
 					{{{ if !users.length}}}
@@ -24,12 +23,15 @@
 					<tr>
 						<td>{../uid}</td>
 						<td>{../username}</td>
-						<td>{../email}</td>
-						<td><span class="timeago" title="{../joindateISO}"></span></td>
+						<td>{../postCount}</td>
+						<td>{{{ if ../shareCount }}}{../shareCount}{{{ else }}}0{{{ end }}}</td>
+    					<td>{{{ if ../uploadCount }}}{../uploadCount}{{{ else }}}0{{{ end }}}</td>
 					</tr>
 					{{{ end }}}
+					
 				</tbody>
 			</table>
 		</div>
+
 	</div>
 </div>

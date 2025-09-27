@@ -15,6 +15,7 @@ const user = require('../../user');
 const topics = require('../../topics');
 const utils = require('../../utils');
 const emailer = require('../../emailer');
+const helpers = require('../accounts/helpers');
 
 const dashboardController = module.exports;
 
@@ -313,6 +314,47 @@ dashboardController.getUsers = async (req, res) => {
 	});
 };
 
+dashboardController.getUserActivity = async (req, res) => {
+	// collecting user information
+	console.log('getUserActivity');
+	let stats = await getStats();
+	stats = stats.filter(stat => stat.name === '[[admin/dashboard:new-users]]').map(({ ...stat }) => {
+		delete stat.href;
+		return stat;
+	});
+	const summary = {
+		day: stats[0].today,
+		week: stats[0].thisweek,
+		month: stats[0].thismonth,
+	};
+
+	const end = parseInt(req.query.until, 10) || Date.now();
+	const start = end - (1000 * 60 * 60 * (req.query.units === 'days' ? 24 : 1) * (req.query.count || (req.query.units === 'days' ? 30 : 24)));
+	const uids = await db.getSortedSetRangeByScore('users:joindate', 0, 500, start, end);
+	const users = await user.getUsersData(uids);
+	console.log(users);
+
+	const userStats = await Promise.all(users.map(async (userData) => {
+		const userActivity = await helpers.getUserDataByUserSlug(userData.userslug, req.uid);
+		return {
+			...userData,
+			postCount: userActivity.counts?.posts || 0,
+			shareCount: userActivity.counts?.shares || 0,
+			uploadCount: userActivity.counts?.uploads || 0,
+		};
+	}));
+	console.log(userStats);
+
+	res.render('admin/dashboard/user-activity', {
+		set: 'user-stats',
+		query: _.pick(req.query, ['units', 'until', 'count']),
+		stats,
+		summary,
+		users: userStats,
+	});
+
+};
+
 dashboardController.getTopics = async (req, res) => {
 	let stats = await getStats();
 	stats = stats.filter(stat => stat.name === '[[admin/dashboard:topics]]').map(({ ...stat }) => {
@@ -339,6 +381,8 @@ dashboardController.getTopics = async (req, res) => {
 		topics: topicData,
 	});
 };
+
+
 
 dashboardController.getSearches = async (req, res) => {
 	let start = 0;

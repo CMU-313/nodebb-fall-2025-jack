@@ -1,0 +1,47 @@
+# gpt generated
+get:
+  tags:
+    - admin
+  summary: Get user activity statistics including posts, shares, and uploads
+  responses:
+    "200":
+      description: A JSON object containing user activity statistics with posts, shares, and uploads count.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - type: object
+                properties:
+                  set:
+                    type: string
+                    description: The analytics set that is being queried
+                  query:
+                    additionalProperties:
+                      description: An object containing the query string parameters, if any
+                  summary:
+                    type: object
+                    properties:
+                      day:
+                        type: number
+                      week:
+                        type: number
+                      month:
+                        type: number
+                  users:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: ../../../components/schemas/UserObject.yaml#/UserObject
+                        - type: object
+                          properties:
+                            postCount:
+                              type: number
+                              description: Number of posts by the user
+                            shareCount:
+                              type: number
+                              description: Number of shares by the user
+                            uploadCount:
+                              type: number
+                              description: Number of uploads by the user
+              - $ref: ../../../components/schemas/admin/dashboard.yaml#/Stats
+              - $ref: ../../../components/schemas/CommonProps.yaml#/CommonProps

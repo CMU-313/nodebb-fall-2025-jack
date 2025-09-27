@@ -80,6 +80,8 @@ paths:
     $ref: 'read/admin/dashboard/logins.yaml'
   /api/admin/dashboard/users:
     $ref: 'read/admin/dashboard/users.yaml'
+  /api/admin/dashboard/user-activity:
+    $ref: 'read/admin/dashboard/user-activity.yaml'
   /api/admin/dashboard/topics:
     $ref: 'read/admin/dashboard/topics.yaml'
   /api/admin/dashboard/searches:
