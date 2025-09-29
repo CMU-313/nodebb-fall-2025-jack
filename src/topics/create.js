@@ -35,7 +35,7 @@ module.exports = function (Topics) {
 			lastposttime: 0,
 			postcount: 0,
 			viewcount: 0,
-			resolved: false,
+			resolved: false, //current problem: only creates resolved/unresolved status for new topics, not existing topics 
 		};
 
 		if (Array.isArray(data.tags) && data.tags.length) {
