@@ -42,4 +42,12 @@ module.exports = function (app, middleware, controllers) {
 		middleware.canViewUsers,
 		middleware.checkAccountPermissions,
 	], helpers.tryRoute(controllers.accounts.edit.uploadPicture));
+
+	// Resolved status routes - add API endpoint for resolved status
+	const resolvedUtils = require('../resolved-basic-utils');
+	router.get('/topics/:tid/resolved', [...middlewares], helpers.tryRoute(async (req, res) => {
+		const { tid } = req.params;
+		const data = await resolvedUtils.getTopicResolvedStatus(tid);
+		res.json({ tid: tid, resolved: data.resolved });
+	}));
 };

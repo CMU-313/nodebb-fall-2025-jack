@@ -287,5 +287,8 @@ TopicObjectSlim:
         numThumbs:
           type: number
           description: The number of thumbnails associated with this topic
+        resolved: 
+          type: boolean 
+          description: Whether the topic has been marked as resolved by course staff
       required:
         - tid
