@@ -50,4 +50,26 @@ module.exports = function (app, middleware, controllers) {
 		const data = await resolvedUtils.getTopicResolvedStatus(tid);
 		res.json({ tid: tid, resolved: data.resolved });
 	}));
+
+	// put update resolved status
+	router.put('/topics/:tid/resolved', [...middlewares], helpers.tryRoute(async (req, res) => {
+		const {tid} = req.params;
+		const {resolved} = req.body;
+		const {uid} = req.uid;
+
+		// Check admin permission
+		const isAdmin = await resolvedUtils.isUserCourseStaff(uid);
+		if (!isAdmin) {
+			throw new Error('[[error:no-privileges]]');
+		}
+
+		// Update status
+		await resolvedUtils.updateTopicResolvedStatus(tid, resolved, uid);
+
+		res.json({ 
+			success: true, 
+			resolved: resolved,
+			message: resolved ? 'Topic marked as resolved' : 'Topic marked as unresolved',
+		});
+	}));
 };
