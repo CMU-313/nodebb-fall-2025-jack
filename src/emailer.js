@@ -26,6 +26,23 @@ const Emailer = module.exports;
 // custom plugin code to send emails via Mailgun API
 const mailgunSender = require('../nodebb-plugin-mailgun-delivery/library.js');
 
+// Helper to create a robust, human-friendly error string for email sends
+function formatEmailErr(err) {
+	if (!err) {
+		return 'Unknown error (no error object)';
+	}
+	if (err instanceof Error) {
+		return err.stack || err.message || String(err);
+	}
+	try {
+		const serialized = typeof err === 'string' ? err : JSON.stringify(err);
+		return serialized;
+	} catch (e) {
+		return String(err);
+	}
+}
+Emailer.formatEmailErr = formatEmailErr;
+
 let prevConfig;
 let app;
 
@@ -376,16 +393,67 @@ Emailer.sendViaFallback = async (data) => {
 	data.text = data.plaintext;
 	delete data.plaintext;
 
-	// use an address object https://nodemailer.com/message/addresses/
-	data.from = {
-		name: data.from_name,
-		address: data.from,
-	};
-	delete data.from_name;
 
-	await mailgunSender.sendViaMailgun(data);
+	// use an address object for nodemailer, but Mailgun HTTP API expects `from` to be a string
+	// so build a sanitized copy for the Mailgun plugin and avoid mutating the original `data`.
+	const mailgunData = { ...data };
 
-	// await Emailer.fallbackTransport.sendMail(data);
+	// Ensure 'from' is a string Mailgun can parse: "Name <address>" or plain address
+	if (data.from_name) {
+		const fromAddr = (typeof data.from === 'object' && data.from.address) ? data.from.address : data.from;
+		mailgunData.from = `"${data.from_name}" <${fromAddr}>`;
+	} else if (typeof data.from === 'object' && data.from.address) {
+		mailgunData.from = data.from.address;
+	} else {
+		mailgunData.from = data.from;
+	}
+	delete mailgunData.from_name;
+
+	// Ensure plaintext/text is present (some hooks use `plaintext`)
+	if (!mailgunData.text && mailgunData.plaintext) {
+		mailgunData.text = mailgunData.plaintext;
+		delete mailgunData.plaintext;
+	}
+
+	// Normalize headers to strings so Mailgun API doesn't receive objects
+	if (mailgunData.headers) {
+		for (const [k, v] of Object.entries(mailgunData.headers)) {
+			if (v === undefined || v === null) {
+				mailgunData.headers[k] = '';
+			} else if (typeof v !== 'string') {
+				try {
+					mailgunData.headers[k] = JSON.stringify(v);
+				} catch (e) {
+					mailgunData.headers[k] = String(v);
+				}
+			}
+		}
+	}
+
+	// Call the plugin which should return/resolves on success or throw/reject on failure
+	try {
+		const result = await mailgunSender.sendViaMailgun(mailgunData);
+		return result;
+	} catch (err) {
+		// Mailgun (or the plugin) may reject with non-Error objects. Normalize so callers
+		// (and logs) always receive an Error instance with useful information.
+		let normalized;
+		if (err instanceof Error) {
+			normalized = err;
+		} else {
+			try {
+				const serialized = typeof err === 'string' ? err : JSON.stringify(err);
+				normalized = new Error(`Mailgun send failed: ${serialized}`);
+			} catch (e) {
+				normalized = new Error('Mailgun send failed (non-serializable error)');
+			}
+		}
+		// Keep original attached for deeper debugging where available
+		normalized.originalError = err;
+		throw normalized;
+	}
+
+
 };
 
 Emailer.renderAndTranslate = async (template, params, lang) => {

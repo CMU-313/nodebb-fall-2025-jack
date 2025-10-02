@@ -299,7 +299,8 @@ async function sendEmail({ uids, notification }, mergeId, reason) {
 			showUnsubscribe: true,
 		}).catch((err) => {
 			if (!errorLogged) {
-				winston.error(`[emailer.send] ${err.stack}`);
+				// winston.error(`[emailer.send] ${err.stack}`);
+				winston.error(`[emailer.send] ${emailer.formatEmailErr(err)}`);
 				errorLogged = true;
 			}
 		});
