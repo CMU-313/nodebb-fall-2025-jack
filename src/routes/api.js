@@ -42,4 +42,35 @@ module.exports = function (app, middleware, controllers) {
 		middleware.canViewUsers,
 		middleware.checkAccountPermissions,
 	], helpers.tryRoute(controllers.accounts.edit.uploadPicture));
+
+	// Resolved status routes - add API endpoint for resolved status
+	const resolvedUtils = require('../resolved-basic-utils');
+	router.get('/topics/:tid/resolved', [...middlewares], helpers.tryRoute(async (req, res) => {
+		const { tid } = req.params;
+		const data = await resolvedUtils.getTopicResolvedStatus(tid);
+		res.json({ tid: tid, resolved: data.resolved });
+	}));
+
+	router.put('/topics/:tid/resolved', [...middlewares, middleware.exposeUid], helpers.tryRoute(async (req, res) => {
+		const { tid } = req.params;
+		const { resolved } = req.body;
+		const { uid } = req;
+		
+		if (!uid) {
+			return res.status(401).json({ error: 'Not logged in' });
+		}
+
+		const isAdmin = await resolvedUtils.isCourseStaff(uid);
+		if (!isAdmin) {
+			return res.status(403).json({ error: 'Insufficient privileges' });
+		}
+
+		await resolvedUtils.updateTopicResolvedStatus(tid, resolved);
+
+		res.json({ 
+			success: true, 
+			resolved,
+			message: resolved ? 'Topic marked as resolved' : 'Topic marked as unresolved',
+		});
+	}));
 };

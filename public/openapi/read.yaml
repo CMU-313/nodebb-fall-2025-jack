@@ -232,6 +232,8 @@ paths:
     $ref: 'read/topic/teaser/topic_id.yaml'
   "/api/topic/pagination/{topic_id}":
     $ref: 'read/topic/pagination/topic_id.yaml'
+  "/api/topics/{tid}/resolved":
+    $ref: 'read/topic/topic_id-resolved.yaml'
   /api/post/upload:
     $ref: 'read/post/upload.yaml'
   /api/topic/thumb/upload:
