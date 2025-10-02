@@ -27,6 +27,30 @@ const validSorts = [
 
 categoryController.get = async function (req, res, next) {
 	let cid = req.params.category_id;
+
+	// Synthetic "View All" category: aggregate topics across all categories
+	if (String(cid) === 'all') {
+		try {
+			const recent = require('./recent');
+			const data = await recent.getData(req, 'recent', 'recent');
+			if (!data) {
+				return next();
+			}
+			// Title/breadcrumbs when accessed via category URL
+			data.title = 'View All';
+			data.breadcrumbs = helpers.buildBreadcrumbs([{ text: 'View All' }]);
+			if (Array.isArray(data.viewAllList)) {
+				data.viewAllList = data.viewAllList.map(item => ({
+					...item,
+					handle: item.handle || 'viewall',
+				}));
+			}
+	
+			return res.render('recent', data);
+		} catch (err) {
+			return next(err);
+		}
+	}
 	if (cid === '-1') {
 		return helpers.redirect(res, `${res.locals.isAPI ? '/api' : ''}/world?${qs.stringify(req.query)}`);
 	}
