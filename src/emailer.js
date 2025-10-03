@@ -389,10 +389,6 @@ Emailer.sendToEmail = async (template, email, language, params) => {
 
 Emailer.sendViaFallback = async (data) => {
 	console.log('[core-emailer] Redirecting email via Mailgun instead of sendmail');
-	// Some minor alterations to the data to conform to nodemailer standard
-	data.text = data.plaintext;
-	delete data.plaintext;
-
 
 	// use an address object for nodemailer, but Mailgun HTTP API expects `from` to be a string
 	// so build a sanitized copy for the Mailgun plugin and avoid mutating the original `data`.
@@ -435,25 +431,14 @@ Emailer.sendViaFallback = async (data) => {
 		const result = await mailgunSender.sendViaMailgun(mailgunData);
 		return result;
 	} catch (err) {
-		// Mailgun (or the plugin) may reject with non-Error objects. Normalize so callers
-		// (and logs) always receive an Error instance with useful information.
-		let normalized;
-		if (err instanceof Error) {
-			normalized = err;
-		} else {
-			try {
-				const serialized = typeof err === 'string' ? err : JSON.stringify(err);
-				normalized = new Error(`Mailgun send failed: ${serialized}`);
-			} catch (e) {
-				normalized = new Error('Mailgun send failed (non-serializable error)');
-			}
-		}
-		// Keep original attached for deeper debugging where available
+		// Always wrap into an Error, but use formatEmailErr to normalize message
+		const normalized = err instanceof Error ? err : new Error(`Mailgun send failed: ${formatEmailErr(err)}`);
+
+		// Keep original attached for debugging
 		normalized.originalError = err;
+
 		throw normalized;
 	}
-
-
 };
 
 Emailer.renderAndTranslate = async (template, params, lang) => {
