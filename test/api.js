@@ -486,6 +486,34 @@ describe('API', async () => {
 					}
 				});
 
+				let server;
+
+				before(async () => {
+					const webserver = require('../src/webserver');
+
+					// only call listen if not already started
+					if (!webserver.server || !webserver.server.listening) {
+						server = await webserver.listen();
+						console.log('[test] Webserver started on port 4567');
+					} else {
+						console.log('[test] Webserver already running');
+						server = webserver.server;
+					}
+				});
+
+				after(async () => {
+					// optional: close only if we started it here
+					if (server && server.listening) {
+						try {
+							await require('../src/webserver').destroy();
+							console.log('[test] Webserver closed');
+						} catch (err) {
+							console.warn('[test] Error closing server:', err.message);
+						}
+					}
+				});
+
+
 				it('should not error out when called', async () => {
 					await setupData();
 
