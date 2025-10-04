@@ -27,6 +27,15 @@ const activitypub = require('../src/activitypub');
 const utils = require('../src/utils');
 const api = require('../src/api');
 
+// CI-specific stubs to prevent hanging ActivityPub network calls
+if (process.env.CI) {
+	console.log('[CI] Stubbing ActivityPub follow/unfollow to prevent hangs');
+	const api = require('../src/api');
+	api.activitypub.follow = async () => '[stubbed follow]';
+	api.activitypub.unfollow = async () => '[stubbed unfollow]';
+}
+
+
 describe('API', async () => {
 	let readApi = false;
 	let writeApi = false;
@@ -486,6 +495,7 @@ describe('API', async () => {
 					}
 				});
 
+
 				it('should not error out when called', async () => {
 					await setupData();
 
@@ -505,6 +515,7 @@ describe('API', async () => {
 					}
 
 					try {
+						console.log(`[api test] START ${method.toUpperCase()} ${url}`);
 						if (type === 'json') {
 							const searchParams = new URLSearchParams(qs);
 							result = await request[method](`${url}?${searchParams}`, {
@@ -517,7 +528,10 @@ describe('API', async () => {
 						} else if (type === 'form') {
 							result = await helpers.uploadFile(url, pathLib.join(__dirname, './files/test.png'), {}, jar, csrfToken);
 						}
+
+						console.log(`[api test] DONE ${method.toUpperCase()} ${url} (${result.response?.statusCode || 'no status'})`);
 					} catch (e) {
+						console.error(`[api test] ERROR ${method.toUpperCase()} ${url}: ${e.message}`);
 						assert(!e, `${method.toUpperCase()} ${path} errored with: ${e.message}`);
 					}
 				});
