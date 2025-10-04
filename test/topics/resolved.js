@@ -41,6 +41,7 @@ describe('Resolved Status', () => {
 			cid: categoryObj.cid,
 		});
 		topicData = result.topicData;
+		
 	}); 
 
 	describe('GET /api/topics/:tid/resolved', () => { /*check that resolved status is correctly returned for topic*/
@@ -116,6 +117,38 @@ describe('Resolved Status', () => {
 
 			const { body } = await helpers.request('get', `/api/topics/${result.topicData.tid}/resolved`, {});
 			assert.strictEqual(body.resolved, false);
+		});
+	});
+	/* Frontend tests */
+	//tests topic page displays resolved status 
+	//test admin can see toggle adn control 
+	describe('Frontend Display', () => {
+		const nconf = require('nconf');
+		const request = require('../../src/request');
+
+		it('should display resolved status on topic page', async () => {
+			const { response, body } = await request.get(`${nconf.get('url')}/topic/${topicData.slug}`, {
+				jar: adminJar,
+			});
+			assert.strictEqual(response.statusCode, 200);
+			assert(body.includes('resolved') || body.includes('unresolved'), 'Topic page should contain resolved status text');
+		});
+
+		it('should show admin controls for admin users', async () => {
+			const { response, body } = await request.get(`${nconf.get('url')}/topic/${topicData.slug}`, {
+				jar: adminJar,
+			});
+			assert.strictEqual(response.statusCode, 200);
+			// Check that the page contains the checkbox element
+			assert(body.includes('checkbox') || body.includes('post-toggle'), 'Admin should see toggle controls');
+		});
+
+		it('should load topic page for non-admin users', async () => {
+			const regularLogin = await helpers.loginUser('regularuser', '123456');
+			const { response } = await request.get(`${nconf.get('url')}/topic/${topicData.slug}`, {
+				jar: regularLogin.jar,
+			});
+			assert.strictEqual(response.statusCode, 200);
 		});
 	});
 });
