@@ -1624,6 +1624,43 @@ describe('Controllers', () => {
 			assert.equal(body.children[0].posts[0].content, 'topic 1 OP');
 		});
 
+		it('should expose synthetic View All category aggregates', async () => {
+			const { body: beforeBody } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(beforeBody.viewAllCategory);
+			const baselineTopics = Number(beforeBody.viewAllCategory.totalTopicCount) || 0;
+			const baselinePosts = Number(beforeBody.viewAllCategory.totalPostCount) || 0;
+
+			const aggregateCategory = await categories.create({ name: `view-all-${utils.generateUUID()}` });
+			const { topicData } = await topics.post({
+				uid: fooUid,
+				cid: aggregateCategory.cid,
+				title: 'View All synthetic topic',
+				content: 'Aggregated content',
+			});
+			await topics.reply({ uid: fooUid, tid: topicData.tid, content: 'Reply for aggregate' });
+
+			const { body: afterBody } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(afterBody.viewAllCategory);
+			assert(Array.isArray(afterBody.viewAllList));
+			assert.strictEqual(afterBody.viewAllList[0].cid, 'all');
+			assert.strictEqual(afterBody.viewAllCategory.cid, 'all');
+			assert.strictEqual(afterBody.viewAllCategory.name, 'View All');
+			const topicsAfter = Number(afterBody.viewAllCategory.totalTopicCount) || 0;
+			const postsAfter = Number(afterBody.viewAllCategory.totalPostCount) || 0;
+			assert(topicsAfter >= baselineTopics + 1);
+			assert(postsAfter >= baselinePosts + 2);
+		});
+
+		it('should render View All category via recent controller', async () => {
+			const { response, body } = await request.get(`${nconf.get('url')}/api/category/all`, { jar });
+			assert.equal(response.statusCode, 200);
+			assert(body);
+			assert.equal(body.title, 'View All');
+			assert(body.template);
+			assert.equal(body.template.name, 'recent');
+			assert(Array.isArray(body.topics));
+		});
+
 		it('should create 2 pages of topics', async () => {
 			const category = await categories.create({ name: 'category with 2 pages' });
 			for (let i = 0; i < 30; i++) {
