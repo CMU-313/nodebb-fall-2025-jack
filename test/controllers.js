@@ -21,6 +21,7 @@ const plugins = require('../src/plugins');
 const utils = require('../src/utils');
 const slugify = require('../src/slugify');
 const helpers = require('./helpers');
+const MockDate = require('mockdate');
 
 const sleep = util.promisify(setTimeout);
 
@@ -1658,6 +1659,121 @@ describe('Controllers', () => {
 			assert(data.categories.length === 0);
 			assert.deepStrictEqual(data.selectedCategory, null);
 			assert.deepStrictEqual(data.selectedCids, []);
+		});
+
+		it('should expose synthetic View All category aggregates', async () => {
+			const { body: beforeBody } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(beforeBody.viewAllCategory);
+			const baselineTopics = Number(beforeBody.viewAllCategory.totalTopicCount) || 0;
+			const baselinePosts = Number(beforeBody.viewAllCategory.totalPostCount) || 0;
+
+			const aggregateCategory = await categories.create({ name: `view-all-${utils.generateUUID()}` });
+			const { topicData } = await topics.post({
+				uid: fooUid,
+				cid: aggregateCategory.cid,
+				title: 'View All synthetic topic',
+				content: 'Aggregated content',
+			});
+			await topics.reply({ uid: fooUid, tid: topicData.tid, content: 'Reply for aggregate' });
+
+			const { body: afterBody } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(afterBody.viewAllCategory);
+			assert(Array.isArray(afterBody.viewAllList));
+			assert.strictEqual(afterBody.viewAllList[0].cid, 'all');
+			assert.strictEqual(afterBody.viewAllCategory.cid, 'all');
+			assert.strictEqual(afterBody.viewAllCategory.name, 'View All');
+			const topicsAfter = Number(afterBody.viewAllCategory.totalTopicCount) || 0;
+			const postsAfter = Number(afterBody.viewAllCategory.totalPostCount) || 0;
+			assert(topicsAfter >= baselineTopics + 1);
+			assert(postsAfter >= baselinePosts + 2);
+		});
+
+		it('should render View All category via recent controller', async () => {
+			const { response, body } = await request.get(`${nconf.get('url')}/api/category/all`, { jar });
+			assert.equal(response.statusCode, 200);
+			assert(body);
+			assert.equal(body.title, 'View All');
+			assert(body.template);
+			assert.equal(body.template.name, 'recent');
+			assert(Array.isArray(body.topics));
+		});
+
+		it('should ignore categories without find privilege in View All aggregates', async () => {
+			const { body: baseline } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			const baseTopics = Number(baseline.viewAllCategory.totalTopicCount) || 0;
+			const basePosts = Number(baseline.viewAllCategory.totalPostCount) || 0;
+
+			const restrictedCategory = await categories.create({ name: `view-all-hidden-${utils.generateUUID()}` });
+			const { topicData } = await topics.post({
+				uid: fooUid,
+				cid: restrictedCategory.cid,
+				title: 'Hidden View All topic',
+				content: 'Hidden aggregate content',
+			});
+			await topics.reply({ uid: fooUid, tid: topicData.tid, content: 'Hidden aggregate reply' });
+
+			await privileges.categories.rescind(['groups:find'], restrictedCategory.cid, 'registered-users');
+
+			try {
+				const { body: after } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+				const topicsAfter = Number(after.viewAllCategory.totalTopicCount) || 0;
+				const postsAfter = Number(after.viewAllCategory.totalPostCount) || 0;
+				assert.strictEqual(topicsAfter, baseTopics);
+				assert.strictEqual(postsAfter, basePosts);
+			} finally {
+				await privileges.categories.give(['groups:find'], restrictedCategory.cid, 'registered-users');
+			}
+		});
+
+		it('should set View All teaser to latest visible activity when available', async () => {
+			const originals = {
+				initialPostDelay: meta.config.initialPostDelay,
+				postDelay: meta.config.postDelay,
+				newbiePostDelay: meta.config.newbiePostDelay,
+			};
+			const oldDate = new Date('2020-01-01T00:00:00Z');
+			const newDate = new Date('2030-01-01T00:00:00Z');
+
+			meta.config.initialPostDelay = 0;
+			meta.config.postDelay = 0;
+			meta.config.newbiePostDelay = 0;
+
+			let latestTopic;
+			try {
+				MockDate.set(oldDate);
+				const legacyCategory = await categories.create({ name: `view-all-old-${utils.generateUUID()}` });
+				await topics.post({
+					uid: adminUid,
+					cid: legacyCategory.cid,
+					title: 'Older View All topic',
+					content: 'Older aggregate content',
+				});
+
+				MockDate.set(newDate);
+				const freshCategory = await categories.create({ name: `view-all-new-${utils.generateUUID()}` });
+				({ topicData: latestTopic } = await topics.post({
+					uid: adminUid,
+					cid: freshCategory.cid,
+					title: 'Newest View All topic',
+					content: 'Newest aggregate content',
+				}));
+			} finally {
+				MockDate.reset();
+			}
+
+			const { body } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(body.viewAllCategory);
+			const teaser = body.viewAllCategory.teaser;
+			if (teaser) {
+				const teaserTid = teaser.tid || (teaser.topic && teaser.topic.tid);
+				assert.strictEqual(Number(teaserTid), latestTopic.tid);
+			} else {
+				assert.strictEqual(teaser, null);
+			}
+
+			meta.config.initialPostDelay = originals.initialPostDelay;
+			meta.config.postDelay = originals.postDelay;
+			meta.config.newbiePostDelay = originals.newbiePostDelay;
 		});
 	});
 
