@@ -486,33 +486,6 @@ describe('API', async () => {
 					}
 				});
 
-				let server;
-
-				before(async () => {
-					const webserver = require('../src/webserver');
-
-					// only call listen if not already started
-					if (!webserver.server || !webserver.server.listening) {
-						server = await webserver.listen();
-						console.log('[test] Webserver started on port 4567');
-					} else {
-						console.log('[test] Webserver already running');
-						server = webserver.server;
-					}
-				});
-
-				after(async () => {
-					// optional: close only if we started it here
-					if (server && server.listening) {
-						try {
-							await require('../src/webserver').destroy();
-							console.log('[test] Webserver closed');
-						} catch (err) {
-							console.warn('[test] Error closing server:', err.message);
-						}
-					}
-				});
-
 
 				it('should not error out when called', async () => {
 					await setupData();
@@ -533,6 +506,7 @@ describe('API', async () => {
 					}
 
 					try {
+						console.log(`[api test] START ${method.toUpperCase()} ${url}`);
 						if (type === 'json') {
 							const searchParams = new URLSearchParams(qs);
 							result = await request[method](`${url}?${searchParams}`, {
@@ -545,7 +519,10 @@ describe('API', async () => {
 						} else if (type === 'form') {
 							result = await helpers.uploadFile(url, pathLib.join(__dirname, './files/test.png'), {}, jar, csrfToken);
 						}
+
+						console.log(`[api test] DONE ${method.toUpperCase()} ${url} (${result.response?.statusCode || 'no status'})`);
 					} catch (e) {
+						console.error(`[api test] ERROR ${method.toUpperCase()} ${url}: ${e.message}`);
 						assert(!e, `${method.toUpperCase()} ${path} errored with: ${e.message}`);
 					}
 				});
