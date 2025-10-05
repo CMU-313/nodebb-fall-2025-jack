@@ -4,7 +4,7 @@ get:
   summary: Get the number of unresolved topics in a specific category
   description: Returns the count of unresolved topics within the specified category.
   parameters:
-    - name: category_id
+    - name: cid
       in: path
       required: true
       description: The ID of the category
