@@ -173,7 +173,16 @@ module.exports = function (Topics) {
 
 				// Load posts and check for endorsement
 				const postData = await posts.getPostsFields(allPids, ['pid', 'endorsed']);
-				const hasEndorsed = postData.some(p => p && (p.endorsed === '1' || p.endorsed === 1 || p.endorsed === true));
+
+				// Filter out invalid or undefined entries
+				const validPosts = postData.filter(p => p && typeof p.endorsed !== 'undefined');
+				// If no posts even have the endorsed field → treat as false (exclude)
+				if (!validPosts.length) {
+					return null;
+				}
+
+				const hasEndorsed = validPosts.some(p => p.endorsed === '1' || p.endorsed === 1 || p.endorsed === true);
+
 
 				return hasEndorsed ? String(tid) : null;
 			} catch (err) {
@@ -182,7 +191,10 @@ module.exports = function (Topics) {
 		});
 
 		const results = await Promise.all(checkTasks);
-		return results.filter(Boolean);
+		const filtered = results.filter(tid => tid !== null);
+		console.debug('[filterEndorsedTids] included:', filtered);
+
+		return filtered;
 	};
 
 
