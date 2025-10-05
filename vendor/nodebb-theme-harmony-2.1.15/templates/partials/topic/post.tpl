@@ -58,7 +58,7 @@
 
 				<div class="d-flex gap-1 align-items-center">
 					<span class="text-muted">{generateWrote(@value, config.timeagoCutoff)}</span>
-					<span class="badge bg-success ms-1">Endorsed</span>
+					<span class="badge bg-success ms-1">endorsed</span>
 					<button component="post/endorse" class="btn btn-sm btn-outline-success ms-1" data-pid="{./pid}">
 						Endorse
 					</button>
