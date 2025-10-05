@@ -282,7 +282,7 @@ paths:
     $ref: 'read/category/category_id.yaml'
   "/api/category/{category_id}/{slug}/{topic_index}":
     $ref: 'read/category/category_id.yaml'
-  "/api/categories/{category_id}/unresolved/count":
+  "/api/categories/{category_id}/unresolved-count":
     $ref: 'read/categories/cid/unresolved_count.yaml'
   /api/self:
     $ref: 'read/self.yaml'
