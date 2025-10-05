@@ -41,6 +41,8 @@ define('forum/category', [
 
 		handleLoadMoreSubcategories();
 
+		handleStaffFilter();
+
 		handleDescription();
 
 		categorySelector.init($('[component="category-selector"]'), {
@@ -91,6 +93,27 @@ define('forum/category', [
 
 				alerts.success('[[category:' + state + '.message]]');
 			});
+		});
+	}
+
+	function handleStaffFilter() {
+		$('[component="category/staff-filter"] [data-staff-filter]').on('click', function (e) {
+			e.preventDefault();
+			const filter = $(this).attr('data-staff-filter');
+			const currentUrl = new URL(window.location);
+			const params = new URLSearchParams(currentUrl.search);
+
+			if (filter === 'staff') {
+				params.set('courseStaff', '1');
+			} else {
+				params.delete('courseStaff');
+			}
+
+			let url = 'category/' + ajaxify.data.slug;
+			if (params.toString()) {
+				url += '?' + params.toString();
+			}
+			ajaxify.go(url);
 		});
 	}
 
