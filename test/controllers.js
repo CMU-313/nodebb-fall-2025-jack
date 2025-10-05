@@ -1659,6 +1659,104 @@ describe('Controllers', () => {
 			assert.deepStrictEqual(data.selectedCategory, null);
 			assert.deepStrictEqual(data.selectedCids, []);
 		});
+
+		it('should filter topics by course staff when courseStaff query param is set', async () => {
+			const groups = require('../src/groups');
+			const testCategory = await categories.create({ name: 'course-staff-filter-test' });
+
+			// Create course-staff group and add fooUid to it
+			await groups.create({ name: 'course-staff', description: 'Course staff members' });
+			await groups.join('course-staff', fooUid);
+
+			// Create a staff topic
+			const { topicData: staffTopic } = await topics.post({
+				uid: fooUid,
+				cid: testCategory.cid,
+				title: 'Staff Topic',
+				content: 'Topic by staff member',
+			});
+
+			// Create another user and topic
+			const otherUid = await user.create({ username: 'student', password: '123456' });
+			const { topicData: studentTopic } = await topics.post({
+				uid: otherUid,
+				cid: testCategory.cid,
+				title: 'Student Topic',
+				content: 'Topic by student',
+			});
+
+			// Request without filter should show both topics
+			let { body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}`, { jar });
+			assert.equal(body.topics.length, 2);
+
+			// Request with courseStaff=1 should show only staff topic
+			({ body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}?courseStaff=1`, { jar }));
+			assert.equal(body.topics.length, 1);
+			assert.equal(body.topics[0].title, 'Staff Topic');
+
+			// Cleanup - mark topics as read to avoid affecting unread tests
+			await topics.markAsRead([staffTopic.tid, studentTopic.tid], fooUid);
+			await groups.leave('course-staff', fooUid);
+		});
+
+		it('should return empty when course-staff group does not exist', async () => {
+			const testCategory = await categories.create({ name: 'no-staff-group-test' });
+			const { topicData: regularTopic } = await topics.post({
+				uid: fooUid,
+				cid: testCategory.cid,
+				title: 'Regular Topic',
+				content: 'Regular content',
+			});
+
+			// Ensure course-staff group doesn't exist or is empty
+			const groups = require('../src/groups');
+			const exists = await groups.exists('course-staff');
+			if (exists) {
+				await groups.leave('course-staff', fooUid);
+			}
+
+			// Request with courseStaff=1 when group is empty should show no topics
+			const { body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}?courseStaff=1`, { jar });
+			assert.equal(body.topics.length, 0);
+
+			// Cleanup - mark topic as read to avoid affecting unread tests
+			await topics.markAsRead([regularTopic.tid], fooUid);
+		});
+
+		it('should work with pagination when filtering by course staff', async () => {
+			const groups = require('../src/groups');
+			const testCategory = await categories.create({ name: 'staff-pagination-test' });
+
+			// Ensure course-staff group exists
+			const exists = await groups.exists('course-staff');
+			if (!exists) {
+				await groups.create({ name: 'course-staff', description: 'Course staff members' });
+			}
+			await groups.join('course-staff', fooUid);
+
+			// Create multiple staff topics
+			const tids = [];
+			for (let i = 0; i < 5; i++) {
+				const result = await topics.post({
+					uid: fooUid,
+					cid: testCategory.cid,
+					title: `Staff Topic ${i + 1}`,
+					content: `Content ${i + 1}`,
+				});
+				tids.push(result.topicData.tid);
+			}
+
+			// Request with courseStaff filter and verify pagination
+			const { body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}?courseStaff=1`, { jar });
+			assert.equal(body.topics.length, 5);
+			body.topics.forEach((topic) => {
+				assert(topic.title.startsWith('Staff Topic'));
+			});
+
+			// Cleanup - mark topics as read to avoid affecting unread tests
+			await topics.markAsRead(tids, fooUid);
+			await groups.leave('course-staff', fooUid);
+		});
 	});
 
 	describe('unread', () => {
