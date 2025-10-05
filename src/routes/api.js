@@ -18,11 +18,19 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/user/email/:email', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByEmail));
 
 	router.get('/categories/:cid/moderators', [...middlewares], helpers.tryRoute(controllers.api.getModerators));
-	// Get number of resolved topics in a category (copilot)
-	router.get('/categories/:cid/unresolved/count', [...middlewares], helpers.tryRoute(async (req, res) => {
+	// Test route to verify API mounting
+	router.get('/test-api-mounted', [...middlewares], helpers.tryRoute(async (req, res) => {
+		console.log('[API] *** TEST ROUTE HIT - API IS MOUNTED ***');
+		res.json({ message: 'API routes are working!' });
+	}));
+	// Get number of resolved topics in a category (copilot) - moved to avoid conflicts
+	router.get('/categories/:cid/unresolved-count', [...middlewares], helpers.tryRoute(async (req, res) => {
+		console.log(`[API] *** UNRESOLVED COUNT ENDPOINT HIT *** for category: ${req.params.cid}`);
 		const { cid } = req.params;
 		const resolvedUtils = require('../resolved-basic-utils');
+		console.log(`[API] About to call getUnresolvedTopicCountInCategory for cid: ${cid}`);
 		const count = await resolvedUtils.getUnresolvedTopicCountInCategory(cid);
+		console.log(`[API] *** RETURNING COUNT ${count} FOR CATEGORY ${cid} ***`);
 		res.json({ cid: cid, unresolvedTopicCount: count });
 	}));
 	router.get('/recent/posts/:term?', [...middlewares], helpers.tryRoute(controllers.posts.getRecentPosts));

@@ -153,7 +153,7 @@ module.exports = async function (app, middleware) {
 
 function addCoreRoutes(app, router, middleware, mounts) {
 	_mounts.meta(router, middleware, controllers);
-	_mounts.api(router, middleware, controllers);
+	// Do NOT mount API here. Mount API routes directly on the app in your main server setup, before using the main router.
 	_mounts.feed(router, middleware, controllers);
 
 	_mounts.activitypub(router, middleware, controllers);
