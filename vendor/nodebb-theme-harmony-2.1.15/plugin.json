@@ -11,8 +11,10 @@
 		{ "hook": "filter:middleware.renderHeader", "method": "filterMiddlewareRenderHeader" }
 	],
 	"scripts": [
-		"public/harmony.js"
+		"public/harmony.js",
+		"public/src/client/categories.js"
 	],
+	"library": "./library.js",
 	"modules": {
 		"../admin/plugins/harmony.js": "public/admin.js",
 		"../client/account/theme.js": "public/settings.js"
@@ -21,5 +23,8 @@
 		"inter": "node_modules/@fontsource/inter/files",
 		"poppins": "node_modules/@fontsource/poppins/files"
 	},
-	"languages": "languages"
+	"languages": "languages", 
+	"nbbpm": {
+		"compatibility": "^3.0.0"
+	  }
 }

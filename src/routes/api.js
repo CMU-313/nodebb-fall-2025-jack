@@ -18,6 +18,13 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/user/email/:email', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByEmail));
 
 	router.get('/categories/:cid/moderators', [...middlewares], helpers.tryRoute(controllers.api.getModerators));
+	// Get number of resolved topics in a category (copilot)
+	router.get('/categories/:cid/unresolved/count', [...middlewares], helpers.tryRoute(async (req, res) => {
+		const { cid } = req.params;
+		const resolvedUtils = require('../resolved-basic-utils');
+		const count = await resolvedUtils.getUnresolvedTopicCountInCategory(cid);
+		res.json({ cid: cid, unresolvedTopicCount: count });
+	}));
 	router.get('/recent/posts/:term?', [...middlewares], helpers.tryRoute(controllers.posts.getRecentPosts));
 	router.get('/unread/total', [...middlewares, middleware.ensureLoggedIn], helpers.tryRoute(controllers.unread.unreadTotal));
 	router.get('/topic/teaser/:topic_id', [...middlewares], helpers.tryRoute(controllers.topics.teaser));

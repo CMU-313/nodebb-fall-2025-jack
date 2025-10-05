@@ -1,5 +1,6 @@
-'use strict';
 
+console.log("in library js");
+'use strict';
 const nconf = require.main.require('nconf');
 const meta = require.main.require('./src/meta');
 const _ = require.main.require('lodash');
@@ -25,6 +26,15 @@ const defaults = {
 library.init = async function (params) {
 	const { router, middleware } = params;
 	const routeHelpers = require.main.require('./src/routes/helpers');
+	console.log("in library init");
+	routeHelpers.setupApiRoute(router, '/categories/:cid/unresolved/count', [], async (req, res) => {
+		const { cid } = req.params;
+		const resolvedUtils = require('../resolved-basic-utils');
+		console.log("loaded resolved utils in library.js");
+		const count = await resolvedUtils.getUnresolvedTopicCountInCategory(cid);
+		console.log("got number unresolved");
+		res.json({ cid, unresolvedTopicCount: count });
+	});
 
 	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/harmony', [], controllers.renderAdminPage);
 
