@@ -553,9 +553,6 @@ define('forum/topic', [
 				firstPost.find('.resolved-loading').replaceWith(currStatus);
 			});
 	}
-
-
-
 	return Topic;
 });
 
