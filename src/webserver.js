@@ -34,7 +34,7 @@ const flags = require('./flags');
 const topicEvents = require('./topics/events');
 const privileges = require('./privileges');
 const routes = require('./routes');
-const apiRoutes = require('./routes/api');
+// const apiRoutes = require('./routes/api');
 const auth = require('./routes/authentication');
 
 const helpers = require('./helpers');
@@ -112,7 +112,7 @@ async function initializeNodeBB() {
 		middleware: middleware,
 	});
 	// Mount API routes directly on the app before all other routes
-	apiRoutes(app, middleware, require('./controllers'));
+	// apiRoutes(app, middleware, require('./controllers'));
 	await routes(app, middleware);
 	await privileges.init();
 	await meta.blacklist.load();

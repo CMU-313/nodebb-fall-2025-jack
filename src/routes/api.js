@@ -18,11 +18,7 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/user/email/:email', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByEmail));
 
 	router.get('/categories/:cid/moderators', [...middlewares], helpers.tryRoute(controllers.api.getModerators));
-	// Test route to verify API mounting
-	router.get('/test-api-mounted', [...middlewares], helpers.tryRoute(async (req, res) => {
-		console.log('[API] *** TEST ROUTE HIT - API IS MOUNTED ***');
-		res.json({ message: 'API routes are working!' });
-	}));
+
 	// Get number of resolved topics in a category (copilot) - moved to avoid conflicts
 	router.get('/categories/:cid/unresolved-count', [...middlewares], helpers.tryRoute(async (req, res) => {
 		console.log(`[API] *** UNRESOLVED COUNT ENDPOINT HIT *** for category: ${req.params.cid}`);
