@@ -114,7 +114,47 @@ get:
                         - icon
                         - selected
                   selectedCategory:
-                    $ref: ../../../../components/schemas/CategoryObject.yaml#/CategoryObject
+                    type: object
+                    properties:
+                      cid:
+                        type: number
+                      name:
+                        type: string
+                      handle:
+                        type: string
+                        nullable: true
+                      description:
+                        type: string
+                      icon:
+                        type: string
+                      bgColor:
+                        type: string
+                      color:
+                        type: string
+                      parentCid:
+                        type: number
+                      slug:
+                        type: string
+                      topic_count:
+                        type: number
+                      post_count:
+                        type: number
+                      totalPostCount:
+                        type: number
+                      totalTopicCount:
+                        type: number
+                      descriptionParsed:
+                        type: string
+                      imageClass:
+                        type: string
+                      isSection:
+                        type: number
+                      teaser:
+                        type: object
+                        nullable: true
+                    required:
+                      - cid
+                      - name
                   cid:
                     type: number
                     description: A category identifier

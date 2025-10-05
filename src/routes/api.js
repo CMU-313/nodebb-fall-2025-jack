@@ -42,4 +42,67 @@ module.exports = function (app, middleware, controllers) {
 		middleware.canViewUsers,
 		middleware.checkAccountPermissions,
 	], helpers.tryRoute(controllers.accounts.edit.uploadPicture));
+
+	// Resolved status routes - add API endpoint for resolved status
+	const resolvedUtils = require('../resolved-basic-utils');
+	router.get('/topics/:tid/resolved', [...middlewares], helpers.tryRoute(async (req, res) => {
+		const { tid } = req.params;
+		const data = await resolvedUtils.getTopicResolvedStatus(tid);
+		res.json({ tid: tid, resolved: data.resolved });
+	}));
+
+	router.put('/topics/:tid/resolved', [...middlewares, middleware.exposeUid], helpers.tryRoute(async (req, res) => {
+		const { tid } = req.params;
+		const { resolved } = req.body;
+		const { uid } = req;
+		
+		if (!uid) {
+			return res.status(401).json({ error: 'Not logged in' });
+		}
+
+		const isAdmin = await resolvedUtils.isCourseStaff(uid);
+		if (!isAdmin) {
+			return res.status(403).json({ error: 'Insufficient privileges' });
+		}
+
+		await resolvedUtils.updateTopicResolvedStatus(tid, resolved);
+
+		res.json({ 
+			success: true, 
+			resolved,
+			message: resolved ? 'Topic marked as resolved' : 'Topic marked as unresolved',
+		});
+	}));
+
+	// GET endorsed status - anyone can read
+	router.get('/posts/:pid/endorsed', [...middlewares], helpers.tryRoute(async (req, res) => {
+		const { pid } = req.params;
+		const data = await resolvedUtils.getPostEndorsedStatus(pid);
+		res.json({ pid: pid, endorsed: data.endorsed });
+	}));
+
+	// PUT endorsed status - admin only
+	router.put('/posts/:pid/endorsed', [...middlewares, middleware.exposeUid], helpers.tryRoute(async (req, res) => {
+		const { pid } = req.params;
+		const { endorsed } = req.body;
+		const { uid } = req;
+		
+		if (!uid) {
+			return res.status(401).json({ error: 'Not logged in' });
+		}
+
+		const isAdmin = await resolvedUtils.isCourseStaff(uid);
+		if (!isAdmin) {
+			return res.status(403).json({ error: 'Only admins can endorse posts' });
+		}
+
+		await resolvedUtils.setPostEndorsedStatus(pid, endorsed);
+
+		res.json({ 
+			success: true, 
+			endorsed,
+			message: endorsed ? 'Post endorsed' : 'Post unendorsed',
+		});
+	}));
 };
+

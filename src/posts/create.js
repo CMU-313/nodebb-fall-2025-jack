@@ -30,7 +30,8 @@ module.exports = function (Posts) {
 		}
 
 		const pid = data.pid || await db.incrObjectField('global', 'nextPid');
-		let postData = { pid, uid, tid, content, sourceContent, timestamp };
+		// add default endorsed status data field
+		let postData = { pid, uid, tid, content, sourceContent, timestamp, endorsed:false};
 
 		if (data.toPid) {
 			postData.toPid = data.toPid;
