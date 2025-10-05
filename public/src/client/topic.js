@@ -75,6 +75,7 @@ define('forum/topic', [
 
 		hooks.fire('action:topic.loaded', ajaxify.data);
 		addResolved_Status();
+		addEndorsed_Status();
 	};
 
 	function handleTopicSearch() {
@@ -553,6 +554,75 @@ define('forum/topic', [
 				firstPost.find('.resolved-loading').replaceWith(currStatus);
 			});
 	}
+
+	function addEndorsed_Status() {
+		const allPosts = $('[component="post"]');
+		const isAdmin = app.user && app.user.isAdmin;
+		
+		allPosts.each(function () {
+			const postElem = $(this);
+			const pid = postElem.attr('data-pid');
+			
+			if (!pid) return;
+			
+			postElem.prepend('<div class="endorsed-loading">Loading...</div>');
+			
+			fetch(`/api/posts/${pid}/endorsed`, {
+				credentials: 'same-origin',
+			}).then(r => r.json())
+				.then(data => {
+					const isEndorsed = data.endorsed;
+					
+					let endorsedStatus;
+					
+					if (isAdmin) {
+						// Admin sees a button with data attribute to track state
+						endorsedStatus = $(`
+							<button class="endorsed-button btn btn-sm" data-endorsed="${isEndorsed}" style="margin: 5px; ${isEndorsed ? 'background-color: #007bff; color: white; border: none;' : 'background-color: #f0f0f0; color: #666; border: 2px solid #007bff;'}">
+								${isEndorsed ? 'Endorsed ✓' : 'Endorse this post?'}
+							</button>
+						`);
+						
+						endorsedStatus.on('click', function () {
+							const button = $(this);
+							const currentState = button.attr('data-endorsed') === 'true'; // Read current state from button
+							const newStatus = !currentState;
+							
+							fetch(`/api/posts/${pid}/endorsed`, {
+								method: 'PUT',
+								headers: {
+									'Content-Type': 'application/json',
+									'x-csrf-token': config.csrf_token,
+								},
+								credentials: 'same-origin',
+								body: JSON.stringify({ endorsed: newStatus }),
+							}).then(r => r.json())
+								.then(() => {
+									button.attr('data-endorsed', newStatus); // Update state on button
+									if (newStatus) {
+										button.text('Endorsed ✓').css({'background-color': '#007bff', 'color': 'white', 'border': 'none'});
+									} else {
+										button.text('Endorse this post?').css({'background-color': '#f0f0f0', 'color': '#666', 'border': '2px solid #007bff'});
+									}
+									alerts.success(newStatus ? 'Post endorsed' : 'Post unendorsed');
+								})
+								.catch(() => alerts.error('Failed to update'));
+						});
+					} else {
+						// Non-admin sees read-only status
+						endorsedStatus = $(`
+							<div style="padding: 5px; margin: 5px; color: ${isEndorsed ? 'blue' : '#999'}; font-size: 14px;">
+								${isEndorsed ? 'Endorsed by admin ✓' : ''}
+							</div>
+						`);
+					}
+					
+					postElem.find('.endorsed-loading').replaceWith(endorsedStatus);
+				});
+		});
+	}
+
+
 	return Topic;
 });
 
