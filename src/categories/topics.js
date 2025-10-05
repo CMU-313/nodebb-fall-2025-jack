@@ -117,6 +117,16 @@ module.exports = function (Categories) {
 			set.add(`cid:${cid}:uid:${data.targetUid}:tids`);
 		}
 
+		if (data.courseStaffUids && Array.isArray(data.courseStaffUids)) {
+			if (data.courseStaffUids.length) {
+				const staffSets = data.courseStaffUids.map(uid => `cid:${cid}:uid:${uid}:tids`);
+				staffSets.forEach(s => set.add(s));
+			} else {
+				// Empty staff list - return no topics by adding a non-existent set
+				set.add('cid:empty:coursestaff');
+			}
+		}
+
 		if (parseInt(cid, 10) === -1 && uid > 0) {
 			set.delete(mainSet);
 			set.add(`uid:${uid}:inbox`);
