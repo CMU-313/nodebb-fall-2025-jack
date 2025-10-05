@@ -144,6 +144,7 @@
 		<div class="mb-2">
 			<label class="form-label text-sm" for="categoryTopicSort">[[user:category-topic-sort]]</label>
 			<select class="form-select form-select-sm" id="categoryTopicSort" data-property="categoryTopicSort">
+				<option value="endorsed" {{{ if (settings.categoryTopicSort == "endorsed") }}}selected{{{ end }}}>[[topic:endorsed]]</option>
 				<option value="recently_replied" {{{ if (settings.categoryTopicSort == "recently_replied") }}}selected{{{ end }}}>[[topic:recently-replied]]</option>
 				<option value="recently_created" {{{ if (settings.categoryTopicSort == "recently_created") }}}selected{{{ end }}}>[[topic:recently-created]]</option>
 				<option value="most_posts" {{{ if (settings.categoryTopicSort == "most_posts") }}}selected{{{ end }}}>[[topic:most-posts]]</option>

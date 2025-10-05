@@ -18,6 +18,7 @@
 				<div class="mb-3">
 					<label class="form-label" for="categoryTopicSort">[[admin/settings/post:sorting.topic-default]]</label>
 					<select id="categoryTopicSort" class="form-select" data-field="categoryTopicSort">
+						<option value="endorsed">[[admin/settings/post:sorting.endorsed]]</option>
 						<option value="recently_replied">[[admin/settings/post:sorting.recently-replied]]</option>
 						<option value="recently_created">[[admin/settings/post:sorting.recently-created]]</option>
 						<option value="most_posts">[[admin/settings/post:sorting.most-posts]]</option>
