@@ -34,6 +34,9 @@ PostObject:
       type: number
     votes:
       type: number
+    endorsed:
+      type: boolean
+      description: Whether this post has been endorsed by an administrator
     timestampISO:
       type: string
       description: An ISO 8601 formatted date string (complementing `timestamp`)
@@ -174,6 +177,9 @@ PostDataObject:
           type: number
         votes:
           type: number
+        endorsed:                   
+          type: boolean
+          description: Whether this post has been endorsed by an administrator
         deleted:
           type: number
         upvotes:
