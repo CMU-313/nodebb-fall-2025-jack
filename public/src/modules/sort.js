@@ -6,7 +6,7 @@ define('sort', ['components'], function (components) {
 
 	module.handleSort = function (field, gotoOnSave) {
 		const threadSort = components.get('thread/sort');
-		const $dropdownToggle = threadSort.find('.dropdown-toggle');
+		const dropdownToggle = threadSort.find('.dropdown-toggle');
 
 		// --- Detect URL parameters ---
 		const urlParams = utils.params();
@@ -16,19 +16,19 @@ define('sort', ['components'], function (components) {
 		threadSort.find('i').removeClass('fa-check');
 
 		// --- Identify active link based on filter or sort ---
-		let $currentSetting;
+		let currentSetting;
 		if (currentFilter) {
-			$currentSetting = threadSort.find(`a[data-filter="${currentFilter}"]`);
+			currentSetting = threadSort.find(`a[data-filter="${currentFilter}"]`);
 		} else {
-			$currentSetting = threadSort.find(`a[data-sort="${currentSort}"]`);
+			currentSetting = threadSort.find(`a[data-sort="${currentSort}"]`);
 		}
 
 		// --- Apply checkmark + label on load ---
-		if ($currentSetting && $currentSetting.length) {
-			$currentSetting.find('i').addClass('fa-check');
-			const label = $currentSetting.text().trim();
-			if ($dropdownToggle.length) {
-				$dropdownToggle.text(label);
+		if (currentSetting && currentSetting.length) {
+			currentSetting.find('i').addClass('fa-check');
+			const label = currentSetting.text().trim();
+			if (dropdownToggle.length) {
+				dropdownToggle.text(label);
 			}
 		}
 
@@ -48,8 +48,8 @@ define('sort', ['components'], function (components) {
 				}
 
 				const label = $el.text().trim();
-				if ($dropdownToggle.length) {
-					$dropdownToggle.text(label);
+				if (dropdownToggle.length) {
+					dropdownToggle.text(label);
 				}
 
 				const qs = $.param(params);
