@@ -60,7 +60,7 @@
 				<span class="d-none d-xl-flex text-lowercase text-xs">[[global:posts]]</span>
 				<i class="d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message"></i>
 			</div>
-			<div class="card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
+			<div class="bg-danger-subtle card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
 				<span component="category/unresolved-count" class="fs-5 ff-secondary lh-1"></span>
 				<span class="d-none d-xl-flex text-lowercase text-xs">Unresolved</span>
 				<i class="d-xl-none fa-regular fa-fw text-xs text-muted opacity-75 fa-message"></i>

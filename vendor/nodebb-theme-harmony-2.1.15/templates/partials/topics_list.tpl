@@ -86,7 +86,7 @@
 		</div>
 
         <div class="d-flex p-0 col-lg-5 col-12 align-content-stretch">
-            <div class="meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted" style="grid-template-columns: 1fr 1fr 1fr 1fr; ">
+            <div class="meta stats d-none d-lg-grid col-6 gap-1 pe-2 text-muted" style="grid-template-columns: 1fr 1fr 1fr; ">
                 {{{ if !reputation:disabled }}}
                 <div class="stats-votes card card-header border-0 p-2 overflow-hidden rounded-1 d-flex flex-column align-items-center">
                     <span class="fs-5 ff-secondary lh-1" title="{./votes}">{humanReadableNumber(./votes, 0)}</span>
@@ -103,11 +103,6 @@
                     <span class="fs-5 ff-secondary lh-1" title="{./viewcount}">{humanReadableNumber(./viewcount, 0)}</span>
                     <span class="d-none d-xl-flex text-lowercase text-xs">[[global:views]]</span>
                     <i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-eye"></i>
-                </div>
-                <div class="stats-unresolved card card-header border-0 p-2 overflow-visible rounded-1 d-flex flex-column align-items-center">
-                    <span class="fs-5 ff-secondary lh-1" title="placeholder">50</span>
-                    <span class="d-none d-xl-flex text-lowercase text-xs">unresolved</span>
-                    <i class="d-xl-none fa fa-fw text-xs text-muted opacity-75 fa-question-circle"></i>
                 </div>
             </div>
 			<div component="topic/teaser" class="meta teaser ps-5 ps-lg-0 col-lg-6 col-12 {{{ if !config.theme.mobileTopicTeasers }}}d-none d-lg-block{{{ end }}}">
