@@ -114,6 +114,20 @@ categoryController.get = async function (req, res, next) {
 	const start = ((currentPage - 1) * userSettings.topicsPerPage) + topicIndex;
 	const stop = start + userSettings.topicsPerPage - 1;
 
+	// treat sort=endorsed (or a saved default of 'endorsed') as filter=endorsed.
+	if (req.query && req.query.sort === 'endorsed') {
+		req.query.filter = 'endorsed';
+		delete req.query.sort;
+		// mark that the original request requested endorsed via sort
+		req._wasSortEndorsed = true;
+	}
+	// If the user's saved default is 'endorsed' and no explicit sort is provided,
+	// treat it as a filter so their preference shows endorsed posts.
+	if ((!req.query || !req.query.sort) && userSettings && userSettings.categoryTopicSort === 'endorsed') {
+		req.query.filter = 'endorsed';
+		req._wasUserDefaultEndorsed = true;
+	}
+
 	const sort = validSorts.includes(req.query.sort) ? req.query.sort : userSettings.categoryTopicSort;
 
 	const categoryData = await categories.getCategoryById({
@@ -173,7 +187,14 @@ categoryController.get = async function (req, res, next) {
 	categoryData.topicIndex = topicIndex;
 	categoryData.selectedTag = tagData.selectedTag;
 	categoryData.selectedTags = tagData.selectedTags;
-	categoryData.sortOptionLabel = `[[topic:${validator.escape(String(sort)).replace(/_/g, '-')}]]`;
+	let sortOptionKey;
+	if ((req.query && req.query.filter === 'endorsed') || req._wasSortEndorsed || req._wasUserDefaultEndorsed) {
+		sortOptionKey = 'endorsed';
+	} else {
+		sortOptionKey = validator.escape(String(sort)).replace(/_/g, '-');
+	}
+
+	categoryData.sortOptionLabel = `[[topic:${sortOptionKey}]]`;
 
 	if (!meta.config['feeds:disableRSS']) {
 		categoryData.rssFeedUrl = `${url}/category/${categoryData.cid}.rss`;
