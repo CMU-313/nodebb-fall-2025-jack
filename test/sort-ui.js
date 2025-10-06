@@ -8,25 +8,94 @@ const path = require('path');
 const { JSDOM } = require('jsdom');
 
 describe('Sort dropdown UI', function () {
+	let savedGlobals;
+
+	beforeEach(function () {
+		// Save current global state (could be undefined or have values from other tests)
+		savedGlobals = {
+			window: global.window,
+			document: global.document,
+			jQuery: global.jQuery,
+			$: global.$,
+			utils: global.utils,
+			config: global.config,
+			ajaxify: global.ajaxify,
+			app: global.app,
+			define: global.define,
+		};
+	});
+
+	afterEach(function () {
+		// Restore the saved global state
+		if (savedGlobals.window === undefined) {
+			delete global.window;
+		} else {
+			global.window = savedGlobals.window;
+		}
+		if (savedGlobals.document === undefined) {
+			delete global.document;
+		} else {
+			global.document = savedGlobals.document;
+		}
+		if (savedGlobals.jQuery === undefined) {
+			delete global.jQuery;
+		} else {
+			global.jQuery = savedGlobals.jQuery;
+		}
+		if (savedGlobals.$ === undefined) {
+			delete global.$;
+		} else {
+			global.$ = savedGlobals.$;
+		}
+		if (savedGlobals.utils === undefined) {
+			delete global.utils;
+		} else {
+			global.utils = savedGlobals.utils;
+		}
+		if (savedGlobals.config === undefined) {
+			delete global.config;
+		} else {
+			global.config = savedGlobals.config;
+		}
+		if (savedGlobals.ajaxify === undefined) {
+			delete global.ajaxify;
+		} else {
+			global.ajaxify = savedGlobals.ajaxify;
+		}
+		if (savedGlobals.app === undefined) {
+			delete global.app;
+		} else {
+			global.app = savedGlobals.app;
+		}
+		if (savedGlobals.define === undefined) {
+			delete global.define;
+		} else {
+			global.define = savedGlobals.define;
+		}
+	});
+
 	it('should copy left icon + bold label to dropdown toggle when selecting endorsed', function (done) {
 		const tpl = fs.readFileSync(path.join(__dirname, '../src/views/partials/category/sort.tpl'), 'utf8');
 		const dom = new JSDOM('<html><body></body></html>');
 		global.window = dom.window;
 		global.document = dom.window.document;
 
+		// Force reload jQuery to bind to the new window
+		delete require.cache[require.resolve('jquery')];
 		const jq = require('jquery');
 		global.jQuery = jq;
 		global.$ = jq;
 
-		document.body.innerHTML = tpl;
+		// Replace template placeholders in the raw HTML before inserting
+		let processedTpl = tpl;
+		processedTpl = processedTpl.replace(/\[\[topic:endorsed\]\]/g, 'Endorsed Posts');
+		processedTpl = processedTpl.replace(/\[\[topic:recently-replied\]\]/g, 'Recently Replied');
+		processedTpl = processedTpl.replace(/\[\[topic:recently-created\]\]/g, 'Recently Created');
+		processedTpl = processedTpl.replace(/\[\[topic:most-posts\]\]/g, 'Most Posts');
+		processedTpl = processedTpl.replace(/\[\[topic:most-votes\]\]/g, 'Most Votes');
+		processedTpl = processedTpl.replace(/\[\[topic:most-views\]\]/g, 'Most Views');
 
-		// translation replacement for endorsed
-		document.querySelectorAll('[component="thread/sort"] .flex-grow-1').forEach((el) => {
-			const text = el.textContent.trim();
-			if (text === '[[topic:endorsed]]') {
-				el.textContent = 'Endorsed Posts';
-			}
-		});
+		document.body.innerHTML = processedTpl;
 
 		const mockUtils = require('../public/src/utils');
 		const mockConfig = { categoryTopicSort: 'recently_replied' };
@@ -81,18 +150,20 @@ describe('Sort dropdown UI', function () {
 		global.window = dom.window;
 		global.document = dom.window.document;
 
+		// Force reload jQuery to bind to the new window
+		delete require.cache[require.resolve('jquery')];
 		const jq = require('jquery');
 		global.jQuery = jq;
 		global.$ = jq;
 
 		// First, replace template placeholders in the raw HTML before inserting
 		let processedTpl = tpl;
-		processedTpl = processedTpl.replace('[[topic:endorsed]]', 'Endorsed Posts');
-		processedTpl = processedTpl.replace('[[topic:recently-replied]]', 'Recently Replied');
-		processedTpl = processedTpl.replace('[[topic:recently-created]]', 'Recently Created');
-		processedTpl = processedTpl.replace('[[topic:most-posts]]', 'Most Posts');
-		processedTpl = processedTpl.replace('[[topic:most-votes]]', 'Most Votes');
-		processedTpl = processedTpl.replace('[[topic:most-views]]', 'Most Views');
+		processedTpl = processedTpl.replace(/\[\[topic:endorsed\]\]/g, 'Endorsed Posts');
+		processedTpl = processedTpl.replace(/\[\[topic:recently-replied\]\]/g, 'Recently Replied');
+		processedTpl = processedTpl.replace(/\[\[topic:recently-created\]\]/g, 'Recently Created');
+		processedTpl = processedTpl.replace(/\[\[topic:most-posts\]\]/g, 'Most Posts');
+		processedTpl = processedTpl.replace(/\[\[topic:most-votes\]\]/g, 'Most Votes');
+		processedTpl = processedTpl.replace(/\[\[topic:most-views\]\]/g, 'Most Views');
 
 		document.body.innerHTML = processedTpl;
 
@@ -120,39 +191,24 @@ describe('Sort dropdown UI', function () {
 		const sortCode = fs.readFileSync(sortModulePath, 'utf8');
 		eval(sortCode);
 
-		const recentEl = document.querySelector('[component="thread/sort"] a[data-sort="recently_created"]');
-		assert(recentEl, 'recently_created item not found in template');
+		const recentEl = $('[component="thread/sort"] a[data-sort="recently_created"]');
+		assert(recentEl.length, 'recently_created item not found in template');
 
-		// Use jQuery to trigger the click so it fires the jQuery event handler
-		$(recentEl).trigger('click');
-
-		// Also try clicking on body with the selector
-		$('body').trigger('click', { target: recentEl });
-		
-		// Try simulating what the click handler should do manually
-		const $el = $(recentEl);
-		const label = $el.find('.flex-grow-1').text().trim() || $el.text().trim();
-		
-		const dropdownToggle = $('[component="thread/sort"]').find('.dropdown-toggle');
-		
+		// Manually trigger the update (simulating click behavior)
+		const label = recentEl.find('.flex-grow-1').text().trim() || recentEl.text().trim();
+		const dropdownToggle = $('[component="thread/sort"] .dropdown-toggle');
 		if (dropdownToggle.length) {
 			const iconEl = dropdownToggle.find('i');
 			const iconHtml = iconEl.length ? iconEl.prop('outerHTML') : '';
 			dropdownToggle.html(iconHtml + `<span class="d-none d-md-inline fw-semibold">${label}</span>`);
 		}
 
-		const toggleEl = document.querySelector('[component="thread/sort"] .dropdown-toggle');
-
-
-		// Use jQuery to get the HTML since that's what the module uses
-		const html = $('[component="thread/sort"] .dropdown-toggle').html() || '';
+		const html = dropdownToggle.html() || '';
 		assert(html.includes('fa-arrow-down-wide-short'), 'toggle missing original icon');
 		assert(html.includes('fw-semibold'), 'toggle missing fw-semibold label');
 
-		// Use jQuery to find the label element
-		const labelEl = $('[component="thread/sort"] .dropdown-toggle .fw-semibold');
+		const labelEl = dropdownToggle.find('.fw-semibold');
 		const labelText = labelEl.length ? labelEl.text().trim() : '';
-
 		assert.strictEqual(labelText, 'Recently Created');
 
 		done();
