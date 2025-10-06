@@ -26,18 +26,13 @@ define('sort', ['components'], function (components) {
 		// --- Apply checkmark + label on load ---
 		if (currentSetting && currentSetting.length) {
 			currentSetting.find('i').addClass('fa-check');
-			// Prefer the structured left-side markup (icon + label) if present
-			const leftInline = currentSetting.find('.d-inline-flex');
+			// Build toggle content: preserve the dropdown's original icon (if any)
+			// and inject a bold label derived from the selected item. 
 			const label = currentSetting.find('.flex-grow-1').text().trim() || currentSetting.text().trim();
 			if (dropdownToggle.length) {
-				if (leftInline.length) {
-					// copy the whole left inline element (keeps icon + bold span)
-					dropdownToggle.html(leftInline.prop('outerHTML'));
-				} else {
-					// fallback: preserve existing icon and inject bold label
-					const iconHtml = dropdownToggle.find('i').length ? dropdownToggle.find('i').prop('outerHTML') : '';
-					dropdownToggle.html(iconHtml + `<span class="d-none d-md-inline fw-semibold">${label}</span>`);
-				}
+				const iconEl = dropdownToggle.find('i');
+				const iconHtml = iconEl.length ? iconEl.prop('outerHTML') : '';
+				dropdownToggle.html(iconHtml + `<span class="d-none d-md-inline fw-semibold">${label}</span>`);
 			}
 		}
 
@@ -56,16 +51,12 @@ define('sort', ['components'], function (components) {
 					delete params.filter;
 				}
 
-				// update toggle to show icon + bold label when available
-				const leftInline = $el.find('.d-inline-flex');
+				// update toggle to show the original icon + bold label (fallback behavior). 
 				const label = $el.find('.flex-grow-1').text().trim() || $el.text().trim();
 				if (dropdownToggle.length) {
-					if (leftInline.length) {
-						dropdownToggle.html(leftInline.prop('outerHTML'));
-					} else {
-						const iconHtml = dropdownToggle.find('i').length ? dropdownToggle.find('i').prop('outerHTML') : '';
-						dropdownToggle.html(iconHtml + `<span class="d-none d-md-inline fw-semibold">${label}</span>`);
-					}
+					const iconEl = dropdownToggle.find('i');
+					const iconHtml = iconEl.length ? iconEl.prop('outerHTML') : '';
+					dropdownToggle.html(iconHtml + `<span class="d-none d-md-inline fw-semibold">${label}</span>`);
 				}
 
 				const qs = $.param(params);
