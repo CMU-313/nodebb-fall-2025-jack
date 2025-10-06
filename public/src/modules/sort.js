@@ -26,9 +26,18 @@ define('sort', ['components'], function (components) {
 		// --- Apply checkmark + label on load ---
 		if (currentSetting && currentSetting.length) {
 			currentSetting.find('i').addClass('fa-check');
-			const label = currentSetting.text().trim();
+			// Prefer the structured left-side markup (icon + label) if present
+			const leftInline = currentSetting.find('.d-inline-flex');
+			const label = currentSetting.find('.flex-grow-1').text().trim() || currentSetting.text().trim();
 			if (dropdownToggle.length) {
-				dropdownToggle.text(label);
+				if (leftInline.length) {
+					// copy the whole left inline element (keeps icon + bold span)
+					dropdownToggle.html(leftInline.prop('outerHTML'));
+				} else {
+					// fallback: preserve existing icon and inject bold label
+					const iconHtml = dropdownToggle.find('i').length ? dropdownToggle.find('i').prop('outerHTML') : '';
+					dropdownToggle.html(iconHtml + `<span class="d-none d-md-inline fw-semibold">${label}</span>`);
+				}
 			}
 		}
 
@@ -47,9 +56,16 @@ define('sort', ['components'], function (components) {
 					delete params.filter;
 				}
 
-				const label = $el.text().trim();
+				// update toggle to show icon + bold label when available
+				const leftInline = $el.find('.d-inline-flex');
+				const label = $el.find('.flex-grow-1').text().trim() || $el.text().trim();
 				if (dropdownToggle.length) {
-					dropdownToggle.text(label);
+					if (leftInline.length) {
+						dropdownToggle.html(leftInline.prop('outerHTML'));
+					} else {
+						const iconHtml = dropdownToggle.find('i').length ? dropdownToggle.find('i').prop('outerHTML') : '';
+						dropdownToggle.html(iconHtml + `<span class="d-none d-md-inline fw-semibold">${label}</span>`);
+					}
 				}
 
 				const qs = $.param(params);
