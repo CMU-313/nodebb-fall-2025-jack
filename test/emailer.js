@@ -206,4 +206,78 @@ describe('emailer', () => {
 			Plugins.hooks.unregister('emailer-test', 'static:email.send', method);
 		});
 	});
+
+	describe('post reply email notification', () => {
+		let adminUid, recipientUid, testCategoryCid;
+		const sentData = null;
+		let originalConfirmByUid;
+
+		before(async () => {
+			// Save original function so we can restore later
+			originalConfirmByUid = user.email.confirmByUid;
+
+			// Disable email validation temporarily for test environment
+			user.email.confirmByUid = async (uid) => {
+				await db.setObjectField(`user:${uid}`, 'email:confirmed', 1);
+			};
+
+			// Create admin user with your email address
+			adminUid = await user.create({
+				username: 'admin',
+				email: 'qge@andrew.cmu.edu',
+			});
+
+			// Create another user to reply
+			recipientUid = await user.create({
+				username: 'replyuser',
+				email: 'replyuser@testmail.org',
+			});
+
+			// Manually mark both as confirmed
+			await db.setObjectField(`user:${adminUid}`, 'email:confirmed', 1);
+			await db.setObjectField(`user:${recipientUid}`, 'email:confirmed', 1);
+
+			// Create a category for the topic
+			const Categories = require('../src/categories');
+			const category = await Categories.create({
+				name: 'Test Category',
+				description: 'Category for emailer test',
+			});
+			if (!category || !category.cid) {
+				throw new Error('Category creation failed: ' + JSON.stringify(category));
+			}
+			testCategoryCid = category.cid;
+			// Admin creates a topic
+			let topicData;
+			const topics = require('../src/topics');
+			const posts = require('../src/posts');
+			try {
+				topicData = await topics.post({
+					uid: adminUid,
+					title: 'Test Topic',
+					content: 'First post content',
+					cid: testCategoryCid,
+				});
+			} catch (err) {
+				console.error('Topic creation error:', err);
+				throw err;
+			}
+			assert.ok(topicData && topicData.tid);
+
+			// Another user replies
+			await posts.reply({
+				uid: recipientUid,
+				tid: topicData.tid,
+				content: 'This is a reply to admin',
+			});
+
+			// Assert that Emailer was triggered
+			assert.ok(sentData, 'Emailer should have been called');
+			assert.strictEqual(sentData.template, 'notification', 'Template should be notification-related');
+			assert(sentData.to.includes('qge@andrew.cmu.edu'), 'Should send to admin email');
+		});
+	});
+
+
+
 });
