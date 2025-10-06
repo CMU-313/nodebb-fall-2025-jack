@@ -515,7 +515,6 @@ describe('API', async () => {
 					}
 
 					try {
-						console.log(`[api test] START ${method.toUpperCase()} ${url}`);
 						if (type === 'json') {
 							const searchParams = new URLSearchParams(qs);
 							result = await request[method](`${url}?${searchParams}`, {
@@ -528,10 +527,7 @@ describe('API', async () => {
 						} else if (type === 'form') {
 							result = await helpers.uploadFile(url, pathLib.join(__dirname, './files/test.png'), {}, jar, csrfToken);
 						}
-
-						console.log(`[api test] DONE ${method.toUpperCase()} ${url} (${result.response?.statusCode || 'no status'})`);
 					} catch (e) {
-						console.error(`[api test] ERROR ${method.toUpperCase()} ${url}: ${e.message}`);
 						assert(!e, `${method.toUpperCase()} ${path} errored with: ${e.message}`);
 					}
 				});
