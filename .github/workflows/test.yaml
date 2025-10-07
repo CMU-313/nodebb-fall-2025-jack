@@ -69,8 +69,6 @@ jobs:
               "redis:port": 6379,
               "redis:password": "",
               "redis:database": 0,
-
-              "activitypubEnabled": 0
             }
           CI: >-
             {
