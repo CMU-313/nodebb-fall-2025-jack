@@ -46,6 +46,12 @@ Categories.existsByHandle = async function (handle) {
 };
 
 Categories.getCategoryById = async function (data) {
+	// --- Normalize legacy sort=endorsed behavior ---
+	if (data.query && data.query.sort === 'endorsed') {
+		data.query.filter = 'endorsed';
+		delete data.query.sort;
+	}
+	
 	const categories = await Categories.getCategories([data.cid]);
 	if (!categories[0]) {
 		return null;
