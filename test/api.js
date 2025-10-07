@@ -29,8 +29,15 @@ const api = require('../src/api');
 
 // CI-specific stubs to prevent hanging ActivityPub network calls
 if (process.env.CI) {
-	console.log('[CI] Stubbing ActivityPub follow/unfollow to prevent hangs');
+	console.log('[CI] Disabling ActivityPub networking for CI environment');
+	const activitypub = require('../src/activitypub');
 	const api = require('../src/api');
+
+	// Stub all network-facing ActivityPub handlers
+	activitypub.inbox = async () => '[stubbed inbox]';
+	activitypub.outbox = async () => '[stubbed outbox]';
+	activitypub.handleInboxMessage = async () => '[stubbed handleInboxMessage]';
+
 	api.activitypub.follow = async () => '[stubbed follow]';
 	api.activitypub.unfollow = async () => '[stubbed unfollow]';
 }
