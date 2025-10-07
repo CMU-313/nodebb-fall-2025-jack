@@ -81,5 +81,35 @@ module.exports = function (app, middleware, controllers) {
 		const resolvedUtils = require('../resolved-basic-utils');
 		const count = await resolvedUtils.getUnresolvedTopicCountInCategory(cid);
 		res.json({ cid: cid, unresolvedTopicCount: count });
+	// GET endorsed status - anyone can read
+	router.get('/posts/:pid/endorsed', [...middlewares], helpers.tryRoute(async (req, res) => {
+		const { pid } = req.params;
+		const data = await resolvedUtils.getPostEndorsedStatus(pid);
+		res.json({ pid: pid, endorsed: data.endorsed });
+	}));
+
+	// PUT endorsed status - admin only
+	router.put('/posts/:pid/endorsed', [...middlewares, middleware.exposeUid], helpers.tryRoute(async (req, res) => {
+		const { pid } = req.params;
+		const { endorsed } = req.body;
+		const { uid } = req;
+		
+		if (!uid) {
+			return res.status(401).json({ error: 'Not logged in' });
+		}
+
+		const isAdmin = await resolvedUtils.isCourseStaff(uid);
+		if (!isAdmin) {
+			return res.status(403).json({ error: 'Only admins can endorse posts' });
+		}
+
+		await resolvedUtils.setPostEndorsedStatus(pid, endorsed);
+
+		res.json({ 
+			success: true, 
+			endorsed,
+			message: endorsed ? 'Post endorsed' : 'Post unendorsed',
+		});
 	}));
 };
+
