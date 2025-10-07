@@ -36,9 +36,8 @@ resolvedUtils.getUnresolvedTopicCountInCategory = async function (cid) {
 	const tids = await database.getSortedSetRange(`cid:${cid}:tids`, 0, -1);
 	console.log(`[resolved-utils] Found topic IDs for category ${cid}:`, tids);
 	let unresolvedCount = 0;
-	for (const tid of tids) {
+	for await (const tid of tids) {
 		const status = await this.getTopicResolvedStatus(tid);
-		console.log(`[resolved-utils] Topic ${tid} resolved status:`, status);
 		if (!(status.resolved)) {
 			unresolvedCount += 1;
 		}
