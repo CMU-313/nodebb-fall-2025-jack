@@ -6,6 +6,7 @@ const User = require('../src/user');
 const topics = require('../src/topics');
 const posts = require('../src/posts');
 const categories = require('../src/categories');
+const db = require('../src/database');
 const helpers = require('./helpers');
 
 describe('Endorsed filter', () => {
@@ -31,17 +32,53 @@ describe('Endorsed filter', () => {
 		// Add a reply to topic B and mark it endorsed
 		const reply = await posts.create({ uid: adminUid, tid: tB, content: 'endorsed reply' });
 		// Manually set endorsed flag on the reply
-		await posts.setPostField(reply.pid, 'endorsed', '1');
+		await posts.setPostField(reply.pid, 'endorsed', 1);
 
 		const tids = [String(tA), String(tB), String(tC)];
 		const filtered = await topics.filterEndorsedTids(tids);
 		assert.deepStrictEqual(filtered.sort(), [String(tB)].sort());
 	});
 
+	it('Topics.filterEndorsedTids handles empty input gracefully', async () => {
+		const filtered = await topics.filterEndorsedTids([]);
+		assert.deepStrictEqual(filtered, []);
+	});
+
+	it('Topics.filterEndorsedTids returns multiple endorsed tids when present', async () => {
+		// Add endorsed replies to topic A and C as well (topic B already has one from first test)
+		const r1 = await posts.create({ uid: adminUid, tid: tA, content: 'endorsed A' });
+		await posts.setPostField(r1.pid, 'endorsed', 1);
+		const r2 = await posts.create({ uid: adminUid, tid: tC, content: 'endorsed C' });
+		await posts.setPostField(r2.pid, 'endorsed', 1);
+
+		const tids = [String(tA), String(tB), String(tC)];
+		const filtered = await topics.filterEndorsedTids(tids);
+		// all three topics should now be endorsed
+		assert.deepStrictEqual(filtered.sort(), [String(tA), String(tB), String(tC)].sort());
+		await posts.setPostField(r1.pid, 'endorsed', 0);
+		await posts.setPostField(r2.pid, 'endorsed', 0);
+	});
+
 	it('categories.getCategoryById with filter=endorsed returns only endorsed topics', async () => {
+		
 		const data = await categories.getCategoryById({ uid: adminUid, cid: cat.cid, start: 0, stop: 10, settings: { topicsPerPage: 10 }, query: { filter: 'endorsed' } });
-		// Ensure only topic B is present
+		// Ensure only topic B is present (has endorsed reply from first test)
 		const tids = data.topics.map(t => String(t.tid));
 		assert.deepStrictEqual(tids, [String(tB)]);
 	});
+
+	it('categories.getCategoryById with legacy sort=endorsed behaves like filter=endorsed', async () => {
+		const data = await categories.getCategoryById({
+			uid: adminUid,
+			cid: cat.cid,
+			start: 0,
+			stop: 10,
+			settings: { topicsPerPage: 10 },
+			query: { sort: 'endorsed' },
+		});
+		const tids = data.topics.map(t => String(t.tid));
+		assert.deepStrictEqual(tids, [String(tB)]);
+	});
+
+
 });
