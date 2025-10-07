@@ -181,7 +181,7 @@ module.exports = function (Topics) {
 					return null;
 				}
 
-				const hasEndorsed = validPosts.some(p => p.endorsed === '1' || p.endorsed === 1 || p.endorsed === true);
+				const hasEndorsed = validPosts.some(p => p.endorsed === '1' || p.endorsed === 1);
 
 
 				return hasEndorsed ? String(tid) : null;
