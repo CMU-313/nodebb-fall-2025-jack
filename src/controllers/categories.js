@@ -37,10 +37,62 @@ categoriesController.list = async function (req, res) {
 		categories.setUnread(tree, pageCids.concat(childCids), req.uid),
 	]);
 
+	// Compute aggregate stats for synthetic View All category across all visible categories
+	const allForumCids = await categories.getAllCidsFromSet('categories:cid');
+	const visibleAllCids = await privileges.categories.filterCids('find', allForumCids, req.uid);
+	const allVisibleCategories = await categories.getCategories(visibleAllCids);
+	let aggTopics = 0;
+	let aggPosts = 0;
+	let latestTeaser = null;
+	allVisibleCategories.forEach((cat) => {
+		if (!cat) { return; }
+		aggTopics += parseInt(cat.totalTopicCount || 0, 10);
+		aggPosts += parseInt(cat.totalPostCount || 0, 10);
+		if (cat.teaser && cat.teaser.timestamp) {
+			if (!latestTeaser || (cat.teaser.timestamp > latestTeaser.timestamp)) {
+				latestTeaser = cat.teaser;
+			}
+		}
+	});
+
+	const viewAllCategory = {
+		cid: 'all',
+		name: 'View All',
+		handle: 'viewall',
+		description: 'All topics across categories',
+		descriptionParsed: 'All topics across categories',
+		icon: 'fa-list-ul',
+		bgColor: '#6c757d',
+		color: '#ffffff',
+		slug: 'all',
+		parentCid: 0,
+		topic_count: aggTopics,
+		post_count: aggPosts,
+		disabled: 0,
+		order: 0,
+		link: '',
+		numRecentReplies: 0,
+		class: '',
+		imageClass: 'cover',
+		isSection: false,
+		minTags: 0,
+		maxTags: 0,
+		postQueue: 0,
+		totalPostCount: aggPosts,
+		totalTopicCount: aggTopics,
+		subCategoriesPerPage: 0,
+		backgroundImage: '',
+		teaser: latestTeaser,
+		children: [],
+	};
+
 	const data = {
 		title: meta.config.homePageTitle || '[[pages:home]]',
 		selectCategoryLabel: '[[pages:categories]]',
 		categories: tree,
+		viewAllList: [viewAllCategory],
+		// Back-compat for templates that used a single object
+		viewAllCategory: viewAllCategory,
 		pagination: pagination.create(page, pageCount, req.query),
 	};
 

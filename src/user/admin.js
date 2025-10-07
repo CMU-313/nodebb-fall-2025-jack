@@ -59,11 +59,13 @@ module.exports = function (User) {
 		if (!showIps && fields.includes('ip')) {
 			fields.splice(fields.indexOf('ip'), 1);
 		}
+		const exportDir = path.join(baseDir, 'build/export');
+		await fs.promises.mkdir(exportDir, { recursive: true });
 		const fd = await fs.promises.open(
-			path.join(baseDir, 'build/export', 'users.csv'),
+			path.join(exportDir, 'users.csv'),
 			'w'
 		);
-		fs.promises.appendFile(fd, `${fields.map(f => `"${f}"`).join(',')}\n`);
+		await fs.promises.appendFile(fd, `${fields.map(f => `"${f}"`).join(',')}` + '\n');
 		await batch.processSortedSet('users:joindate', async (uids) => {
 			const userFieldsToLoad = fields.filter(field => field !== 'ip' && field !== 'password');
 			const usersData = await User.getUsersFields(uids, userFieldsToLoad);
@@ -80,7 +82,7 @@ module.exports = function (User) {
 
 			const opts = { fields, header: false };
 			const csv = await json2csvAsync(usersData, opts);
-			await fs.promises.appendFile(fd, csv);
+			await fs.promises.appendFile(fd, csv + '\n');
 		}, {
 			batch: 5000,
 			interval: 250,
