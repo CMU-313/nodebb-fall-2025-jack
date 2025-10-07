@@ -25,6 +25,9 @@ if (process.env.CI) {
 	ap.fetchRemoteObject = async () => null;
 	ap.postToInbox = async () => ({ status: 'stubbed' });
 	ap.send = async () => ({ status: 'stubbed' });
+
+	const meta = require('../src/meta');
+	meta.config.activitypubEnabled = 0;
 }
 
 
