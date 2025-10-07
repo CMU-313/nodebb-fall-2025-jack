@@ -29,5 +29,16 @@ resolvedUtils.updateTopicResolvedStatus = async function (tid, resolved) {
 	return { resolved: resolved };
 };
 
+resolvedUtils.getPostEndorsedStatus = async function (pid) {
+	const data = await database.getObjectField(`post:${pid}`, 'endorsed');
+	return {
+		endorsed: data === '1' || data === true || data === 1,
+	};
+};
+
+resolvedUtils.setPostEndorsedStatus = async function (pid, endorsed) {
+	await database.setObjectField(`post:${pid}`, 'endorsed', endorsed ? 1 : 0);
+};
+
 
 module.exports = resolvedUtils;

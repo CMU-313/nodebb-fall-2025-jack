@@ -69,6 +69,18 @@ module.exports = function (Posts) {
 
 		posts = await parsePosts(posts, options);
 		const result = await plugins.hooks.fire('filter:post.getPostSummaryByPids', { posts: posts, uid: uid });
+
+		if (Array.isArray(result.posts)) {
+			result.posts.forEach((post) => {
+				if (post) {
+					if (!post.hasOwnProperty('endorsed')) {
+						post.endorsed = false; // Default for old posts
+					} else {
+						post.endorsed = post.endorsed === '1' || post.endorsed === true || post.endorsed === 1;
+					}
+				}
+			});
+		}
 		return result.posts;
 	};
 

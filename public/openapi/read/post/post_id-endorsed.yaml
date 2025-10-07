@@ -1,0 +1,27 @@
+get:
+  tags:
+    - posts
+  summary: Get endorsed status for a post
+  description: Returns whether a post has been endorsed by an administrator
+  parameters:
+    - in: path
+      name: pid
+      required: true
+      schema:
+        type: string
+      example: "1"
+      description: Post ID
+  responses:
+    '200':
+      description: Endorsed status retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              pid:
+                type: string
+                description: Post ID
+              endorsed:
+                type: boolean
+                description: Whether the post is endorsed
