@@ -18,12 +18,6 @@ const topics = require('../src/topics');
 const posts = require('../src/posts');
 const activitypub = require('../src/activitypub');
 
-if (process.env.CI) {
-	console.log('[CI] Skipping ActivityPub integration tests');
-	describe.skip('ActivityPub integration (network disabled in CI)', () => {});
-	return;
-}
-
 describe('ActivityPub integration', () => {
 	before(async () => {
 		meta.config.activitypubEnabled = 1;
@@ -363,20 +357,33 @@ describe('ActivityPub integration', () => {
 				};
 
 				let topic;
+				let cid;
 
 				before(async () => {
 					const controllers = require('../src/controllers');
 
+					// Create a category for the test
+					({ cid } = await categories.create({ name: utils.generateUUID().slice(0, 8) }));
+
 					activitypub._cache.set(`0;${id}`, remoteNote);
 					activitypub._cache.set(`0;https://example.org/user/foobar`, remoteUser);
 					await db.sortedSetAdd(`followersRemote:${remoteUser.id}`, Date.now(), 1); // fake a follow
-					await controllers.activitypub.postInbox({
+					
+					// Pass cid in the request context or ensure it's available
+					const req = {
 						body: {
 							type: 'Create',
 							actor: 'https://example.org/user/foobar',
 							object: remoteNote,
 						},
-					}, { sendStatus: () => {} });
+						uid: 0,
+					};
+					const res = { 
+						sendStatus: () => {},
+						status: () => ({ json: () => {} }),
+					};
+					
+					await controllers.activitypub.postInbox(req, res);
 				});
 
 				it('should create a new topic if Note is at root-level or its parent has not been seen before', async () => {
