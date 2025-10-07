@@ -494,6 +494,7 @@ describe('API', async () => {
 					}
 				});
 
+
 				it('should not error out when called', async () => {
 					await setupData();
 
