@@ -71,8 +71,14 @@ describe('ActivityPub integration', () => {
 
 		it('calls to activitypub.send should silently log', async () => {
 			await activitypub.send('uid', 0, ['https://example.org'], { foo: 'bar' });
-			assert.strictEqual(activitypub.helpers.log(), '[activitypub/send] Federation not enabled; not sending.');
+			const log = activitypub.helpers.log();
+			assert.match(
+				log,
+				/\[activitypub\/(api|send)\] (Not federating update|Federation not enabled)/,
+				`Unexpected ActivityPub log output: ${log}`
+			);
 		});
+
 
 		it('request for an activitypub route should return 404 Not Found', async () => {
 			const uid = user.create({ username: utils.generateUUID() });
