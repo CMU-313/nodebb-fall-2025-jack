@@ -53,6 +53,16 @@ Posts.getPostsByPids = async function (pids, uid) {
 	if (!data || !Array.isArray(data.posts)) {
 		return [];
 	}
+	// Convert endorsed from string to boolean, or set default if missing
+	data.posts.forEach((post) => {
+		if (post) {
+			if (!post.hasOwnProperty('endorsed')) {
+				post.endorsed = false; // Default for old posts
+			} else {
+				post.endorsed = post.endorsed === '1' || post.endorsed === true || post.endorsed === 1;
+			}
+		}
+	});
 	return data.posts.filter(Boolean);
 };
 
