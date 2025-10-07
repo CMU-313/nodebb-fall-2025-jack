@@ -19,16 +19,13 @@ const posts = require('../src/posts');
 
 // CI-specific stub to prevent hanging ActivityPub network calls
 if (process.env.CI) {
-	console.log('[CI] Stubbing ActivityPub follow/unfollow and remote fetches to prevent hangs');
+	console.log('[CI] Stubbing ActivityPub network calls');
 
-	// Disable federation before requiring activitypub so it initializes as disabled
-	meta.config.activitypubEnabled = 0;
+	meta.config.activitypubEnabled = 0; // disables federation globally before import
 
-	// Safely import and stub
 	const ap = require('../src/activitypub');
 	ap.fetchRemoteObject = async () => null;
 	ap.postToInbox = async () => ({ status: 'stubbed' });
-	ap.send = async () => ({ status: 'stubbed' });
 }
 
 // Now import after stubbing (important!)
@@ -58,8 +55,15 @@ describe('ActivityPub integration', () => {
 	});
 
 	describe('Master toggle', () => {
-		before(async () => {
+		beforeEach(() => {
+			meta.config.activitypubEnabled = 0;
+			meta.config.activitypubAllowLoopback = 0;
+		});
+
+		afterEach(() => {
+			// restore defaults if later tests need it
 			delete meta.config.activitypubEnabled;
+			delete meta.config.activitypubAllowLoopback;
 		});
 
 		it('calls to activitypub.get should throw', async () => {
@@ -104,10 +108,6 @@ describe('ActivityPub integration', () => {
 			assert.strictEqual(response.statusCode, 200);
 			assert(body && body.links && Array.isArray(body.links));
 			assert(!body.links.some(obj => obj.type && obj.type === 'application/activity+json'));
-		});
-
-		after(() => {
-			meta.config.activitypubEnabled = 1;
 		});
 	});
 
