@@ -81,6 +81,7 @@ module.exports = function (app, middleware, controllers) {
 		const resolvedUtils = require('../resolved-basic-utils');
 		const count = await resolvedUtils.getUnresolvedTopicCountInCategory(cid);
 		res.json({ cid: cid, unresolvedTopicCount: count });
+	}));
 	// GET endorsed status - anyone can read
 	router.get('/posts/:pid/endorsed', [...middlewares], helpers.tryRoute(async (req, res) => {
 		const { pid } = req.params;
@@ -112,4 +113,3 @@ module.exports = function (app, middleware, controllers) {
 		});
 	}));
 };
-
