@@ -16,22 +16,23 @@ const user = require('../src/user');
 const categories = require('../src/categories');
 const topics = require('../src/topics');
 const posts = require('../src/posts');
-const activitypub = require('../src/activitypub');
 
 // CI-specific stub to prevent hanging ActivityPub network calls
 if (process.env.CI) {
 	console.log('[CI] Stubbing ActivityPub follow/unfollow and remote fetches to prevent hangs');
 
 	// Disable federation before requiring activitypub so it initializes as disabled
-	const meta = require('../src/meta');
 	meta.config.activitypubEnabled = 0;
 
-	// Now safely import and stub
+	// Safely import and stub
 	const ap = require('../src/activitypub');
 	ap.fetchRemoteObject = async () => null;
 	ap.postToInbox = async () => ({ status: 'stubbed' });
 	ap.send = async () => ({ status: 'stubbed' });
 }
+
+// Now import after stubbing (important!)
+const activitypub = require('../src/activitypub');
 
 
 
