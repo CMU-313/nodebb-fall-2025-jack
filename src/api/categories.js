@@ -117,10 +117,11 @@ categoriesAPI.getChildren = async (caller, { cid, start }) => {
 
 categoriesAPI.getTopics = async (caller, data) => {
 	data.query = data.query || {};
-	const [userPrivileges, settings, targetUid] = await Promise.all([
+	const [userPrivileges, settings, targetUid, courseStaffUids] = await Promise.all([
 		privileges.categories.get(data.cid, caller.uid),
 		user.getSettings(caller.uid),
 		user.getUidByUserslug(data.query.author),
+		getCourseStaffUids(data.query.courseStaff),
 	]);
 
 	if (!userPrivileges.read) {
@@ -150,6 +151,7 @@ categoriesAPI.getTopics = async (caller, data) => {
 		query: data.query,
 		tag: data.query.tag,
 		targetUid,
+		courseStaffUids,
 	});
 	categories.modifyTopicsByPrivilege(result.topics, userPrivileges);
 
@@ -249,3 +251,15 @@ categoriesAPI.setModerator = async (caller, { cid, member, set }) => {
 	const privilegeList = await privileges.categories.getUserPrivilegeList();
 	await categoriesAPI.setPrivilege(caller, { cid, privilege: privilegeList, member, set });
 };
+
+async function getCourseStaffUids(filterValue) {
+	if (filterValue !== '1') {
+		return null;
+	}
+	try {
+		const sets = await groups.getMembersOfGroups(['course-staff']);
+		return Array.isArray(sets) && sets.length ? sets[0] : [];
+	} catch (err) {
+		return [];
+	}
+}
