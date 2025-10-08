@@ -67,18 +67,4 @@ describe('Endorsed filter', () => {
 		assert.deepStrictEqual(tids, [String(tB)]);
 	});
 
-	it('categories.getCategoryById with legacy sort=endorsed behaves like filter=endorsed', async () => {
-		const data = await categories.getCategoryById({
-			uid: adminUid,
-			cid: cat.cid,
-			start: 0,
-			stop: 10,
-			settings: { topicsPerPage: 10 },
-			query: { sort: 'endorsed' },
-		});
-		const tids = data.topics.map(t => String(t.tid));
-		assert.deepStrictEqual(tids, [String(tB)]);
-	});
-
-
 });

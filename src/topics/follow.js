@@ -192,7 +192,7 @@ module.exports = function (Topics) {
 
 		const results = await Promise.all(checkTasks);
 		const filtered = results.filter(tid => tid !== null);
-		console.debug('[filterEndorsedTids] included:', filtered);
+		// console.debug('[filterEndorsedTids] included:', filtered);
 
 		return filtered;
 	};
