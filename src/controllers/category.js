@@ -16,6 +16,7 @@ const helpers = require('./helpers');
 const utils = require('../utils');
 const translator = require('../translator');
 const analytics = require('../analytics');
+const groups = require('../groups');
 
 const categoryController = module.exports;
 
@@ -111,6 +112,7 @@ categoryController.get = async function (req, res, next) {
 	}
 
 	const targetUid = await user.getUidByUserslug(req.query.author);
+	const courseStaffUids = await getCourseStaffUids(req.query.courseStaff);
 	const start = ((currentPage - 1) * userSettings.topicsPerPage) + topicIndex;
 	const stop = start + userSettings.topicsPerPage - 1;
 
@@ -140,6 +142,7 @@ categoryController.get = async function (req, res, next) {
 		query: req.query,
 		tag: req.query.tag,
 		targetUid: targetUid,
+		courseStaffUids: courseStaffUids,
 	});
 	if (!categoryData) {
 		return next();
@@ -226,6 +229,7 @@ categoryController.get = async function (req, res, next) {
 		}
 	}
 
+	categoryData.query = req.query;
 	res.render('category', categoryData);
 };
 
@@ -304,5 +308,17 @@ function addTags(categoryData, res, currentPage) {
 			type: 'application/activity+json',
 			href: `${nconf.get('url')}/actegory/${categoryData.cid}`,
 		});
+	}
+}
+
+async function getCourseStaffUids(filterValue) {
+	if (filterValue !== '1') {
+		return null;
+	}
+	try {
+		const sets = await groups.getMembersOfGroups(['course-staff']);
+		return Array.isArray(sets) && sets.length ? sets[0] : [];
+	} catch (err) {
+		return [];
 	}
 }

@@ -21,6 +21,7 @@ const plugins = require('../src/plugins');
 const utils = require('../src/utils');
 const slugify = require('../src/slugify');
 const helpers = require('./helpers');
+const MockDate = require('mockdate');
 
 const sleep = util.promisify(setTimeout);
 
@@ -1658,6 +1659,219 @@ describe('Controllers', () => {
 			assert(data.categories.length === 0);
 			assert.deepStrictEqual(data.selectedCategory, null);
 			assert.deepStrictEqual(data.selectedCids, []);
+		});
+
+		it('should filter topics by course staff when courseStaff query param is set', async () => {
+			const groups = require('../src/groups');
+			const testCategory = await categories.create({ name: 'course-staff-filter-test' });
+
+			// Create course-staff group and add fooUid to it
+			await groups.create({ name: 'course-staff', description: 'Course staff members' });
+			await groups.join('course-staff', fooUid);
+
+			// Create a staff topic
+			const { topicData: staffTopic } = await topics.post({
+				uid: fooUid,
+				cid: testCategory.cid,
+				title: 'Staff Topic',
+				content: 'Topic by staff member',
+			});
+
+			// Create another user and topic
+			const otherUid = await user.create({ username: 'student', password: '123456' });
+			const { topicData: studentTopic } = await topics.post({
+				uid: otherUid,
+				cid: testCategory.cid,
+				title: 'Student Topic',
+				content: 'Topic by student',
+			});
+
+			// Request without filter should show both topics
+			let { body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}`, { jar });
+			assert.equal(body.topics.length, 2);
+
+			// Request with courseStaff=1 should show only staff topic
+			({ body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}?courseStaff=1`, { jar }));
+			assert.equal(body.topics.length, 1);
+			assert.equal(body.topics[0].title, 'Staff Topic');
+
+			// Cleanup - mark topics as read to avoid affecting unread tests
+			await topics.markAsRead([staffTopic.tid, studentTopic.tid], fooUid);
+			await groups.leave('course-staff', fooUid);
+		});
+
+		it('should return empty when course-staff group does not exist', async () => {
+			const testCategory = await categories.create({ name: 'no-staff-group-test' });
+			const { topicData: regularTopic } = await topics.post({
+				uid: fooUid,
+				cid: testCategory.cid,
+				title: 'Regular Topic',
+				content: 'Regular content',
+			});
+
+			// Ensure course-staff group doesn't exist or is empty
+			const groups = require('../src/groups');
+			const exists = await groups.exists('course-staff');
+			if (exists) {
+				await groups.leave('course-staff', fooUid);
+			}
+
+			// Request with courseStaff=1 when group is empty should show no topics
+			const { body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}?courseStaff=1`, { jar });
+			assert.equal(body.topics.length, 0);
+
+			// Cleanup - mark topic as read to avoid affecting unread tests
+			await topics.markAsRead([regularTopic.tid], fooUid);
+		});
+
+		it('should work with pagination when filtering by course staff', async () => {
+			const groups = require('../src/groups');
+			const testCategory = await categories.create({ name: 'staff-pagination-test' });
+
+			// Ensure course-staff group exists
+			const exists = await groups.exists('course-staff');
+			if (!exists) {
+				await groups.create({ name: 'course-staff', description: 'Course staff members' });
+			}
+			await groups.join('course-staff', fooUid);
+
+			// Create multiple staff topics
+			const tids = [];
+			for (let i = 0; i < 5; i++) {
+				const result = await topics.post({
+					uid: fooUid,
+					cid: testCategory.cid,
+					title: `Staff Topic ${i + 1}`,
+					content: `Content ${i + 1}`,
+				});
+				tids.push(result.topicData.tid);
+			}
+
+			// Request with courseStaff filter and verify pagination
+			const { body } = await request.get(`${nconf.get('url')}/api/category/${testCategory.slug}?courseStaff=1`, { jar });
+			assert.equal(body.topics.length, 5);
+			body.topics.forEach((topic) => {
+				assert(topic.title.startsWith('Staff Topic'));
+			});
+
+			// Cleanup - mark topics as read to avoid affecting unread tests
+			await topics.markAsRead(tids, fooUid);
+			await groups.leave('course-staff', fooUid);
+		});
+
+		it('should expose synthetic View All category aggregates', async () => {
+			const { body: beforeBody } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(beforeBody.viewAllCategory);
+			const baselineTopics = Number(beforeBody.viewAllCategory.totalTopicCount) || 0;
+			const baselinePosts = Number(beforeBody.viewAllCategory.totalPostCount) || 0;
+
+			const aggregateCategory = await categories.create({ name: `view-all-${utils.generateUUID()}` });
+			const { topicData } = await topics.post({
+				uid: fooUid,
+				cid: aggregateCategory.cid,
+				title: 'View All synthetic topic',
+				content: 'Aggregated content',
+			});
+			await topics.reply({ uid: fooUid, tid: topicData.tid, content: 'Reply for aggregate' });
+
+			const { body: afterBody } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(afterBody.viewAllCategory);
+			assert(Array.isArray(afterBody.viewAllList));
+			assert.strictEqual(afterBody.viewAllList[0].cid, 'all');
+			assert.strictEqual(afterBody.viewAllCategory.cid, 'all');
+			assert.strictEqual(afterBody.viewAllCategory.name, 'View All');
+			const topicsAfter = Number(afterBody.viewAllCategory.totalTopicCount) || 0;
+			const postsAfter = Number(afterBody.viewAllCategory.totalPostCount) || 0;
+			assert(topicsAfter >= baselineTopics + 1);
+			assert(postsAfter >= baselinePosts + 2);
+		});
+
+		it('should render View All category via recent controller', async () => {
+			const { response, body } = await request.get(`${nconf.get('url')}/api/category/all`, { jar });
+			assert.equal(response.statusCode, 200);
+			assert(body);
+			assert.equal(body.title, 'View All');
+			assert(body.template);
+			assert.equal(body.template.name, 'recent');
+			assert(Array.isArray(body.topics));
+		});
+
+		it('should ignore categories without find privilege in View All aggregates', async () => {
+			const { body: baseline } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			const baseTopics = Number(baseline.viewAllCategory.totalTopicCount) || 0;
+			const basePosts = Number(baseline.viewAllCategory.totalPostCount) || 0;
+
+			const restrictedCategory = await categories.create({ name: `view-all-hidden-${utils.generateUUID()}` });
+			const { topicData } = await topics.post({
+				uid: fooUid,
+				cid: restrictedCategory.cid,
+				title: 'Hidden View All topic',
+				content: 'Hidden aggregate content',
+			});
+			await topics.reply({ uid: fooUid, tid: topicData.tid, content: 'Hidden aggregate reply' });
+
+			await privileges.categories.rescind(['groups:find'], restrictedCategory.cid, 'registered-users');
+
+			try {
+				const { body: after } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+				const topicsAfter = Number(after.viewAllCategory.totalTopicCount) || 0;
+				const postsAfter = Number(after.viewAllCategory.totalPostCount) || 0;
+				assert.strictEqual(topicsAfter, baseTopics);
+				assert.strictEqual(postsAfter, basePosts);
+			} finally {
+				await privileges.categories.give(['groups:find'], restrictedCategory.cid, 'registered-users');
+			}
+		});
+
+		it('should set View All teaser to latest visible activity when available', async () => {
+			const originals = {
+				initialPostDelay: meta.config.initialPostDelay,
+				postDelay: meta.config.postDelay,
+				newbiePostDelay: meta.config.newbiePostDelay,
+			};
+			const oldDate = new Date('2020-01-01T00:00:00Z');
+			const newDate = new Date('2030-01-01T00:00:00Z');
+
+			meta.config.initialPostDelay = 0;
+			meta.config.postDelay = 0;
+			meta.config.newbiePostDelay = 0;
+
+			let latestTopic;
+			try {
+				MockDate.set(oldDate);
+				const legacyCategory = await categories.create({ name: `view-all-old-${utils.generateUUID()}` });
+				await topics.post({
+					uid: adminUid,
+					cid: legacyCategory.cid,
+					title: 'Older View All topic',
+					content: 'Older aggregate content',
+				});
+
+				MockDate.set(newDate);
+				const freshCategory = await categories.create({ name: `view-all-new-${utils.generateUUID()}` });
+				({ topicData: latestTopic } = await topics.post({
+					uid: adminUid,
+					cid: freshCategory.cid,
+					title: 'Newest View All topic',
+					content: 'Newest aggregate content',
+				}));
+			} finally {
+				MockDate.reset();
+			}
+
+			const { body } = await request.get(`${nconf.get('url')}/api/categories`, { jar });
+			assert(body.viewAllCategory);
+			const teaser = body.viewAllCategory.teaser;
+			if (teaser) {
+				const teaserTid = teaser.tid || (teaser.topic && teaser.topic.tid);
+				assert.strictEqual(Number(teaserTid), latestTopic.tid);
+			} else {
+				assert.strictEqual(teaser, null);
+			}
+
+			meta.config.initialPostDelay = originals.initialPostDelay;
+			meta.config.postDelay = originals.postDelay;
+			meta.config.newbiePostDelay = originals.newbiePostDelay;
 		});
 	});
 

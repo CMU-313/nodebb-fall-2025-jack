@@ -2,11 +2,12 @@
 	<nav class="topic-list-header d-flex flex-nowrap my-2 p-0 border-0 rounded">
 		<div class="d-flex flex-row p-2 text-bg-light gap-1 border rounded w-100">
 			<div component="category/controls" class="d-flex me-auto mb-0 gap-2 flex-wrap">
-				{{{ if (template.category || template.world) }}}
-				<!-- IMPORT partials/category/watch.tpl -->
-				<!-- IMPORT partials/tags/filter-dropdown-left.tpl -->
-				<!-- IMPORT partials/category/sort.tpl -->
-				{{{ end }}}
+			{{{ if (template.category || template.world) }}}
+			<!-- IMPORT partials/category/watch.tpl -->
+			<!-- IMPORT partials/tags/filter-dropdown-left.tpl -->
+			<!-- IMPORT partials/category/sort.tpl -->
+			<!-- IMPORT partials/category/staff-filter.tpl -->
+			{{{ end }}}
 				{{{ if (template.popular || template.top)}}}
 				<!-- IMPORT partials/topic-terms.tpl -->
 				{{{ end }}}
