@@ -28,12 +28,6 @@ const utils = require('../src/utils');
 const api = require('../src/api');
 
 // CI-specific stubs to prevent hanging ActivityPub network calls
-if (process.env.CI) {
-	console.log('[CI] Stubbing ActivityPub follow/unfollow to prevent hangs');
-	const api = require('../src/api');
-	api.activitypub.follow = async () => '[stubbed follow]';
-	api.activitypub.unfollow = async () => '[stubbed unfollow]';
-}
 
 describe('API', async () => {
 	let readApi = false;
@@ -695,22 +689,6 @@ describe('API', async () => {
 			}
 
 			assert(schema[prop], `"${prop}" was found in response, but is not defined in schema (path: ${method} ${path}, context: ${context})`);
-		});
-	}
-
-	// ActivityPub stub
-	if (process.env.CI) {
-		it('should exercise ActivityPub follow/unfollow stubs to restore coverage', async () => {
-			const api = require('../src/api');
-			assert(api.activitypub);
-			assert(typeof api.activitypub.follow === 'function');
-			assert(typeof api.activitypub.unfollow === 'function');
-
-			const followRes = await api.activitypub.follow('https://example.org/user/123');
-			const unfollowRes = await api.activitypub.unfollow('https://example.org/user/123');
-
-			assert.strictEqual(followRes, '[stubbed follow]');
-			assert.strictEqual(unfollowRes, '[stubbed unfollow]');
 		});
 	}
 
