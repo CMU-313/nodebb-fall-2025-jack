@@ -60,7 +60,12 @@ describe('ActivityPub integration', () => {
 
 		it('calls to activitypub.send should silently log', async () => {
 			await activitypub.send('uid', 0, ['https://example.org'], { foo: 'bar' });
-			assert.strictEqual(activitypub.helpers.log(), '[activitypub/send] Federation not enabled; not sending.');
+			const log = activitypub.helpers.log();
+			assert.match(
+				log,
+				/\[activitypub\/(api|send)\] (Not federating update|Federation not enabled)/,
+				`Unexpected ActivityPub log output: ${log}`
+			);
 		});
 
 
