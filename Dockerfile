@@ -19,9 +19,6 @@ COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 # Install corepack to allow usage of other package managers
 RUN corepack enable
 
-# Removing unnecessary files for us
-RUN find . -mindepth 1 -maxdepth 1 -name '.*' ! -name '.' ! -name '..' -exec bash -c 'echo "Deleting {}"; rm -rf {}' \;
-
 # Install tini
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tini \
@@ -65,8 +62,9 @@ RUN corepack enable \
     && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
 
 # Copy entrypoint and tini
-COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/install/docker/setup.json /usr/src/app/
-COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json /usr/src/app/install/docker/setup.json
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
 
 # Copy everything built (app + node_modules + plugin)
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/

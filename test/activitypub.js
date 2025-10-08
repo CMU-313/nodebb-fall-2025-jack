@@ -18,6 +18,15 @@ const topics = require('../src/topics');
 const posts = require('../src/posts');
 
 // CI-specific stub to prevent hanging ActivityPub network calls
+if (process.env.CI) {
+	console.log('[CI] Stubbing ActivityPub network calls');
+
+	meta.config.activitypubEnabled = 0; // disables federation globally before import
+
+	const ap = require('../src/activitypub');
+	ap.fetchRemoteObject = async () => null;
+	ap.postToInbox = async () => ({ status: 'stubbed' });
+}
 
 // Now import after stubbing (important!)
 const activitypub = require('../src/activitypub');
