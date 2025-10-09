@@ -20,7 +20,6 @@ resolvedUtils.isCourseStaff = async function (uid) {
 // Get status
 resolvedUtils.getTopicResolvedStatus = async function (tid) {
 	const data = await database.getObjectField(`topic:${tid}`, 'resolved');
-	console.log(`[resolved-utils] Topic ${tid} resolved field:`, data);
 	return { resolved: data === '1' || data === true || data === 'true' };
 };
 
@@ -31,10 +30,7 @@ resolvedUtils.updateTopicResolvedStatus = async function (tid, resolved) {
 };
 //write a function to get the number of resolved topics in a category
 resolvedUtils.getUnresolvedTopicCountInCategory = async function (cid) {
-	console.log('here!');
-	console.log(`[resolved-utils] Checking unresolved topics for category: ${cid}`);
 	const tids = await database.getSortedSetRange(`cid:${cid}:tids`, 0, -1);
-	console.log(`[resolved-utils] Found topic IDs for category ${cid}:`, tids);
 	let unresolvedCount = 0;
 	for await (const tid of tids) {
 		const status = await this.getTopicResolvedStatus(tid);
@@ -42,7 +38,6 @@ resolvedUtils.getUnresolvedTopicCountInCategory = async function (cid) {
 			unresolvedCount += 1;
 		}
 	}
-	console.log(`[resolved-utils] Unresolved topic count for category ${cid}:`, unresolvedCount);
 	return unresolvedCount;
 };
 

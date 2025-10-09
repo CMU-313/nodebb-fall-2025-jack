@@ -36,7 +36,6 @@ define('forum/topic', [
 	});
 
 	Topic.init = async function () {
-		console.log('topic.init is running');
 		const tidChanged = tid === '0' || String(tid) !== String(ajaxify.data.tid);
 		tid = String(ajaxify.data.tid);
 		currentUrl = ajaxify.currentPage;
@@ -514,10 +513,6 @@ define('forum/topic', [
 						const currentResolved = checkbox.text().trim() === '✓';
 						const newStatus = !currentResolved;
 						
-						// Debug logging
-						console.log('CSRF Token:', config.csrf_token);
-						console.log('Request URL:', `${config.relative_path}/api/topics/${tid}/resolved`);
-						
 						fetch(`${config.relative_path}/api/topics/${tid}/resolved`, {
 							method: 'PUT',
 							headers: { 
@@ -528,24 +523,20 @@ define('forum/topic', [
 							body: JSON.stringify({ resolved: newStatus }),
 						})
 							.then(res => {
-								console.log('Response status:', res.status);
 								if (!res.ok) {
 									return res.json().then(err => {
-										console.log('Error response:', err);
 										throw new Error('Failed to update');
 									});
 								}
 								return res.json();
 							})
 							.then((data) => {
-								console.log('Success response:', data);
 								checkbox.text(newStatus ? '✓' : '');
 								statusText.text(newStatus ? 'resolved' : 'unresolved');
 								statusText.css('color', newStatus ? 'green' : 'red');
 								alerts.success(newStatus ? 'Marked as resolved' : 'Marked as unresolved');
 							})
 							.catch((err) => {
-								console.log('Catch error:', err);
 								alerts.error('Failed to update');
 							});
 					});
