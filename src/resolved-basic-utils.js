@@ -28,6 +28,18 @@ resolvedUtils.updateTopicResolvedStatus = async function (tid, resolved) {
 	await database.setObjectField(`topic:${tid}`, 'resolved', resolved ? 1 : 0);
 	return { resolved: resolved };
 };
+//write a function to get the number of resolved topics in a category
+resolvedUtils.getUnresolvedTopicCountInCategory = async function (cid) {
+	const tids = await database.getSortedSetRange(`cid:${cid}:tids`, 0, -1);
+	let unresolvedCount = 0;
+	for await (const tid of tids) {
+		const status = await this.getTopicResolvedStatus(tid);
+		if (!(status.resolved)) {
+			unresolvedCount += 1;
+		}
+	}
+	return unresolvedCount;
+};
 
 resolvedUtils.getPostEndorsedStatus = async function (pid) {
 	const data = await database.getObjectField(`post:${pid}`, 'endorsed');

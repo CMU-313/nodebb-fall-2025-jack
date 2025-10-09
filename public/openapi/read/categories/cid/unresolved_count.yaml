@@ -1,0 +1,31 @@
+get:
+  tags:
+    - categories
+  summary: Get the number of unresolved topics in a specific category
+  description: Returns the count of unresolved topics within the specified category.
+  parameters:
+    - name: cid
+      in: path
+      required: true
+      description: The ID of the category
+      schema:
+        type: integer
+      example: 1
+  responses:
+    '200':
+      description: Successfully retrieved unresolved topic count
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              cid:
+                type: integer
+                description: Category ID
+              unresolvedTopicCount:
+                type: integer
+                description: Number of unresolved topics
+    '400':
+      description: Invalid category ID
+    '404':
+      description: Category not found
