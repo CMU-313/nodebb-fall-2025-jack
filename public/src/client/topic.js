@@ -525,18 +525,21 @@ define('forum/topic', [
 							.then(res => {
 								if (!res.ok) {
 									return res.json().then(err => {
+										console.log('Error response:', err);
 										throw new Error('Failed to update');
 									});
 								}
 								return res.json();
 							})
 							.then((data) => {
+								console.log('Success response:', data);
 								checkbox.text(newStatus ? '✓' : '');
 								statusText.text(newStatus ? 'resolved' : 'unresolved');
 								statusText.css('color', newStatus ? 'green' : 'red');
 								alerts.success(newStatus ? 'Marked as resolved' : 'Marked as unresolved');
 							})
 							.catch((err) => {
+								console.log('Catch error:', err);
 								alerts.error('Failed to update');
 							});
 					});
