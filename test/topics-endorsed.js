@@ -67,4 +67,70 @@ describe('Endorsed filter', () => {
 		assert.deepStrictEqual(tids, [String(tB)]);
 	});
 
+	it('categories.getCategoryById without filter=endorsed uses default sort option', async () => {
+	// Call category fetch normally (no endorsed filter)
+		const data = await categories.getCategoryById({
+			uid: adminUid,
+			cid: cat.cid,
+			start: 0,
+			stop: 10,
+			settings: { topicsPerPage: 10 },
+			query: {}, // no filter key
+		});
+
+		// Should include all topics, since we're not filtering by 'endorsed'
+		const tids = data.topics.map(t => String(t.tid));
+		assert(tids.includes(String(tA)));
+		assert(tids.includes(String(tB)));
+		assert(tids.includes(String(tC)));
+
+		it('categories.getCategoryById without filter=endorsed uses default sort option', async () => {
+			const data = await categories.getCategoryById({
+				uid: adminUid,
+				cid: cat.cid,
+				start: 0,
+				stop: 10,
+				settings: { topicsPerPage: 10 },
+				query: {}, // no filter key
+			});
+
+			// Verify it returns all topics (non-endorsed case)
+			const tids = data.topics.map(t => String(t.tid));
+			assert(tids.includes(String(tA)));
+			assert(tids.includes(String(tB)));
+			assert(tids.includes(String(tC)));
+		});
+	});
+
+	it('handles tids containing null or invalid topic IDs gracefully', async () => {
+		const filtered = await topics.filterEndorsedTids([null, undefined, '']);
+		assert.deepStrictEqual(filtered, []);
+	});
+
+	it('returns null for topics with no posts', async () => {
+		// Create a fake topic with no mainPid/posts
+		const fakeTid = await db.incrObjectField('topic:next', 'tid');
+		const filtered = await topics.filterEndorsedTids([String(fakeTid)]);
+		assert.deepStrictEqual(filtered, []);
+	});
+
+	it('returns null if posts have no endorsed field', async () => {
+		const tid = (await topics.post({ uid: adminUid, title: 'NoEndorse', content: 'test', cid: cat.cid })).topicData.tid;
+		// Force remove "endorsed" field from post
+		const [pid] = await posts.getPidsFromSet(`tid:${tid}:posts`, 0, -1, false);
+		await db.deleteObjectField(`post:${pid}`, 'endorsed');
+		const filtered = await topics.filterEndorsedTids([String(tid)]);
+		assert.deepStrictEqual(filtered, []);
+	});
+
+	it('handles internal errors gracefully (catch block)', async () => {
+		const original = posts.getPostsFields;
+		posts.getPostsFields = () => { throw new Error('mock failure'); };
+		const filtered = await topics.filterEndorsedTids([String(tA)]);
+		assert.deepStrictEqual(filtered, []);
+		posts.getPostsFields = original;
+	});
+
+
+
 });
