@@ -137,6 +137,67 @@ module.exports = function (Topics) {
 		return tids.filter((tid, index) => tid && !!scores[index]);
 	};
 
+	// return True if the topic has at least one endorsed post (including mainPid and all replies)
+	Topics.filterEndorsedTids = async function (tids) {
+		if (!Array.isArray(tids) || !tids.length) {
+			return [];
+		}
+
+		const posts = require('../posts');
+
+		const checkTasks = tids.map(async (tid) => {
+			if (!tid) {
+				return null;
+			}
+			try {
+				// Get mainPid and all other pids
+				const [mainPid, pidsFromSet] = await Promise.all([
+					Topics.getTopicField(tid, 'mainPid'),
+					posts.getPidsFromSet(`tid:${tid}:posts`, 0, -1, false),
+				]);
+
+				// Combine and deduplicate
+				let allPids = [];
+				if (mainPid) {
+					allPids.push(mainPid);
+				}
+				if (Array.isArray(pidsFromSet)) {
+					allPids = allPids.concat(pidsFromSet);
+				}
+				// remove duplicates
+				allPids = [...new Set(allPids)]; 
+
+				if (!allPids.length) {
+					return null;
+				}
+
+				// Load posts and check for endorsement
+				const postData = await posts.getPostsFields(allPids, ['pid', 'endorsed']);
+
+				// Filter out invalid or undefined entries
+				const validPosts = postData.filter(p => p && typeof p.endorsed !== 'undefined');
+				// If no posts even have the endorsed field → treat as false (exclude)
+				if (!validPosts.length) {
+					return null;
+				}
+
+				const hasEndorsed = validPosts.some(p => p.endorsed === '1' || p.endorsed === 1);
+
+
+				return hasEndorsed ? String(tid) : null;
+			} catch (err) {
+				return null;
+			}
+		});
+
+		const results = await Promise.all(checkTasks);
+		const filtered = results.filter(tid => tid !== null);
+		// console.debug('[filterEndorsedTids] included:', filtered);
+
+		return filtered;
+	};
+
+
 	Topics.filterNotIgnoredTids = async function (tids, uid) {
 		if (parseInt(uid, 10) <= 0) {
 			return tids;

@@ -176,7 +176,14 @@ categoryController.get = async function (req, res, next) {
 	categoryData.topicIndex = topicIndex;
 	categoryData.selectedTag = tagData.selectedTag;
 	categoryData.selectedTags = tagData.selectedTags;
-	categoryData.sortOptionLabel = `[[topic:${validator.escape(String(sort)).replace(/_/g, '-')}]]`;
+	let sortOptionKey;
+	if ((req.query && req.query.filter === 'endorsed') || req._wasSortEndorsed || req._wasUserDefaultEndorsed) {
+		sortOptionKey = 'endorsed';
+	} else {
+		sortOptionKey = validator.escape(String(sort)).replace(/_/g, '-');
+	}
+
+	categoryData.sortOptionLabel = `[[topic:${sortOptionKey}]]`;
 
 	if (!meta.config['feeds:disableRSS']) {
 		categoryData.rssFeedUrl = `${url}/category/${categoryData.cid}.rss`;

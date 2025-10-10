@@ -28,6 +28,27 @@ module.exports = function (Categories) {
 	};
 
 	Categories.getTopicIds = async function (data) {
+		// If a filter is requested (e.g. endorsed), handle it across the whole
+		// category rather than just the paginated window. This ensures the
+		// "endorsed" filter shows only topics that actually have an endorsed
+		// post anywhere in the category.
+		if (data && (data.filter === 'endorsed' || (data.query && data.query.filter === 'endorsed'))) {
+			// Get all tids (pinned + normal) for the category
+			const allTids = await Categories.getAllTopicIds(data.cid, 0, -1);
+			if (!allTids || !allTids.length) {
+				return [];
+			}
+			// Filter by endorsed posts
+			const endorsedTids = await topics.filterEndorsedTids(allTids);
+			if (!endorsedTids || !endorsedTids.length) {
+				return [];
+			}
+			// Apply pagination
+			const start = data.start || 0;
+			const stop = data.stop === -1 ? endorsedTids.length - 1 : data.stop;
+			return endorsedTids.slice(start, stop !== -1 ? stop + 1 : undefined);
+		}
+
 		const [pinnedTids, set] = await Promise.all([
 			Categories.getPinnedTids({ ...data, start: 0, stop: -1 }),
 			Categories.buildTopicsSortedSet(data),

@@ -46,6 +46,7 @@ Categories.existsByHandle = async function (handle) {
 };
 
 Categories.getCategoryById = async function (data) {
+	
 	const categories = await Categories.getCategories([data.cid]);
 	if (!categories[0]) {
 		return null;
