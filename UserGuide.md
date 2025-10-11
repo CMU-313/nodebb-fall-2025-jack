@@ -5,6 +5,7 @@ Hi! This is our user guide for Team Jack's NodeBB. Please follow the table of co
 [3. View All Posts](#name-of-feature-view-all-posts) <br>
 [5. Filter Posts by Course Staff](#name-of-feature-filter-posts-by-course-staff) <br>
 [10. Endorse Answers by Course Staff](#name-of-feature-endorse-answers-by-course-staff) <br>
+[10. User Analytics Dashboard](#name-of-feature-User-Analytics-Dashboard) <br>
 
 
 
@@ -294,7 +295,6 @@ user story #32
 1. Run `./nodebb setup`
 3. Run `npm install` 
 4. Run `./nodebb dev` 
-5. Run `./nodebb start`
 6. Log in to NodeBB as an admin using username=`admin` and password = `password123!`
 7. Go to the"Announcements" category. If there are no topics, create a topic. Otherwise, randomly click on a topic.
 8. Click on "endorse this post?" to mark it as "endorsed"  <img width="1543" height="718" alt="image" src="https://github.com/user-attachments/assets/c5c0c086-cdb1-46b7-861f-c907fccac8ae" />
@@ -339,3 +339,47 @@ I believe these are sufficient because they test all the acceptance criteria I c
     - categories.getCategoryById with sort=endorsed behaves like filter=endorsed
 
 These test cases are sufficient since they test all the acceptance criteria for issue #62,  with general cases (read/writes correctly read the endorsed status and don't cause any error) and also edge cases (handling empty inputs) all pass these test cases, and still do not affect the overall code coverage when testing. When running nodebb, there is also no console.log error and no delays/errors occur. Therefore, these tests cover the changes that have been made sufficiently. 
+
+## Name of Feature: User Analytics Dashboard
+
+*Link to the related user story and pull request(s)*
+- User Story:https://github.com/CMU-313/nodebb-fall-2025-jack/issues/18
+- PRs:https://github.com/CMU-313/nodebb-fall-2025-jack/pull/56
+
+### Manual Testing
+*Detailed instructions on how to use and user test your new feature*
+1. Download the `.env` file from the [shared google drive](https://drive.google.com/file/d/1XFQmOZFPj2SsV8CZmdOxoiA7-lfBJtPY/view?usp=drive_link), and add it to the root directory.
+2. Run `./nodebb setup`
+3. Run `npm install` 
+4. Run `./nodebb dev` 
+5. Log in as admin using username=`admin` and password=`password123!`. <img width="1334" height="559" alt="image" src="https://github.com/user-attachments/assets/cf09c4b0-9a54-4c98-a91a-59effb68b314" />
+6. Go to the Admin Tab from the Homepage 
+
+<img width="1275" height="720" alt="Image" src="https://github.com/user-attachments/assets/06a1e666-f646-41b9-8401-62024d36998c" />
+
+7. Select the users subtab under the Dashboards primary tab. Within this tab, there should be a UserActivity table with 4 fields per user that joined
+
+<img width="1278" height="1199" alt="Image" src="https://github.com/user-attachments/assets/651444a4-8b42-4300-927a-52d805d33a2d" />
+
+8. Select the User Activity link to expand the table.
+
+
+<img width="995" height="149" alt="Image" src="https://github.com/user-attachments/assets/22a52ff0-eb65-4be8-b9de-7bed3de09ba3" />
+
+9. Verify that there are 5 fields per user in this view. 
+
+<img width="1033" height="197" alt="Image" src="https://github.com/user-attachments/assets/532961f3-dd0a-4980-80f9-24c5286a8e9a" />
+
+### Automated Tests
+*Link/description of where your added automated tests can be found*
+- Description of the automated tests can be found in Commit in this PR: https://github.com/CMU-313/nodebb-fall-2025-jack/pull/56
+### Description of what is being tested and why you believe the tests are sufficient for covering the changes that you have made
+What is being tested
+- User activity tracking accuracy: These tests validate that the /api/admin/dashboard/user-activity endpoint accurately reflects changes in user post counts when a new topic or post is created. The test first records a user’s initial postCount, creates a new post, and then re-queries the endpoint to confirm that the count increments by exactly one. This ensures the correctness of the server’s aggregation logic for user activity statistics.
+- Handling of inactive users:A separate test confirms that newly created users with no recorded actions (posts, shares, or uploads) are handled gracefully by the system. It verifies that all activity-related fields (postCount, shareCount, and uploadCount) are numeric and default to zero when no data exists. This guarantees consistent API responses and prevents null or undefined values in the dashboard data.
+- Dashboard accessibility and rendering:Multiple tests ensure that the User Activity Dashboard loads correctly for admin users through both standard and parameterized requests. These verify that the rendered HTML includes expected table headers such as “Number of Posts,” “Number of Shares,” and “Number of Uploads.” Additionally, queries with time range parameters (e.g., ?units=days&until=<timestamp>&count=<n>) confirm that date filtering logic functions properly.
+
+- Authorization and security checks:One test explicitly validates access control by ensuring that non-admin users receive a 403 Forbidden response when attempting to load the /admin/dashboard/user-activity page. This ensures that sensitive administrative data remains inaccessible to regular users.
+
+
+These tests collectively ensure the functional accuracy, robustness, and access control of the entire Admin Dashboard system. The increment test confirms that user activity metrics update precisely when new posts are created, validating the backend logic that powers the dashboard’s reporting accuracy. The zero-activity test demonstrates that the API handles edge cases gracefully by returning well-typed, predictable data even for users with no recorded activity. Access control is verified through the 403 test, which ensures that only administrators can access analytics data, effectively preventing unauthorized access. Additionally, by testing both standard and parameterized dashboard endpoints, the suite guarantees the reliability of the analytics pages under various query conditions, helping prevent regressions in future updates. The inclusion of multiple dashboard routes—such as logins, users, topics, searches, and user-activity—provides comprehensive coverage, confirming that all admin-facing analytics interfaces load correctly and display essential data components. Together, these tests validate the integrity, usability, and security of the Admin Dashboard’s user activity and analytics features, ensuring administrators receive accurate, complete, and protected insights into user behavior.
