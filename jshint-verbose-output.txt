@@ -1,0 +1,39 @@
+src/topics/create.js: line 8, col 7, Redefinition of 'utils'. (W079)
+src/topics/create.js: line 18, col 7, Redefinition of 'translator'. (W079)
+
+src/topics/data.js: line 7, col 7, Redefinition of 'utils'. (W079)
+src/topics/data.js: line 8, col 7, Redefinition of 'translator'. (W079)
+
+src/topics/delete.js: line 11, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/events.js: line 12, col 7, Redefinition of 'translator'. (W079)
+src/topics/events.js: line 14, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/follow.js: line 8, col 7, Redefinition of 'utils'. (W079)
+src/topics/follow.js: line 38, col 13, Confusing use of '!'. (W018)
+
+src/topics/fork.js: line 11, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/index.js: line 8, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/posts.js: line 14, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/recent.js: line 7, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/tags.js: line 15, col 7, Redefinition of 'translator'. (W079)
+src/topics/tags.js: line 16, col 7, Redefinition of 'utils'. (W079)
+src/topics/tags.js: line 572, col 13, Confusing use of '!'. (W018)
+src/topics/tags.js: line 584, col 13, Confusing use of '!'. (W018)
+
+src/topics/teaser.js: line 11, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/tools.js: line 11, col 7, Redefinition of 'utils'. (W079)
+
+src/topics/unread.js: line 15, col 7, Redefinition of 'utils'. (W079)
+src/topics/unread.js: line 206, col 13, Confusing use of '!'. (W018)
+src/topics/unread.js: line 262, col 45, Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (params) (W083)
+src/topics/unread.js: line 351, col 13, Confusing use of '!'. (W018)
+
+src/topics/user.js: line 4, col 7, Redefinition of 'utils'. (W079)
+
+24 errors

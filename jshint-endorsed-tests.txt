@@ -1,0 +1,3 @@
+test/topics-endorsed.js: line 10, col 7, 'helpers' is defined but never used.
+
+1 error
