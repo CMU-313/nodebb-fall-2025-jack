@@ -81,3 +81,6 @@ test.sh
 .env
 /build/
 /build/!export
+
+# stryker temp files
+.stryker-tmp
