@@ -32,5 +32,14 @@ jobs:
           script: | 
             cd ${{ secrets.REPO_NAME }}
             git pull origin main
+
+            echo "Writing .env file for Docker Compose..."
+            cat > .env <<EOF
+            MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }}
+            MAILGUN_DOMAIN=${{ secrets.MAILGUN_DOMAIN }}
+            EOF
+            chmod 600 .env
+
             docker compose down
             docker compose -f docker-compose-redis.yml up --build -d
+            echo "Deployment complete!"
