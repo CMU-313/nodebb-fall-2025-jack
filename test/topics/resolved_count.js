@@ -38,7 +38,6 @@ describe('GET /api/categories/:cid/unresolved-count', () => {
 			cid: categoryObj.cid,
 		});
 		topicData = result.topicData;
-		
 	});
 	it('should return correct count of unresolved topics in category', async () => {
 		// Initially there should be 1 unresolved topic

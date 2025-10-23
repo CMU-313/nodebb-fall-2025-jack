@@ -90,7 +90,7 @@ describe('API tokens', () => {
 
 			assert(token);
 			assert(await db.exists(`token:${second}`));
-			assert.equal(await db.sortedSetScore(`tokens:uid`, second), 0);
+			assert.equal(await db.sortedSetScore('tokens:uid', second), 0);
 			assert.strictEqual(parseInt(token.uid, 10), 0);
 		});
 	});
@@ -142,9 +142,9 @@ describe('API tokens', () => {
 			await api.utils.tokens.delete(token);
 
 			assert.strictEqual(await db.exists(`token:${token}`), false);
-			assert.strictEqual(await db.sortedSetScore(`tokens:uid`, token), null);
-			assert.strictEqual(await db.sortedSetScore(`tokens:createtime`, token), null);
-			assert.strictEqual(await db.sortedSetScore(`tokens:lastSeen`, token), null);
+			assert.strictEqual(await db.sortedSetScore('tokens:uid', token), null);
+			assert.strictEqual(await db.sortedSetScore('tokens:createtime', token), null);
+			assert.strictEqual(await db.sortedSetScore('tokens:lastSeen', token), null);
 		});
 	});
 
@@ -152,7 +152,7 @@ describe('API tokens', () => {
 		it('should record the current time as the last seen time of that token', async () => {
 			await api.utils.tokens.log(token);
 
-			assert(await db.sortedSetScore(`tokens:lastSeen`, token));
+			assert(await db.sortedSetScore('tokens:lastSeen', token));
 		});
 	});
 

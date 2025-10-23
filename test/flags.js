@@ -907,7 +907,7 @@ describe('Flags', () => {
 
 			it('should escape flag reason', async () => {
 				const postData = await Topics.reply({
-					tid: tid,
+					tid,
 					uid: 1,
 					content: 'This is flaggable content',
 				});
@@ -1190,7 +1190,5 @@ describe('Flags', () => {
 				}
 			});
 		});
-
-
 	});
 });

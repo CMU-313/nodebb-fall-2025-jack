@@ -77,7 +77,7 @@ define('forum/topic', [
 		addEndorsed_Status();
 	};
 
-	function handleTopicSearch() {
+	function handleTopicSearch () {
 		require(['mousetrap'], (mousetrap) => {
 			if (config.topicSearchEnabled) {
 				require(['search'], function (search) {
@@ -139,7 +139,7 @@ define('forum/topic', [
 		});
 	};
 
-	function handleBookmark(tid) {
+	function handleBookmark (tid) {
 		if (window.location.hash) {
 			const el = $(utils.escapeHTML(window.location.hash));
 			if (el.length) {
@@ -171,7 +171,7 @@ define('forum/topic', [
 		}
 	}
 
-	function handleThumbs() {
+	function handleThumbs () {
 		const listEl = document.querySelector('[component="topic/thumb/list"]');
 		if (!listEl) {
 			return;
@@ -189,7 +189,7 @@ define('forum/topic', [
 				});
 				const html = await app.parseAndTranslate('modals/topic-thumbs-view', {
 					src: clickedThumb.href,
-					thumbs: thumbs,
+					thumbs,
 				});
 
 				const modal = bootbox.dialog({
@@ -208,7 +208,7 @@ define('forum/topic', [
 		});
 	}
 
-	function addBlockQuoteHandler() {
+	function addBlockQuoteHandler () {
 		components.get('topic').on('click', 'blockquote .toggle', function () {
 			const blockQuote = $(this).parent('blockquote');
 			const toggle = $(this);
@@ -218,7 +218,7 @@ define('forum/topic', [
 		});
 	}
 
-	function addCodeBlockHandler() {
+	function addCodeBlockHandler () {
 		new clipboard('[component="copy/code/btn"]', {
 			text: function (trigger) {
 				const btn = $(trigger);
@@ -233,11 +233,11 @@ define('forum/topic', [
 			},
 		});
 
-		function addCopyCodeButton() {
-			function scrollbarVisible(element) {
+		function addCopyCodeButton () {
+			function scrollbarVisible (element) {
 				return element.scrollHeight > element.clientHeight;
 			}
-			function offsetCodeBtn(codeEl) {
+			function offsetCodeBtn (codeEl) {
 				if (!codeEl.length) { return; }
 				if (!codeEl[0].scrollHeight) {
 					return setTimeout(offsetCodeBtn, 100, codeEl);
@@ -263,8 +263,8 @@ define('forum/topic', [
 		hooks.registerPage('action:posts.edited', addCopyCodeButton);
 	}
 
-	function addParentHandler() {
-		function gotoPost(event, toPid) {
+	function addParentHandler () {
+		function gotoPost (event, toPid) {
 			const toPost = $('[component="topic"]>[component="post"][data-pid="' + toPid + '"]');
 			if (toPost.length) {
 				event.preventDefault();
@@ -294,7 +294,7 @@ define('forum/topic', [
 		});
 	}
 
-	function addRepliesHandler() {
+	function addRepliesHandler () {
 		$('[component="topic"]').on('click', '[component="post/reply-count"]', function () {
 			const btn = $(this);
 			require(['forum/topic/replies'], function (replies) {
@@ -303,7 +303,7 @@ define('forum/topic', [
 		});
 	}
 
-	function addPostsPreviewHandler() {
+	function addPostsPreviewHandler () {
 		if (!ajaxify.data.showPostPreviewsOnHover || utils.isMobile()) {
 			return;
 		}
@@ -312,14 +312,14 @@ define('forum/topic', [
 		let link = null;
 
 		const postCache = {};
-		function destroyTooltip() {
+		function destroyTooltip () {
 			clearTimeout(renderTimeout);
 			renderTimeout = 0;
 			$('#post-tooltip').remove();
 			destroyed = true;
 		}
 
-		function onClickOutside(ev) {
+		function onClickOutside (ev) {
 			// If the click is outside the tooltip, destroy it
 			if (!$(ev.target).closest('#post-tooltip').length) {
 				destroyTooltip();
@@ -344,7 +344,7 @@ define('forum/topic', [
 			destroyed = false;
 
 			renderTimeout = setTimeout(async () => {
-				async function renderPost(pid) {
+				async function renderPost (pid) {
 					const postData = postCache[pid] || await api.get(`/posts/${encodeURIComponent(pid)}/summary`);
 					$('#post-tooltip').remove();
 					if (postData && ajaxify.data.template.topic) {
@@ -396,13 +396,13 @@ define('forum/topic', [
 		});
 	}
 
-	function setupQuickReply() {
+	function setupQuickReply () {
 		if (config.enableQuickReply || (config.theme && config.theme.enableQuickReply)) {
 			quickreply.init();
 		}
 	}
 
-	function updateTopicTitle() {
+	function updateTopicTitle () {
 		const span = components.get('navbar/title').find('span');
 		if ($(window).scrollTop() > 50 && span.hasClass('hidden')) {
 			span.html(ajaxify.data.title).removeClass('hidden');
@@ -442,7 +442,7 @@ define('forum/topic', [
 		}
 	};
 
-	function updateUserBookmark(index) {
+	function updateUserBookmark (index) {
 		const bookmarkKey = 'topic:' + ajaxify.data.tid + ':bookmark';
 		const currentBookmark = ajaxify.data.bookmark || storage.getItem(bookmarkKey);
 		if (config.topicPostSort === 'newest_to_oldest') {
@@ -480,20 +480,19 @@ define('forum/topic', [
 		}
 	}
 
-
-	function addResolved_Status() { 
+	function addResolved_Status () {
 		const firstPost = $('[component="post"][data-index="0"]');
 		if (!firstPost.length) return;
 
 		const isAdmin = app.user && app.user.isAdmin;
 		const tid = ajaxify.data.tid;
-		
+
 		firstPost.prepend('<div class="resolved-loading">Loading...</div>');
-		
+
 		fetch(`/api/topics/${tid}/resolved`).then(res => res.json())
 			.then(data => {
 				const isResolved = data.resolved;
-				
+
 				const currStatus = $(`
 					<div class="post-toggle" style="cursor: ${isAdmin ? 'pointer' : 'default'}; padding: 5px; margin: 5px; display: flex; align-items: center; gap: 8px;">
 						<div class="checkbox" style="width: 15px; height: 15px; border: 2px solid #999; display: inline-block; text-align: center; line-height: 12px; font-size: 12px;">
@@ -512,10 +511,10 @@ define('forum/topic', [
 						const statusText = $(this).find('.current_status');
 						const currentResolved = checkbox.text().trim() === '✓';
 						const newStatus = !currentResolved;
-						
+
 						fetch(`${config.relative_path}/api/topics/${tid}/resolved`, {
 							method: 'PUT',
-							headers: { 
+							headers: {
 								'Content-Type': 'application/json',
 								'x-csrf-token': config.csrf_token,
 							},
@@ -549,26 +548,26 @@ define('forum/topic', [
 			});
 	}
 
-	function addEndorsed_Status() {
+	function addEndorsed_Status () {
 		const allPosts = $('[component="post"]');
 		const isAdmin = app.user && app.user.isAdmin;
-		
+
 		allPosts.each(function () {
 			const postElem = $(this);
 			const pid = postElem.attr('data-pid');
-			
+
 			if (!pid) return;
-			
+
 			postElem.prepend('<div class="endorsed-loading">Loading...</div>');
-			
+
 			fetch(`/api/posts/${pid}/endorsed`, {
 				credentials: 'same-origin',
 			}).then(r => r.json())
 				.then(data => {
 					const isEndorsed = data.endorsed;
-					
+
 					let endorsedStatus;
-					
+
 					if (isAdmin) {
 						// Admin sees a button with data attribute to track state
 						endorsedStatus = $(`
@@ -576,12 +575,12 @@ define('forum/topic', [
 								${isEndorsed ? 'Endorsed ✓' : 'Endorse this post?'}
 							</button>
 						`);
-						
+
 						endorsedStatus.on('click', function () {
 							const button = $(this);
 							const currentState = button.attr('data-endorsed') === 'true'; // Read current state from button
 							const newStatus = !currentState;
-							
+
 							fetch(`/api/posts/${pid}/endorsed`, {
 								method: 'PUT',
 								headers: {
@@ -594,9 +593,9 @@ define('forum/topic', [
 								.then(() => {
 									button.attr('data-endorsed', newStatus); // Update state on button
 									if (newStatus) {
-										button.text('Endorsed ✓').css({'background-color': '#007bff', 'color': 'white', 'border': 'none'});
+										button.text('Endorsed ✓').css({ 'background-color': '#007bff', color: 'white', border: 'none' });
 									} else {
-										button.text('Endorse this post?').css({'background-color': '#f0f0f0', 'color': '#666', 'border': '2px solid #007bff'});
+										button.text('Endorse this post?').css({ 'background-color': '#f0f0f0', color: '#666', border: '2px solid #007bff' });
 									}
 									alerts.success(newStatus ? 'Post endorsed' : 'Post unendorsed');
 								})
@@ -610,14 +609,11 @@ define('forum/topic', [
 							</div>
 						`);
 					}
-					
+
 					postElem.find('.endorsed-loading').replaceWith(endorsedStatus);
 				});
 		});
 	}
 
-
 	return Topic;
 });
-
-

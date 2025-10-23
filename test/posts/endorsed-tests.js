@@ -23,7 +23,7 @@ describe('Post Endorsed Status', () => {
 		adminUid = await user.create({ username: 'endorseadmin', password: '123456' });
 		await groups.join('administrators', adminUid);
 
-		// Setup: Create regular user  
+		// Setup: Create regular user
 		regularUid = await user.create({ username: 'endorseregular', password: '123456' });
 
 		// Setup: Login admin and get jar
@@ -75,7 +75,7 @@ describe('Post Endorsed Status', () => {
 			assert.strictEqual(response.statusCode, 200);
 			assert.strictEqual(body.success, true);
 			assert.strictEqual(body.endorsed, true);
-			
+
 			// Verify it was actually updated
 			const { body: statusBody } = await helpers.request('get', `/api/posts/${postData.pid}/endorsed`, {});
 			assert.strictEqual(statusBody.endorsed, true);
@@ -89,7 +89,7 @@ describe('Post Endorsed Status', () => {
 			});
 			assert.strictEqual(response.statusCode, 200);
 			assert.strictEqual(body.endorsed, false);
-			
+
 			// Verify it was actually updated
 			const { body: statusBody } = await helpers.request('get', `/api/posts/${postData.pid}/endorsed`, {});
 			assert.strictEqual(statusBody.endorsed, false);
@@ -134,7 +134,7 @@ describe('Post Endorsed Status', () => {
 				tid: topicData.tid,
 				content: 'Test reply for boolean check',
 			});
-			
+
 			const retrievedPosts = await posts.getPostsByPids([result.pid], regularUid);
 			assert.strictEqual(typeof retrievedPosts[0].endorsed, 'boolean');
 		});
@@ -146,10 +146,10 @@ describe('Post Endorsed Status', () => {
 				tid: topicData.tid,
 				content: 'Old post simulation',
 			});
-			
+
 			// Simulate old post by removing the field
 			await db.deleteObjectField(`post:${result.pid}`, 'endorsed');
-			
+
 			const retrievedPosts = await posts.getPostsByPids([result.pid], regularUid);
 			assert.strictEqual(retrievedPosts[0].endorsed, false); // Backward compatibility
 		});

@@ -92,7 +92,7 @@ categoriesController.list = async function (req, res) {
 		categories: tree,
 		viewAllList: [viewAllCategory],
 		// Back-compat for templates that used a single object
-		viewAllCategory: viewAllCategory,
+		viewAllCategory,
 		pagination: pagination.create(page, pageCount, req.query),
 	};
 

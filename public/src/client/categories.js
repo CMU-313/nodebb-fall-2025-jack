@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('forum/categories', ['api', 'categorySelector'], function (api, categorySelector) {
 	const categories = {};
 

@@ -22,7 +22,7 @@ const relative_path = nconf.get('relative_path');
 const upload_url = nconf.get('upload_url');
 const validSorts = ['oldest_to_newest', 'newest_to_oldest', 'most_votes'];
 
-topicsController.get = async function getTopic(req, res, next) {
+topicsController.get = async function getTopic (req, res, next) {
 	const tid = req.params.topic_id;
 	if (
 		(req.params.post_index && !utils.isNumber(req.params.post_index) && req.params.post_index !== 'unread') ||
@@ -150,16 +150,16 @@ topicsController.get = async function getTopic(req, res, next) {
 	res.render('topic', topicData);
 };
 
-function generateQueryString(query) {
+function generateQueryString (query) {
 	const qString = qs.stringify(query);
 	return qString.length ? `?${qString}` : '';
 }
 
-function calculatePageFromIndex(postIndex, settings) {
+function calculatePageFromIndex (postIndex, settings) {
 	return 1 + Math.floor((postIndex - 1) / settings.postsPerPage);
 }
 
-function calculateStartStop(page, postIndex, settings) {
+function calculateStartStop (page, postIndex, settings) {
 	let startSkip = 0;
 
 	if (!settings.usePagination) {
@@ -174,7 +174,7 @@ function calculateStartStop(page, postIndex, settings) {
 	return { start: Math.max(0, start), stop: Math.max(0, stop) };
 }
 
-async function markAsRead(req, tid) {
+async function markAsRead (req, tid) {
 	if (req.loggedIn) {
 		const markedRead = await topics.markAsRead([tid], req.uid);
 		const promises = [topics.markTopicNotificationsRead([tid], req.uid)];
@@ -185,7 +185,7 @@ async function markAsRead(req, tid) {
 	}
 }
 
-async function buildBreadcrumbs(topicData) {
+async function buildBreadcrumbs (topicData) {
 	const breadcrumbs = [
 		{
 			text: topicData.category.name,
@@ -200,7 +200,7 @@ async function buildBreadcrumbs(topicData) {
 	topicData.breadcrumbs = parentCrumbs.concat(breadcrumbs);
 }
 
-async function addOldCategory(topicData, userPrivileges) {
+async function addOldCategory (topicData, userPrivileges) {
 	if (userPrivileges.isAdminOrMod && topicData.oldCid) {
 		topicData.oldCategory = await categories.getCategoryFields(
 			topicData.oldCid, ['cid', 'name', 'icon', 'bgColor', 'color', 'slug']
@@ -208,7 +208,7 @@ async function addOldCategory(topicData, userPrivileges) {
 	}
 }
 
-async function addTags(topicData, req, res, currentPage, postAtIndex) {
+async function addTags (topicData, req, res, currentPage, postAtIndex) {
 	let description = '';
 	if (postAtIndex && postAtIndex.content) {
 		description = utils.stripHTMLTags(utils.decodeHTMLEntities(postAtIndex.content)).trim();
@@ -260,7 +260,7 @@ async function addTags(topicData, req, res, currentPage, postAtIndex) {
 			{
 				property: 'og:description',
 				content: description,
-			},
+			}
 		);
 	}
 
@@ -307,7 +307,7 @@ async function addTags(topicData, req, res, currentPage, postAtIndex) {
 	}
 }
 
-async function addOGImageTags(res, topicData, postAtIndex) {
+async function addOGImageTags (res, topicData, postAtIndex) {
 	const uploads = postAtIndex ? await posts.uploads.listWithSizes(postAtIndex.pid) : [];
 	const images = uploads.map((upload) => {
 		upload.name = `${url + upload_url}/${upload.name}`;
@@ -329,7 +329,7 @@ async function addOGImageTags(res, topicData, postAtIndex) {
 	images.forEach(path => addOGImageTag(res, path));
 }
 
-function addOGImageTag(res, image) {
+function addOGImageTag (res, image) {
 	let imageUrl;
 	if (typeof image === 'string' && !image.startsWith('http')) {
 		imageUrl = url + image.replace(new RegExp(`^${relative_path}`), '');

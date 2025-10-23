@@ -71,16 +71,16 @@ process.on('message', async (msg) => {
 		await fs.promises.writeFile(profilePath, JSON.stringify({
 			user: userData,
 			settings: userSettings,
-			ips: ips,
-			sessions: sessions,
-			usernames: usernames,
-			emails: emails,
+			ips,
+			sessions,
+			usernames,
+			emails,
 			messages: chatData,
-			bookmarks: bookmarks,
-			watchedTopics: watchedTopics,
-			upvoted: upvoted,
-			downvoted: downvoted,
-			following: following,
+			bookmarks,
+			watchedTopics,
+			upvoted,
+			downvoted,
+			following,
 		}, null, 4));
 
 		await db.close();
@@ -88,7 +88,7 @@ process.on('message', async (msg) => {
 	}
 });
 
-async function getRoomMessages(uid, roomId) {
+async function getRoomMessages (uid, roomId) {
 	const batch = require('../../batch');
 	let data = [];
 	await batch.processSortedSet(`chat:room:${roomId}:mids`, async (mids) => {
@@ -102,7 +102,7 @@ async function getRoomMessages(uid, roomId) {
 	return data;
 }
 
-async function getSetData(set, keyPrefix, uid) {
+async function getSetData (set, keyPrefix, uid) {
 	const privileges = require('../../privileges');
 	const batch = require('../../batch');
 	let data = [];

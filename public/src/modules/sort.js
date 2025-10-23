@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('sort', ['components'], function (components) {
 	const module = {};
 
@@ -27,7 +26,7 @@ define('sort', ['components'], function (components) {
 		if (currentSetting && currentSetting.length) {
 			currentSetting.find('i').addClass('fa-check');
 			// Build toggle content: preserve the dropdown's original icon (if any)
-			// and inject a bold label derived from the selected item. 
+			// and inject a bold label derived from the selected item.
 			const label = currentSetting.find('.flex-grow-1').text().trim() || currentSetting.text().trim();
 			if (dropdownToggle.length) {
 				const iconEl = dropdownToggle.find('i');
@@ -51,7 +50,7 @@ define('sort', ['components'], function (components) {
 					delete params.filter;
 				}
 
-				// update toggle to show the original icon + bold label (fallback behavior). 
+				// update toggle to show the original icon + bold label (fallback behavior).
 				const label = $el.find('.flex-grow-1').text().trim() || $el.text().trim();
 				if (dropdownToggle.length) {
 					const iconEl = dropdownToggle.find('i');

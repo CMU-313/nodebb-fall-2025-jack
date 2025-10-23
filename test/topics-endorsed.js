@@ -60,7 +60,6 @@ describe('Endorsed filter', () => {
 	});
 
 	it('categories.getCategoryById with filter=endorsed returns only endorsed topics', async () => {
-		
 		const data = await categories.getCategoryById({ uid: adminUid, cid: cat.cid, start: 0, stop: 10, settings: { topicsPerPage: 10 }, query: { filter: 'endorsed' } });
 		// Ensure only topic B is present (has endorsed reply from first test)
 		const tids = data.topics.map(t => String(t.tid));
@@ -68,7 +67,7 @@ describe('Endorsed filter', () => {
 	});
 
 	it('categories.getCategoryById without filter=endorsed uses default sort option', async () => {
-	// Call category fetch normally (no endorsed filter)
+		// Call category fetch normally (no endorsed filter)
 		const data = await categories.getCategoryById({
 			uid: adminUid,
 			cid: cat.cid,
@@ -130,7 +129,4 @@ describe('Endorsed filter', () => {
 		assert.deepStrictEqual(filtered, []);
 		posts.getPostsFields = original;
 	});
-
-
-
 });

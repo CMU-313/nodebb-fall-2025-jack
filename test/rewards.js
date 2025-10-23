@@ -63,13 +63,13 @@ describe('rewards', () => {
 		});
 
 		it('should check condition', (done) => {
-			function method(next) {
+			function method (next) {
 				next(null, 1);
 			}
 			rewards.checkConditionAndRewardUser({
 				uid: adminUid,
 				condition: 'essentials/user.postcount',
-				method: method,
+				method,
 			}, (err, data) => {
 				assert.ifError(err);
 				done();

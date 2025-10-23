@@ -41,10 +41,9 @@ describe('Resolved Status', () => {
 			cid: categoryObj.cid,
 		});
 		topicData = result.topicData;
-		
-	}); 
+	});
 
-	describe('GET /api/topics/:tid/resolved', () => { /*check that resolved status is correctly returned for topic*/
+	describe('GET /api/topics/:tid/resolved', () => { /* check that resolved status is correctly returned for topic */
 		it('should return resolved status for a topic', async () => {
 			const { response, body } = await helpers.request('get', `/api/topics/${topicData.tid}/resolved`, {
 				jar: adminJar,
@@ -54,14 +53,14 @@ describe('Resolved Status', () => {
 			assert.strictEqual(body.resolved, false); // New topics default to unresolved
 		});
 
-		it('should work for guests', async () => {/*check that resolved status is public and readable*/
+		it('should work for guests', async () => { /* check that resolved status is public and readable */
 			const { response, body } = await helpers.request('get', `/api/topics/${topicData.tid}/resolved`, {});
 			assert.strictEqual(response.statusCode, 200);
 			assert.strictEqual(typeof body.resolved, 'boolean');
 		});
 	});
 
-	describe('PUT /api/topics/:tid/resolved', () => {/*check that only admin can mark topic as resolved*/
+	describe('PUT /api/topics/:tid/resolved', () => { /* check that only admin can mark topic as resolved */
 		it('should allow admin to mark topic as resolved', async () => {
 			const { response, body } = await helpers.request('put', `/api/topics/${topicData.tid}/resolved`, {
 				jar: adminJar,
@@ -76,7 +75,7 @@ describe('Resolved Status', () => {
 			assert.strictEqual(statusBody.resolved, true);
 		});
 
-		it('should allow admin to mark topic as unresolved', async () => {/*check that only admin can mark as unresolved*/
+		it('should allow admin to mark topic as unresolved', async () => { /* check that only admin can mark as unresolved */
 			const { response, body } = await helpers.request('put', `/api/topics/${topicData.tid}/resolved`, {
 				jar: adminJar,
 				body: { resolved: false },
@@ -89,7 +88,7 @@ describe('Resolved Status', () => {
 			assert.strictEqual(statusBody.resolved, false);
 		});
 
-		it('should fail if non-admin tries to update', async () => {/*check that test fails if non-admin tries to update status button*/
+		it('should fail if non-admin tries to update', async () => { /* check that test fails if non-admin tries to update status button */
 			const regularLogin = await helpers.loginUser('regularuser', '123456');
 			const { response } = await helpers.request('put', `/api/topics/${topicData.tid}/resolved`, {
 				jar: regularLogin.jar,
@@ -106,7 +105,7 @@ describe('Resolved Status', () => {
 		});
 	});
 
-	describe('New topics', () => {/*check that default topic status is unresolved*/
+	describe('New topics', () => { /* check that default topic status is unresolved */
 		it('should default new topics to resolved: false', async () => {
 			const result = await topics.post({
 				uid: adminUid,
@@ -120,8 +119,8 @@ describe('Resolved Status', () => {
 		});
 	});
 	/* Frontend tests */
-	//tests topic page displays resolved status 
-	//test admin can see toggle adn control 
+	// tests topic page displays resolved status
+	// test admin can see toggle adn control
 	describe('Frontend Display', () => {
 		const nconf = require('nconf');
 		const request = require('../../src/request');

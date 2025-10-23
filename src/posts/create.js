@@ -31,7 +31,7 @@ module.exports = function (Posts) {
 
 		const pid = data.pid || await db.incrObjectField('global', 'nextPid');
 		// add default endorsed status data field
-		let postData = { pid, uid, tid, content, sourceContent, timestamp, endorsed:false};
+		let postData = { pid, uid, tid, content, sourceContent, timestamp, endorsed: false };
 
 		if (data.toPid) {
 			postData.toPid = data.toPid;
@@ -68,7 +68,7 @@ module.exports = function (Posts) {
 				});
 		}
 
-		({ post: postData } = await plugins.hooks.fire('filter:post.create', { post: postData, data: data }));
+		({ post: postData } = await plugins.hooks.fire('filter:post.create', { post: postData, data }));
 		await db.setObject(`post:${postData.pid}`, postData);
 
 		const topicData = await topics.getTopicFields(tid, ['cid', 'pinned']);
@@ -91,7 +91,7 @@ module.exports = function (Posts) {
 		return result.post;
 	};
 
-	async function addReplyTo(postData, timestamp) {
+	async function addReplyTo (postData, timestamp) {
 		if (!postData.toPid) {
 			return;
 		}
@@ -101,7 +101,7 @@ module.exports = function (Posts) {
 		]);
 	}
 
-	async function checkToPid(toPid, uid) {
+	async function checkToPid (toPid, uid) {
 		if (!utils.isNumber(toPid) && !activitypub.helpers.isUri(toPid)) {
 			throw new Error('[[error:invalid-pid]]');
 		}

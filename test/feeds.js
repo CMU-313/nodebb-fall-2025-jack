@@ -26,7 +26,7 @@ describe('feeds', () => {
 		fooUid = await user.create({ username: 'foo', password: 'barbar', email: 'foo@test.com' });
 
 		const result = await topics.post({
-			cid: cid,
+			cid,
 			uid: fooUid,
 			title: 'test topic title',
 			content: 'test topic content',
@@ -101,7 +101,6 @@ describe('feeds', () => {
 			assert.equal(response.statusCode, 200);
 			assert(body);
 		});
-
 
 		it('should not allow access if uid or token is missing', async () => {
 			await privileges.categories.rescind(['groups:read'], cid, 'guests');

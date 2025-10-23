@@ -175,10 +175,10 @@ describe('API', async () => {
 		},
 	};
 
-	async function dummySearchHook(data) {
+	async function dummySearchHook (data) {
 		return [1];
 	}
-	async function dummyEmailerHook(data) {
+	async function dummyEmailerHook (data) {
 		// pretend to handle sending emails
 	}
 
@@ -187,7 +187,7 @@ describe('API', async () => {
 		plugins.hooks.unregister('emailer-test', 'static:email.send');
 	});
 
-	async function setupData() {
+	async function setupData () {
 		if (setup) {
 			return;
 		}
@@ -327,12 +327,12 @@ describe('API', async () => {
 		csrfToken = await helpers.getCsrfToken(jar);
 
 		// Pre-seed ActivityPub cache so contrived actor assertions pass
-		activitypub._cache.set(`0;https://example.org/foobar`, {
+		activitypub._cache.set('0;https://example.org/foobar', {
 			id: 'https://example.org/foobar',
 			name: 'foobar',
 			publicKey: {
-				id: `https://example.org/foobar#key`,
-				owner: `https://example.org/foobar`,
+				id: 'https://example.org/foobar#key',
+				owner: 'https://example.org/foobar',
 				publicKeyPem: 'secretcat',
 			},
 		});
@@ -391,7 +391,6 @@ describe('API', async () => {
 		];
 		paths = paths.filter(path => path.method !== '_all' && !exclusionPrefixes.some(prefix => path.path.startsWith(prefix)));
 
-
 		// For each express path, query for existence in read and write api schemas
 		paths.forEach((pathObj) => {
 			describe(`${pathObj.method.toUpperCase()} ${pathObj.path}`, () => {
@@ -418,7 +417,7 @@ describe('API', async () => {
 	generateTests(readApi, Object.keys(readApi.paths));
 	generateTests(writeApi, Object.keys(writeApi.paths), writeApi.servers[0].url);
 
-	function generateTests(api, paths, prefix) {
+	function generateTests (api, paths, prefix) {
 		// Iterate through all documented paths, make a call to it,
 		// and compare the result body with what is defined in the spec
 		const pathLib = path; // for calling path module from inside this forEach
@@ -494,7 +493,6 @@ describe('API', async () => {
 					}
 				});
 
-
 				it('should not error out when called', async () => {
 					await setupData();
 
@@ -520,8 +518,8 @@ describe('API', async () => {
 								jar: !unauthenticatedRoutes.includes(path) ? jar : undefined,
 								maxRedirect: 0,
 								redirect: 'manual',
-								headers: headers,
-								body: body,
+								headers,
+								body,
 							});
 						} else if (type === 'form') {
 							result = await helpers.uploadFile(url, pathLib.join(__dirname, './files/test.png'), {}, jar, csrfToken);
@@ -604,18 +602,18 @@ describe('API', async () => {
 		});
 	}
 
-	function buildBody(schema) {
+	function buildBody (schema) {
 		return Object.keys(schema).reduce((memo, cur) => {
 			memo[cur] = schema[cur].example;
 			return memo;
 		}, {});
 	}
 
-	function compare(schema, response, method, path, context) {
+	function compare (schema, response, method, path, context) {
 		let required = [];
 		const additionalProperties = schema.hasOwnProperty('additionalProperties');
 
-		function flattenAllOf(obj) {
+		function flattenAllOf (obj) {
 			return obj.reduce((memo, obj) => {
 				if (obj.allOf) {
 					obj = { properties: flattenAllOf(obj.allOf) };
@@ -713,5 +711,4 @@ describe('API', async () => {
 			assert.strictEqual(unfollowRes, '[stubbed unfollow]');
 		});
 	}
-
 });

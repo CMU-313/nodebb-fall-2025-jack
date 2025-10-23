@@ -1,6 +1,5 @@
 'use strict';
 
-
 const assert = require('assert');
 const validator = require('validator');
 const { JSDOM } = require('jsdom');
@@ -185,7 +184,7 @@ describe('Utility Methods', () => {
 		};
 		const zxcvbn = require('zxcvbn');
 
-		function check(pwd, expectedError) {
+		function check (pwd, expectedError) {
 			try {
 				utils.assertPasswordValidity(pwd, zxcvbn);
 				assert(false);
@@ -556,7 +555,7 @@ describe('Utility Methods', () => {
 
 		it('should translate in place', async () => {
 			const translator = Translator.create('en-GB');
-			const el = $(`<div><span id="search" title="[[global:search]]"></span><span id="text">[[global:home]]</span></div>`);
+			const el = $('<div><span id="search" title="[[global:search]]"></span><span id="text">[[global:home]]</span></div>');
 			await translator.translateInPlace(el.get(0));
 			assert.strictEqual(el.find('#text').text(), 'Home');
 			assert.strictEqual(el.find('#search').attr('title'), 'Search');

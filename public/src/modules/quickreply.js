@@ -15,7 +15,7 @@ define('quickreply', [
 		const element = components.get('topic/quickreply/text');
 		const qrDraftId = `qr:draft:tid:${ajaxify.data.tid}`;
 		const data = {
-			element: element,
+			element,
 			strategies: [],
 			options: {
 				style: {
@@ -125,7 +125,7 @@ define('quickreply', [
 		});
 	};
 
-	function destroyAutoComplete() {
+	function destroyAutoComplete () {
 		if (QuickReply._autocomplete) {
 			QuickReply._autocomplete.destroy();
 			QuickReply._autocomplete = null;

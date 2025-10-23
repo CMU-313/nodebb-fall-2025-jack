@@ -35,7 +35,7 @@ describe('minifier', () => {
 
 		minifier.js.bundle({
 			files: scripts,
-			destPath: destPath,
+			destPath,
 			filename: 'concatenated.js',
 		}, false, (err) => {
 			assert.ifError(err);
@@ -144,7 +144,6 @@ describe('Build', () => {
 			done();
 		});
 	});
-
 
 	/* disabled, doesn't work on gh actions in prod mode
 	it('should build bundle files', function (done) {

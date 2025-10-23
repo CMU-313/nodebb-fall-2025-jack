@@ -68,7 +68,7 @@ describe('Admin Controllers', () => {
 	it('should 403 if user is not admin', async () => {
 		({ jar } = await helpers.loginUser('admin', 'barbar'));
 		const { response, body } = await request.get(`${nconf.get('url')}/admin`, {
-			jar: jar,
+			jar,
 		});
 
 		assert.equal(response.statusCode, 403);
@@ -87,7 +87,7 @@ describe('Admin Controllers', () => {
 			'/admin/dashboard/searches', '/admin/dashboard/user-activity', `/admin/dashboard/searches?start=${start}&end=${end}`,
 		];
 		await async.each(dashboards, async (url) => {
-			const { response, body } = await request.get(`${nconf.get('url')}${url}`, { jar: jar });
+			const { response, body } = await request.get(`${nconf.get('url')}${url}`, { jar });
 			assert.equal(response.statusCode, 200, url);
 			assert(body);
 		});
@@ -96,7 +96,7 @@ describe('Admin Controllers', () => {
 	// cursor generated test
 	it('should load user activity dashboard', async () => {
 		await groups.join('administrators', adminUid);
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/dashboard/user-activity`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/dashboard/user-activity`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 		assert(body.includes('users-activity'));
@@ -111,8 +111,8 @@ describe('Admin Controllers', () => {
 		const today = new Date();
 		const until = today.getTime();
 		const count = 7;
-		
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/dashboard/user-activity?units=days&until=${until}&count=${count}`, { jar: jar });
+
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/dashboard/user-activity?units=days&until=${until}&count=${count}`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
@@ -127,30 +127,30 @@ describe('Admin Controllers', () => {
 	// cursor generated tests
 	it('should correctly track post counts on user activity dashboard', async () => {
 		await groups.join('administrators', adminUid);
-		
+
 		// Get initial count
 		let response = await request.get(`${nconf.get('url')}/api/admin/dashboard/user-activity`, {
-			jar: jar,
+			jar,
 			json: true,
 		});
 		const initialUser = response.body.users.find(u => u.uid === regular2Uid);
 		const initialPostCount = initialUser ? initialUser.postCount : 0;
-		
+
 		// Create a new post
 		await topics.post({
 			uid: regular2Uid,
 			title: 'Post count tracking test',
 			content: 'Test content for post count validation',
-			cid: cid,
+			cid,
 		});
-		
+
 		// Get updated count
 		response = await request.get(`${nconf.get('url')}/api/admin/dashboard/user-activity`, {
-			jar: jar,
+			jar,
 			json: true,
 		});
 		const updatedUser = response.body.users.find(u => u.uid === regular2Uid);
-		
+
 		// Assert the count increased by 1
 		assert(updatedUser, 'User should be in the response');
 		assert.strictEqual(updatedUser.postCount, initialPostCount + 1, 'Post count should increment by 1');
@@ -158,18 +158,18 @@ describe('Admin Controllers', () => {
 
 	it('should display zero for counts when user has no activity', async () => {
 		await groups.join('administrators', adminUid);
-		
+
 		// Create a brand new user with no activity
 		const newUid = await user.create({ username: 'inactive-user', password: 'password' });
-		
+
 		// Get the user activity data
 		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/dashboard/user-activity`, {
-			jar: jar,
+			jar,
 			json: true,
 		});
-		
+
 		assert.equal(response.statusCode, 200);
-		
+
 		// Find the new user (they might not be in the response if created after the date range)
 		// But we can verify the structure is correct by checking any user has proper numeric counts
 		const anyUser = body.users[0];
@@ -181,7 +181,7 @@ describe('Admin Controllers', () => {
 	});
 
 	it('should load admin analytics', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/analytics?units=hours`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/analytics?units=hours`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 		assert(body.query);
@@ -189,67 +189,67 @@ describe('Admin Controllers', () => {
 	});
 
 	it('should load groups page', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/groups`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/groups`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load groups detail page', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/groups/administrators`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/groups/administrators`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load global privileges page', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/privileges`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/privileges`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load admin privileges page', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/privileges/admin`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/privileges/admin`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load privileges page for category 1', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/privileges/1`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/privileges/1`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load manage digests', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/digest`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/digest`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load manage uploads', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/uploads`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/manage/uploads`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load general settings page', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/settings/general`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/settings/general`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load email settings page', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/settings/email`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/settings/email`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load user settings page', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/admin/settings/user`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/admin/settings/user`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load info page for a user', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/user/regular/info`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/user/regular/info`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body.history);
 		assert(Array.isArray(body.history.flags));
@@ -263,13 +263,13 @@ describe('Admin Controllers', () => {
 	});
 
 	it('should load /admin/settings/homepage', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/settings/general`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/settings/general`, { jar, json: true });
 		assert.equal(response.statusCode, 200);
 		assert(body.routes);
 	});
 
 	it('should load /admin/advanced/database', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/advanced/database`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/advanced/database`, { jar, json: true });
 
 		assert.equal(response.statusCode, 200);
 
@@ -284,7 +284,7 @@ describe('Admin Controllers', () => {
 
 	it('should load /admin/extend/plugins', async function () {
 		this.timeout(50000);
-		const { body } = await request.get(`${nconf.get('url')}/api/admin/extend/plugins`, { jar: jar });
+		const { body } = await request.get(`${nconf.get('url')}/api/admin/extend/plugins`, { jar });
 
 		assert(body.hasOwnProperty('installed'));
 		assert(body.hasOwnProperty('upgradeCount'));
@@ -293,43 +293,42 @@ describe('Admin Controllers', () => {
 	});
 
 	it('should load /admin/manage/users', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users`, { jar, json: true });
 		assert.strictEqual(response.statusCode, 200);
 		assert(body);
 		assert(body.users.length > 0);
 	});
 
-
 	it('should load /admin/manage/users?filters=banned', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?filters=banned`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?filters=banned`, { jar, json: true });
 		assert.strictEqual(response.statusCode, 200);
 		assert(body);
 		assert.strictEqual(body.users.length, 0);
 	});
 
 	it('should load /admin/manage/users?filters=banned&filters=verified', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?filters=banned&filters=verified`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?filters=banned&filters=verified`, { jar, json: true });
 		assert.strictEqual(response.statusCode, 200);
 		assert(body);
 		assert.strictEqual(body.users.length, 0);
 	});
 
 	it('should load /admin/manage/users?query=admin', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?query=admin`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?query=admin`, { jar, json: true });
 		assert.strictEqual(response.statusCode, 200);
 		assert(body);
 		assert.strictEqual(body.users[0].username, 'admin');
 	});
 
 	it('should return empty results if query is too short', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?query=a`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/users?query=a`, { jar });
 		assert.strictEqual(response.statusCode, 200);
 		assert(body);
 		assert.strictEqual(body.users.length, 0);
 	});
 
 	it('should load /admin/manage/registration', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/registration`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/registration`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
@@ -341,13 +340,13 @@ describe('Admin Controllers', () => {
 	});
 
 	it('should load /api/registration-queue', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/registration-queue`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/registration-queue`, { jar, json: true });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load /admin/manage/admins-mods', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/admins-mods`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/manage/admins-mods`, { jar, json: true });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
@@ -358,7 +357,7 @@ describe('Admin Controllers', () => {
 			assert.ifError(err);
 			setTimeout(async () => {
 				const { response, body } = await request.get(`${nconf.get('url')}/api/admin/users/csv`, {
-					jar: jar,
+					jar,
 					headers: {
 						referer: `${nconf.get('url')}/admin/manage/users`,
 					},
@@ -378,7 +377,7 @@ describe('Admin Controllers', () => {
 
 	it('should return 403 if referer is not /api/admin/groups/administrators/csv', async () => {
 		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/groups/administrators/csv`, {
-			jar: jar,
+			jar,
 			headers: {
 				referer: '/topic/1/test',
 			},
@@ -389,7 +388,7 @@ describe('Admin Controllers', () => {
 
 	it('should load /api/admin/groups/administrators/csv', async () => {
 		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/groups/administrators/csv`, {
-			jar: jar,
+			jar,
 			headers: {
 				referer: `${nconf.get('url')}/admin/manage/groups`,
 			},
@@ -423,14 +422,14 @@ describe('Admin Controllers', () => {
 	});
 
 	it('should load /admin/advanced/errors', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/advanced/errors`, { jar: jar, json: true });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/advanced/errors`, { jar, json: true });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
 
 	it('should load /admin/advanced/errors/export', async () => {
 		await meta.errors.clear();
-		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/advanced/errors/export`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/admin/advanced/errors/export`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert.strictEqual(body, '');
 	});
@@ -488,7 +487,7 @@ describe('Admin Controllers', () => {
 		const { cid: rootCid } = await categories.create({ name: 'parent category' });
 		const { cid: childCid } = await categories.create({ name: 'child category', parentCid: rootCid });
 		const { response, body } = await helpers.request('get', `/api/admin/manage/categories?cid=${rootCid}`, {
-			jar: jar,
+			jar,
 			json: true,
 		});
 		assert.strictEqual(response.statusCode, 200);
@@ -529,7 +528,7 @@ describe('Admin Controllers', () => {
 	});
 
 	it('should load /post-queue', async () => {
-		const { response, body } = await request.get(`${nconf.get('url')}/api/post-queue`, { jar: jar });
+		const { response, body } = await request.get(`${nconf.get('url')}/api/post-queue`, { jar });
 		assert.equal(response.statusCode, 200);
 		assert(body);
 	});
@@ -656,7 +655,7 @@ describe('Admin Controllers', () => {
 			});
 			meta.config['min:rep:flag'] = oldValue;
 
-			const flagsResult = await helpers.request('get', `/api/flags`, {
+			const flagsResult = await helpers.request('get', '/api/flags', {
 				json: true,
 				jar: moderatorJar,
 			});
@@ -676,7 +675,7 @@ describe('Admin Controllers', () => {
 
 	it('should escape special characters in config', async () => {
 		const plugins = require('../src/plugins');
-		function onConfigGet(config, callback) {
+		function onConfigGet (config, callback) {
 			config.someValue = '"foo"';
 			config.otherValue = "'123'";
 			config.script = '</script>';

@@ -47,7 +47,7 @@ describe('emailer', () => {
 	});
 
 	// TODO: test sendmail here at some point
-	
+
 	it('plugin hook should work', (done) => {
 		const error = new Error();
 		const method = function (data, next) {
@@ -116,7 +116,6 @@ describe('emailer', () => {
 				return { id: 'test-id', message: 'Queued. Thank you.' };
 			};
 		});
-
 
 		after(() => {
 			// Restore original function
@@ -277,7 +276,4 @@ describe('emailer', () => {
 			assert(sentData.to.includes('qge@andrew.cmu.edu'), 'Should send to admin email');
 		});
 	});
-
-
-
 });

@@ -129,7 +129,7 @@ describe('Upload Controllers', () => {
 			assert(Array.isArray(body.response.images));
 			assert(body.response.images[0].url);
 			const name = body.response.images[0].url.replace(`${nconf.get('relative_path') + nconf.get('upload_url')}`, '');
-			await socketUser.deleteUpload({ uid: regularUid }, { uid: regularUid, name: name });
+			await socketUser.deleteUpload({ uid: regularUid }, { uid: regularUid, name });
 
 			const uploads = await db.getSortedSetRange(`uid:${regularUid}:uploads`, 0, -1);
 			assert.equal(uploads.includes(name), false);
@@ -320,7 +320,7 @@ describe('Upload Controllers', () => {
 		});
 
 		it('should fail to upload invalid file type', async () => {
-			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/admin/category/uploadpicture`, path.join(__dirname, '../test/files/503.html'), { params: JSON.stringify({ cid: cid }) }, jar, csrf_token);
+			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/admin/category/uploadpicture`, path.join(__dirname, '../test/files/503.html'), { params: JSON.stringify({ cid }) }, jar, csrf_token);
 			assert.strictEqual(response.statusCode, 500);
 			assert.equal(body.error, '[[error:invalid-image-type, image&#x2F;png&amp;#44; image&#x2F;jpeg&amp;#44; image&#x2F;pjpeg&amp;#44; image&#x2F;jpg&amp;#44; image&#x2F;gif&amp;#44; image&#x2F;svg+xml]]');
 		});
@@ -332,14 +332,14 @@ describe('Upload Controllers', () => {
 		});
 
 		it('should upload category image', async () => {
-			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/admin/category/uploadpicture`, path.join(__dirname, '../test/files/test.png'), { params: JSON.stringify({ cid: cid }) }, jar, csrf_token);
+			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/admin/category/uploadpicture`, path.join(__dirname, '../test/files/test.png'), { params: JSON.stringify({ cid }) }, jar, csrf_token);
 			assert.equal(response.statusCode, 200);
 			assert(Array.isArray(body));
 			assert.equal(body[0].url, `${nconf.get('relative_path')}/assets/uploads/category/category-1.png`);
 		});
 
 		it('should upload svg as category image after cleaning it up', async () => {
-			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/admin/category/uploadpicture`, path.join(__dirname, '../test/files/dirty.svg'), { params: JSON.stringify({ cid: cid }) }, jar, csrf_token);
+			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/admin/category/uploadpicture`, path.join(__dirname, '../test/files/dirty.svg'), { params: JSON.stringify({ cid }) }, jar, csrf_token);
 			assert.equal(response.statusCode, 200);
 			assert(Array.isArray(body));
 			assert.equal(body[0].url, `${nconf.get('relative_path')}/assets/uploads/category/category-1.svg`);

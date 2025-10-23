@@ -30,8 +30,8 @@ module.exports = function (User) {
 		}
 	};
 
-	async function prelimChecks(uid, cid, field) {
-		const bypass = {bypass: true};
+	async function prelimChecks (uid, cid, field) {
+		const bypass = { bypass: true };
 		if (activitypub.helpers.isUri(uid) || parseInt(uid, 10) === 0) {
 			return bypass;
 		}
@@ -50,22 +50,20 @@ module.exports = function (User) {
 		}
 
 		// return userData, isAdminOrMod, isMemberOfExempt;
-		return {bypass: false, userData: userData, isAdminOrMod: isAdminOrMod, isMemberOfExempt: isMemberOfExempt};
-
+		return { bypass: false, userData, isAdminOrMod, isMemberOfExempt };
 	}
 
-
-	function endChecks(userData, lasttime, metaconfig) {
+	function endChecks (userData, lasttime, metaconfig) {
 		const now = Date.now();
 		// const lasttime = userData[field] || 0;
 
 		const rules = [
-			()=>{
+			() => {
 				if (now - userData.joindate < metaconfig.initialPostDelay * 1000) {
 					throw new Error(`[[error:user-too-new, ${metaconfig.initialPostDelay}]]`);
 				}
 			},
-			()=>{
+			() => {
 				if (now - lasttime < metaconfig.postDelay * 1000) {
 					throw new Error(`[[error:too-many-posts, ${metaconfig.postDelay}]]`);
 				}
@@ -73,18 +71,15 @@ module.exports = function (User) {
 		];
 
 		for (const rule of rules) rule();
-		return;
 	}
 
 	// Refactored
-	async function isReady(uid, cid, field) {
-
+	async function isReady (uid, cid, field) {
 		const prelim = await prelimChecks(uid, cid, field);
 		if (prelim.bypass) return;
 		const { userData, isAdminOrMod, isMemberOfExempt } = prelim;
-		
+
 		await User.checkMuted(uid);
-		
 
 		const { shouldIgnoreDelays } = await plugins.hooks.fire('filter:user.posts.isReady', {
 			shouldIgnoreDelays: false,
@@ -110,18 +105,14 @@ module.exports = function (User) {
 
 		if (isNewbie) {
 			const minutes = Math.floor(metaconfig.newbiePostDelay / 60);
-			const msg = tooFast ? 
-				`[[error:too-many-posts-newbie-minutes, ${minutes}, ${metaconfig.newbieReputationThreshold}]]` : 
+			const msg = tooFast ?
+				`[[error:too-many-posts-newbie-minutes, ${minutes}, ${metaconfig.newbieReputationThreshold}]]` :
 				`[[error:too-many-posts-newbie, ${metaconfig.newbiePostDelay}, ${metaconfig.newbieReputationThreshold}]]`;
 			throw new Error(msg);
 		}
 
-		
 		endChecks(userData, lasttime, metaconfig);
-		
-		return;
 	}
-	
 
 	User.onNewPostMade = async function (postData) {
 		// For scheduled posts, use "action" time. It'll be updated in related cron job when post is published
@@ -167,7 +158,7 @@ module.exports = function (User) {
 		return await incrementUserFieldAndSetBy(uid, 'flags', 'users:flags', value);
 	};
 
-	async function incrementUserFieldAndSetBy(uid, field, set, value) {
+	async function incrementUserFieldAndSetBy (uid, field, set, value) {
 		value = parseInt(value, 10);
 		if (!value || !field || !(parseInt(uid, 10) > 0)) {
 			return;
