@@ -7,9 +7,27 @@
     "clear-text",
     "progress"
   ],
-  "mutate": ["src/**/*.js", "!src/**/*.spec.js"],
+  "mochaOptions": {
+    "spec": ["test/**/*.js"],
+    "require": ["jsdom-global/register"],
+    "ui": "bdd"
+  },
+  "mutate": [
+    "src/**/*.js",
+    "nodebb-plugin-mailgun-delivery/**/*.js",
+    "!src/cli/**/*.js"
+  ],
+  "ignorePatterns": [
+    "node_modules/**",
+    ".stryker-tmp/**",
+    ".nyc_output/**",
+    "coverage/**",
+    "logs/**",
+    "build/public/plugins/**",
+    "build/public/uploads/**"
+  ],
   "testRunner": "mocha",
   "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/mocha-runner for information about the mocha plugin.",
   "coverageAnalysis": "perTest",
-  "buildCommand": "./nodebb setup"
+  "tempDirName": ".stryker-tmp"
 }
