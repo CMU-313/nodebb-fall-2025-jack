@@ -9,7 +9,7 @@ start.start = async function () {
 	printStartupInfo();
 
 	// Skip heavy startup during Stryker sandbox runs
-	if (process.env.STRYKER_MUTATOR || process.env.SKIP_PLUGIN_LOAD || process.env.DISABLE_WEB_SERVER) {
+	if (process.env.STRYKER_MUTATOR) {
 		winston.warn('[Stryker sandbox] Skipping full NodeBB startup (webserver, sockets, plugins, jobs)');
 		return; // exit early so Stryker doesn't hang
 	}
