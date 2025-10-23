@@ -1,0 +1,28 @@
+src/posts/create.js:12:7: Redefinition of 'utils'.
+
+src/posts/data.js:5:7: Redefinition of 'utils'.
+
+src/posts/delete.js:13:7: Redefinition of 'utils'.
+
+src/posts/diffs.js:9:7: Redefinition of 'translator'.
+
+src/posts/edit.js:13:7: Redefinition of 'utils'.
+src/posts/edit.js:15:7: Redefinition of 'translator'.
+
+src/posts/index.js:6:7: Redefinition of 'utils'.
+
+src/posts/parse.js:11:7: Redefinition of 'translator'.
+src/posts/parse.js:12:7: Redefinition of 'utils'.
+
+src/posts/queue.js:16:7: Redefinition of 'utils'.
+
+src/posts/summary.js:12:7: Redefinition of 'utils'.
+
+src/posts/topics.js:6:7: Redefinition of 'utils'.
+
+src/posts/user.js:14:7: Redefinition of 'utils'.
+
+src/posts/votes.js:10:7: Redefinition of 'translator'.
+src/posts/votes.js:11:7: Redefinition of 'utils'.
+
+15 errors

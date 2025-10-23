@@ -1,0 +1,382 @@
+src/activitypub/actors.js: line 13, col 7, Redefinition of 'utils'.
+
+src/activitypub/feps.js: line 6, col 7, Redefinition of 'utils'.
+
+src/activitypub/helpers.js: line 19, col 7, Redefinition of 'utils'.
+
+src/activitypub/inbox.js: line 319, col 9, Expected a 'break' statement before 'case'.
+
+src/activitypub/index.js: line 15, col 7, Redefinition of 'utils'.
+
+src/activitypub/mocks.js: line 17, col 7, Redefinition of 'translator'.
+src/activitypub/mocks.js: line 18, col 7, Redefinition of 'utils'.
+
+src/activitypub/notes.js: line 16, col 7, Redefinition of 'utils'.
+
+src/analytics.js: line 12, col 7, Redefinition of 'utils'.
+
+src/api/activitypub.js: line 23, col 7, Redefinition of 'utils'.
+
+src/api/categories.js: line 10, col 7, Redefinition of 'utils'.
+src/api/categories.js: line 176, col 35, Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (cids)
+
+src/api/chats.js: line 13, col 7, Redefinition of 'utils'.
+
+src/api/posts.js: line 7, col 7, Redefinition of 'utils'.
+src/api/posts.js: line 20, col 7, Redefinition of 'translator'.
+
+src/api/users.js: line 19, col 7, Redefinition of 'translator'.
+src/api/users.js: line 21, col 7, Redefinition of 'utils'.
+src/api/users.js: line 690, col 33, Confusing use of '!'.
+
+src/api/utils.js: line 8, col 7, Redefinition of 'utils'.
+
+src/batch.js: line 7, col 7, Redefinition of 'utils'.
+
+src/categories/create.js: line 10, col 7, Redefinition of 'utils'.
+
+src/categories/data.js: line 8, col 7, Redefinition of 'utils'.
+
+src/categories/delete.js: line 12, col 7, Redefinition of 'utils'.
+
+src/categories/icon.js: line 7, col 9, Expected an identifier and instead saw 'default' (a reserved word).
+src/categories/icon.js: line 10, col 7, Redefinition of 'utils'.
+
+src/categories/index.js: line 14, col 7, Redefinition of 'utils'.
+
+src/categories/recentreplies.js: line 13, col 7, Redefinition of 'utils'.
+
+src/categories/search.js: line 8, col 7, Redefinition of 'utils'.
+
+src/categories/topics.js: line 10, col 7, Redefinition of 'translator'.
+src/categories/topics.js: line 12, col 7, Redefinition of 'utils'.
+
+src/categories/update.js: line 5, col 7, Redefinition of 'utils'.
+src/categories/update.js: line 7, col 7, Redefinition of 'translator'.
+
+src/categories/watch.js: line 6, col 7, Redefinition of 'utils'.
+src/categories/watch.js: line 17, col 13, Confusing use of '!'.
+src/categories/watch.js: line 25, col 48, Confusing use of '!'.
+
+src/cli/upgrade-plugins.js: line 3, col 7, Redefinition of 'prompt'.
+
+src/cli/user.js: line 3, col 18, Redefinition of 'Option'.
+src/cli/user.js: line 74, col 5, Redefinition of 'utils'.
+
+src/constants.js: line 7, col 7, Redefinition of 'app'.
+src/constants.js: line 9, col 7, Redefinition of 'config'.
+
+src/controllers/accounts/chats.js: line 107, col 9, Confusing use of '!'.
+
+src/controllers/accounts/helpers.js: line 11, col 7, Redefinition of 'utils'.
+src/controllers/accounts/helpers.js: line 13, col 7, Redefinition of 'translator'.
+
+src/controllers/accounts/posts.js: line 14, col 7, Redefinition of 'utils'.
+
+src/controllers/accounts/profile.js: line 15, col 7, Redefinition of 'utils'.
+
+src/controllers/accounts/settings.js: line 267, col 2, Unnecessary semicolon.
+
+src/controllers/activitypub/actors.js: line 14, col 7, Redefinition of 'utils'.
+
+src/controllers/activitypub/index.js: line 9, col 7, Redefinition of 'utils'.
+
+src/controllers/activitypub/topics.js: line 9, col 7, Redefinition of 'translator'.
+src/controllers/activitypub/topics.js: line 12, col 7, Redefinition of 'utils'.
+
+src/controllers/admin/cache.js: line 5, col 7, Redefinition of 'utils'.
+
+src/controllers/admin/categories.js: line 10, col 7, Redefinition of 'translator'.
+
+src/controllers/admin/dashboard.js: line 16, col 7, Redefinition of 'utils'.
+
+src/controllers/admin/errors.js: line 7, col 7, Redefinition of 'utils'.
+
+src/controllers/admin/privileges.js: line 5, col 7, Redefinition of 'utils'.
+
+src/controllers/admin/settings.js: line 16, col 7, Redefinition of 'translator'.
+
+src/controllers/admin/users.js: line 12, col 7, Redefinition of 'utils'.
+
+src/controllers/api.js: line 10, col 7, Redefinition of 'translator'.
+src/controllers/api.js: line 13, col 7, Redefinition of 'utils'.
+
+src/controllers/authentication.js: line 15, col 7, Redefinition of 'utils'.
+
+src/controllers/category.js: line 16, col 7, Redefinition of 'utils'.
+src/controllers/category.js: line 17, col 7, Redefinition of 'translator'.
+
+src/controllers/errors.js: line 8, col 7, Redefinition of 'translator'.
+src/controllers/errors.js: line 43, col 67, 'next' is defined but never used.
+
+src/controllers/helpers.js: line 9, col 7, Redefinition of 'translator'.
+src/controllers/helpers.js: line 16, col 7, Redefinition of 'utils'.
+src/controllers/helpers.js: line 485, col 75, Expected a 'break' statement before 'case'.
+
+src/controllers/mods.js: line 16, col 7, Redefinition of 'utils'.
+
+src/controllers/posts.js: line 10, col 7, Redefinition of 'utils'.
+
+src/controllers/search.js: line 16, col 7, Redefinition of 'translator'.
+src/controllers/search.js: line 17, col 7, Redefinition of 'utils'.
+
+src/controllers/tags.js: line 12, col 7, Redefinition of 'utils'.
+
+src/controllers/topics.js: line 15, col 7, Redefinition of 'utils'.
+
+src/controllers/users.js: line 13, col 7, Redefinition of 'utils'.
+
+src/database/index.js: line 14, col 7, Redefinition of 'utils'.
+
+src/database/mongo/helpers.js: line 4, col 7, Redefinition of 'utils'.
+
+src/database/mongo/sorted/intersect.js: line 143, col 67, Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (module)
+
+src/database/mongo/sorted.js: line 4, col 7, Redefinition of 'utils'.
+
+src/database/mongo.js: line 8, col 7, Redefinition of 'prompt'.
+src/database/mongo.js: line 9, col 7, Redefinition of 'utils'.
+
+src/database/redis/connection.js: line 42, col 13, Confusing use of '!'.
+
+src/emailer.js: line 19, col 7, Redefinition of 'translator'.
+src/emailer.js: line 47, col 5, Redefinition of 'app'.
+
+src/events.js: line 10, col 7, Redefinition of 'utils'.
+
+src/flags.js: line 20, col 7, Redefinition of 'utils'.
+src/flags.js: line 902, col 17, Confusing use of '!'.
+
+src/groups/data.js: line 8, col 7, Redefinition of 'utils'.
+src/groups/data.js: line 9, col 7, Redefinition of 'translator'.
+
+src/groups/ownership.js: line 5, col 7, Redefinition of 'utils'.
+src/groups/ownership.js: line 11, col 13, Confusing use of '!'.
+
+src/install.js: line 6, col 7, Redefinition of 'prompt'.
+src/install.js: line 11, col 7, Redefinition of 'utils'.
+
+src/languages.js: line 5, col 7, Redefinition of 'utils'.
+
+src/messaging/create.js: line 9, col 7, Redefinition of 'utils'.
+
+src/messaging/data.js: line 9, col 7, Redefinition of 'utils'.
+
+src/messaging/edit.js: line 9, col 7, Redefinition of 'utils'.
+
+src/messaging/index.js: line 13, col 7, Redefinition of 'utils'.
+src/messaging/index.js: line 14, col 7, Redefinition of 'translator'.
+
+src/messaging/notifications.js: line 13, col 7, Redefinition of 'utils'.
+
+src/messaging/rooms.js: line 16, col 7, Redefinition of 'utils'.
+src/messaging/rooms.js: line 237, col 13, Confusing use of '!'.
+
+src/messaging/unread.js: line 4, col 7, Redefinition of 'utils'.
+src/messaging/unread.js: line 9, col 13, Confusing use of '!'.
+
+src/meta/configs.js: line 192, col 13, Confusing use of '!'.
+
+src/meta/css.js: line 14, col 7, Redefinition of 'utils'.
+src/meta/css.js: line 16, col 7, Redefinition of 'CSS'.
+
+src/meta/errors.js: line 7, col 9, Redefinition of 'setTimeout'.
+src/meta/errors.js: line 12, col 7, Redefinition of 'utils'.
+
+src/meta/tags.js: line 8, col 7, Redefinition of 'utils'.
+
+src/meta/themes.js: line 13, col 7, Redefinition of 'utils'.
+
+src/middleware/assert.js: line 20, col 7, Redefinition of 'utils'.
+
+src/middleware/expose.js: line 10, col 7, Redefinition of 'utils'.
+
+src/middleware/render.js: line 12, col 7, Redefinition of 'translator'.
+src/middleware/render.js: line 22, col 7, Redefinition of 'utils'.
+
+src/notifications.js: line 17, col 7, Redefinition of 'utils'.
+src/notifications.js: line 345, col 9, Confusing use of '!'.
+src/notifications.js: line 362, col 49, Confusing use of '!'.
+
+src/plugins/hooks.js: line 5, col 7, Redefinition of 'utils'.
+
+src/plugins/index.js: line 16, col 5, Redefinition of 'app'.
+
+src/posts/create.js: line 12, col 7, Redefinition of 'utils'.
+
+src/posts/data.js: line 5, col 7, Redefinition of 'utils'.
+
+src/posts/delete.js: line 13, col 7, Redefinition of 'utils'.
+
+src/posts/diffs.js: line 9, col 7, Redefinition of 'translator'.
+
+src/posts/edit.js: line 13, col 7, Redefinition of 'utils'.
+src/posts/edit.js: line 15, col 7, Redefinition of 'translator'.
+
+src/posts/index.js: line 6, col 7, Redefinition of 'utils'.
+
+src/posts/parse.js: line 11, col 7, Redefinition of 'translator'.
+src/posts/parse.js: line 12, col 7, Redefinition of 'utils'.
+
+src/posts/queue.js: line 16, col 7, Redefinition of 'utils'.
+
+src/posts/summary.js: line 12, col 7, Redefinition of 'utils'.
+
+src/posts/topics.js: line 6, col 7, Redefinition of 'utils'.
+
+src/posts/user.js: line 14, col 7, Redefinition of 'utils'.
+
+src/posts/votes.js: line 10, col 7, Redefinition of 'translator'.
+src/posts/votes.js: line 11, col 7, Redefinition of 'utils'.
+
+src/privileges/admin.js: line 10, col 7, Redefinition of 'utils'.
+
+src/privileges/categories.js: line 11, col 7, Redefinition of 'utils'.
+
+src/privileges/global.js: line 10, col 7, Redefinition of 'utils'.
+
+src/privileges/helpers.js: line 11, col 7, Redefinition of 'translator'.
+src/privileges/helpers.js: line 12, col 7, Redefinition of 'utils'.
+src/privileges/helpers.js: line 209, col 22, Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (privileges)
+
+src/privileges/posts.js: line 14, col 7, Redefinition of 'utils'.
+
+src/privileges/topics.js: line 12, col 7, Redefinition of 'utils'.
+
+src/request.js: line 31, col 23, 'AbortSignal' is not defined.
+
+src/rewards/admin.js: line 5, col 7, Redefinition of 'utils'.
+
+src/routes/feeds.js: line 15, col 7, Redefinition of 'utils'.
+
+src/routes/write/users.js: line 11, col 10, 'guestRoutes' is defined but never used.
+
+src/search.js: line 14, col 7, Redefinition of 'utils'.
+
+src/sitemap.js: line 12, col 7, Redefinition of 'utils'.
+
+src/socket.io/admin/analytics.js: line 4, col 7, Redefinition of 'utils'.
+
+src/socket.io/admin/email.js: line 8, col 7, Redefinition of 'utils'.
+
+src/socket.io/admin/user.js: line 12, col 7, Redefinition of 'translator'.
+src/socket.io/admin/user.js: line 13, col 7, Redefinition of 'utils'.
+
+src/socket.io/categories.js: line 145, col 31, Confusing use of '!'.
+
+src/socket.io/groups.js: line 10, col 7, Redefinition of 'utils'.
+
+src/socket.io/helpers.js: line 14, col 7, Redefinition of 'utils'.
+
+src/socket.io/modules.js: line 9, col 7, Redefinition of 'utils'.
+src/socket.io/modules.js: line 115, col 9, Confusing use of '!'.
+
+src/socket.io/posts/tools.js: line 13, col 7, Redefinition of 'utils'.
+
+src/socket.io/posts.js: line 7, col 7, Redefinition of 'utils'.
+
+src/socket.io/topics/infinitescroll.js: line 6, col 7, Redefinition of 'utils'.
+
+src/socket.io/topics/tags.js: line 8, col 7, Redefinition of 'utils'.
+
+src/socket.io/user.js: line 18, col 7, Redefinition of 'utils'.
+
+src/topics/create.js: line 8, col 7, Redefinition of 'utils'.
+src/topics/create.js: line 18, col 7, Redefinition of 'translator'.
+
+src/topics/data.js: line 7, col 7, Redefinition of 'utils'.
+src/topics/data.js: line 8, col 7, Redefinition of 'translator'.
+
+src/topics/delete.js: line 11, col 7, Redefinition of 'utils'.
+
+src/topics/events.js: line 12, col 7, Redefinition of 'translator'.
+src/topics/events.js: line 14, col 7, Redefinition of 'utils'.
+
+src/topics/follow.js: line 8, col 7, Redefinition of 'utils'.
+src/topics/follow.js: line 38, col 13, Confusing use of '!'.
+
+src/topics/fork.js: line 11, col 7, Redefinition of 'utils'.
+
+src/topics/index.js: line 8, col 7, Redefinition of 'utils'.
+
+src/topics/posts.js: line 14, col 7, Redefinition of 'utils'.
+
+src/topics/recent.js: line 7, col 7, Redefinition of 'utils'.
+
+src/topics/tags.js: line 15, col 7, Redefinition of 'translator'.
+src/topics/tags.js: line 16, col 7, Redefinition of 'utils'.
+src/topics/tags.js: line 572, col 13, Confusing use of '!'.
+src/topics/tags.js: line 584, col 13, Confusing use of '!'.
+
+src/topics/teaser.js: line 11, col 7, Redefinition of 'utils'.
+
+src/topics/tools.js: line 11, col 7, Redefinition of 'utils'.
+
+src/topics/unread.js: line 15, col 7, Redefinition of 'utils'.
+src/topics/unread.js: line 206, col 13, Confusing use of '!'.
+src/topics/unread.js: line 262, col 45, Functions declared within loops referencing an outer scoped variable may lead to confusing semantics. (params)
+src/topics/unread.js: line 351, col 13, Confusing use of '!'.
+
+src/topics/user.js: line 4, col 7, Redefinition of 'utils'.
+
+src/user/admin.js: line 17, col 13, Confusing use of '!'.
+
+src/user/approval.js: line 12, col 7, Redefinition of 'utils'.
+
+src/user/auth.js: line 9, col 7, Redefinition of 'utils'.
+src/user/auth.js: line 15, col 13, Confusing use of '!'.
+src/user/auth.js: line 41, col 13, Confusing use of '!'.
+src/user/auth.js: line 103, col 13, Confusing use of '!'.
+
+src/user/blocks.js: line 5, col 7, Redefinition of 'utils'.
+
+src/user/categories.js: line 10, col 7, Redefinition of 'utils'.
+src/user/categories.js: line 47, col 13, Confusing use of '!'.
+src/user/categories.js: line 57, col 13, Confusing use of '!'.
+src/user/categories.js: line 69, col 13, Confusing use of '!'.
+src/user/categories.js: line 88, col 13, Confusing use of '!'.
+
+src/user/create.js: line 7, col 7, Redefinition of 'utils'.
+
+src/user/data.js: line 11, col 7, Redefinition of 'utils'.
+
+src/user/delete.js: line 18, col 7, Redefinition of 'utils'.
+
+src/user/digest.js: line 14, col 7, Redefinition of 'utils'.
+
+src/user/email.js: line 8, col 7, Redefinition of 'utils'.
+src/user/email.js: line 219, col 9, Confusing use of '!'.
+
+src/user/follow.js: line 8, col 7, Redefinition of 'utils'.
+
+src/user/index.js: line 12, col 7, Redefinition of 'utils'.
+src/user/index.js: line 213, col 9, Confusing use of '!'.
+
+src/user/info.js: line 9, col 7, Redefinition of 'utils'.
+
+src/user/interstitials.js: line 11, col 7, Redefinition of 'utils'.
+
+src/user/invite.js: line 13, col 7, Redefinition of 'translator'.
+src/user/invite.js: line 14, col 7, Redefinition of 'utils'.
+
+src/user/notifications.js: line 12, col 7, Redefinition of 'translator'.
+
+src/user/online.js: line 7, col 7, Redefinition of 'utils'.
+src/user/online.js: line 11, col 36, Confusing use of '!'.
+src/user/online.js: line 23, col 13, Confusing use of '!'.
+
+src/user/posts.js: line 172, col 33, Confusing use of '!'.
+
+src/user/profile.js: line 8, col 7, Redefinition of 'utils'.
+
+src/user/reset.js: line 8, col 7, Redefinition of 'utils'.
+
+src/user/search.js: line 11, col 7, Redefinition of 'utils'.
+
+src/utils.js: line 15, col 7, Redefinition of 'utils'.
+
+src/webserver.js: line 11, col 7, Redefinition of 'app'.
+
+src/widgets/index.js: line 9, col 7, Redefinition of 'translator'.
+
+222 errors
