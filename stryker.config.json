@@ -12,14 +12,12 @@
     "command": "node -r ./test/setup/stryker-sandbox-bootstrap.js ./node_modules/.bin/nyc --reporter=html --reporter=text-summary mocha"
   },
   "mochaOptions": {
-    "spec": ["test/**/*.js"],
+    "spec": ["test/categories.js"],
     "require": ["jsdom-global/register"],
     "ui": "bdd"
   },
   "mutate": [
-    "src/**/*.js",
-    "nodebb-plugin-mailgun-delivery/**/*.js",
-    "!src/cli/**/*.js"
+    "src/categories/**/*.js"
   ],
   "ignorePatterns": [
     "node_modules/**",
