@@ -7,6 +7,10 @@
     "clear-text",
     "progress"
   ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node -r ./test/setup/stryker-sandbox-bootstrap.js ./node_modules/.bin/nyc --reporter=html --reporter=text-summary mocha"
+  },
   "mochaOptions": {
     "spec": ["test/**/*.js"],
     "require": ["jsdom-global/register"],
@@ -26,8 +30,9 @@
     "build/public/plugins/**",
     "build/public/uploads/**"
   ],
-  "testRunner": "mocha",
-  "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/mocha-runner for information about the mocha plugin.",
-  "coverageAnalysis": "perTest",
-  "tempDirName": ".stryker-tmp"
+  "coverageAnalysis": "off",
+  "tempDirName": ".stryker-tmp",
+  "timeoutMS": 600000,          
+  "timeoutFactor": 2,           
+  "concurrency": 7
 }
