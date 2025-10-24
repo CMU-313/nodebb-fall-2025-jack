@@ -23,6 +23,28 @@ const file = require('./file');
 const viewsDir = nconf.get('views_dir');
 const Emailer = module.exports;
 
+// --- Quick opt-out for tests / mutation runs ---
+if (process.env.DISABLE_EMAIL === 'true') {
+	console.log('[emailer] disabled');
+
+	Emailer.registerApp = () => Emailer;
+	Emailer.send = async () => {
+		console.log('[emailer] Disabled: not sending (DISABLE_EMAIL=true)');
+		return;
+	};
+	Emailer.sendToEmail = async () => {
+		console.log('[emailer] Disabled: not sending (DISABLE_EMAIL=true)');
+		return;
+	};
+	Emailer.sendViaFallback = async () => {
+		console.log('[emailer] Disabled: not sending (DISABLE_EMAIL=true)');
+		return;
+	};
+	module.exports = Emailer;
+	return; // safely exits setup early, but leaves Emailer defined
+}
+
+
 // custom plugin code to send emails via Mailgun API
 const mailgunSender = require('../nodebb-plugin-mailgun-delivery/library.js');
 

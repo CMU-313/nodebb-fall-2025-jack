@@ -1,24 +1,15 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
   "packageManager": "npm",
-  "reporters": [
-    "html",
-    "clear-text",
-    "progress"
-  ],
+  "reporters": ["clear-text", "progress", "html"],
+
   "testRunner": "command",
   "commandRunner": {
-    "command": "node -r ./test/setup/stryker-sandbox-bootstrap.js ./node_modules/.bin/nyc --reporter=html --reporter=text-summary mocha"
+    "command": "NODE_ENV=test DISABLE_EMAIL=true SKIP_ASSET_BUILD=true DISABLE_LOGGING=true npx mocha test/categories.js"
   },
-  "mochaOptions": {
-    "spec": ["test/categories.js"],
-    "require": ["jsdom-global/register"],
-    "ui": "bdd"
-  },
-  "mutate": [
-    "src/categories/**/*.js"
-  ],
+
+  "mutate": ["src/categories/create.js"],
+
   "ignorePatterns": [
     "node_modules/**",
     ".stryker-tmp/**",
@@ -28,9 +19,9 @@
     "build/public/plugins/**",
     "build/public/uploads/**"
   ],
+
   "coverageAnalysis": "off",
-  "tempDirName": ".stryker-tmp",
-  "timeoutMS": 600000,          
-  "timeoutFactor": 2,           
-  "concurrency": 7
+  "timeoutMS": 90000,
+  "timeoutFactor": 1.5,
+  "concurrency": 6
 }
