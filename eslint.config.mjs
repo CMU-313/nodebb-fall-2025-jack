@@ -31,6 +31,25 @@ export default defineConfig([
 			'install/docker/',
 		],
 	},
+	// k6 load tests (ES6 modules)
+	{
+		plugins: {
+			js,
+			'@stylistic/js': stylisticJs,
+		},
+		extends: ['js/recommended'],
+		files: ['test/k6/**/*.js'],
+		languageOptions: {
+			ecmaVersion: 2020,
+			sourceType: 'module',
+			globals: {
+				...globals.node,
+			},
+		},
+		rules: {
+			...commonRules,
+		}
+	},
 	// tests
 	{
 		plugins: {
@@ -39,6 +58,7 @@ export default defineConfig([
 		},
 		extends: ['js/recommended'],
 		files: ['test/**/*.js'],
+		ignores: ['test/k6/**/*.js'],
 		languageOptions: {
 			ecmaVersion: 2020,
 			sourceType: 'commonjs',
