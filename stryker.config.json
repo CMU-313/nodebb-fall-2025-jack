@@ -1,14 +1,14 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "packageManager": "npm",
-  "reporters": ["clear-text", "progress", "html"],
+  "reporters": ["clear-text", "progress", "html", "json"],
 
   "testRunner": "command",
   "commandRunner": {
     "command": "NODE_ENV=test DISABLE_EMAIL=true SKIP_ASSET_BUILD=true DISABLE_LOGGING=true npx mocha test/categories.js"
   },
 
-  "mutate": ["src/categories/create.js"],
+  "mutate": ["src/categories/create.js","src/categories/delete.js"],
 
   "ignorePatterns": [
     "node_modules/**",
