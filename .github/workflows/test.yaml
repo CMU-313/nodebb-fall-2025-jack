@@ -185,13 +185,10 @@ jobs:
           echo "✅ Injected test_database into config.json:"
           cat config.json
 
-      - name: Prepare Stryker sandbox
+      - name: Copy config into Stryker sandboxes
         run: |
           mkdir -p .stryker-tmp
-          cp config.json .stryker-tmp/config.json || true
-
-      - name: Verify Redis connection
-        run: redis-cli -h 127.0.0.1 -p 6379 ping
+          find .stryker-tmp -type d -name "sandbox-*" -exec cp config.json {}/config.json \; || true
     
       - name: Run Stryker Mutation Testing
         env:
