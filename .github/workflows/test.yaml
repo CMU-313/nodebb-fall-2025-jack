@@ -114,7 +114,7 @@ jobs:
     env:
       TEST_ENV: 'production'
     needs: test     # only run if regular tests pass
-    if: github.event_name == 'pull_request'  # only on PRs
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'  # only on PRs
 
     services:
       redis:
@@ -131,7 +131,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Node
         uses: actions/setup-node@v4
         with:
@@ -195,17 +195,17 @@ jobs:
         run: |
           echo "Running Stryker mutation tests..."
           npx stryker run
-          SCORE=$(grep -o '"mutationScore": *[0-9.]*' mutation-report/mutation.json | head -1 | grep -o '[0-9.]*')
+          SCORE=$(grep -o '"mutationScore": *[0-9.]*' reports/mutation/mutation.json | head -1 | grep -o '[0-9.]*')
           echo "SCORE=$SCORE" >> $GITHUB_ENV
 
       - name: Upload mutation report artifact
         uses: actions/upload-artifact@v4
         with:
           name: mutation-report
-          path: mutation-report
+          path: reports/mutation
 
       - name: Post PR comment with mutation score
-        if: env.SCORE != ''
+        if: github.event_name == 'pull_request' && env.SCORE != ''
         uses: actions/github-script@v7
         with:
           script: |
