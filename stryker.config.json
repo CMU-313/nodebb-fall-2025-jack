@@ -3,9 +3,9 @@
   "packageManager": "npm",
   "reporters": ["clear-text", "progress", "html", "json"],
 
-  "testRunner": "command",
-  "commandRunner": {
-    "command": "NODE_ENV=test npx mocha test/categories.js"
+  "testRunner": "mocha",
+  "mochaOptions": {
+    "spec": ["test/categories.js"]
   },
 
   "mutate": ["src/categories/create.js","src/categories/delete.js"],
@@ -13,6 +13,7 @@
   "ignorePatterns": [
     "node_modules/**",
     ".stryker-tmp/**",
+    "require-main.js",
     ".nyc_output/**",
     "coverage/**",
     "logs/**",

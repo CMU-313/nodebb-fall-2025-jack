@@ -5,7 +5,12 @@
  * ATTENTION: testing db is flushed before every use!
  */
 
-require('../../require-main');
+try {
+	require('../../require-main');
+} catch (err) {
+	// Fallback for Stryker or test sandboxes where require-main isn't present
+	require('../mocks/require-main-polyfill');
+}
 
 const path = require('path');
 const nconf = require('nconf');

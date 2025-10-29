@@ -196,8 +196,9 @@ jobs:
           REDIS_HOST: 127.0.0.1
           REDIS_PORT: 6379
         run: |
-          echo "Running Stryker mutation tests..."
-          npx stryker run || true
+          echo "Running Stryker mutation tests with Mocha runner..."
+          rm -f .stryker-incremental.json
+          npx stryker run
           SCORE=$(jq -r '.mutationScore' reports/mutation/mutation.json 2>/dev/null || echo "0")
           echo "SCORE=$SCORE" >> $GITHUB_ENV
 
@@ -205,4 +206,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mutation-report
-          path: reports/mutation/mutation.html
+          path: reports/mutation

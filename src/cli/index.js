@@ -3,7 +3,11 @@
 const fs = require('fs');
 const path = require('path');
 
-require('../../require-main');
+try {
+	require('../../require-main');
+} catch (err) {
+	require('../../test/mocks/require-main-polyfill');
+}
 
 const packageInstall = require('./package-install');
 const { paths } = require('../constants');
