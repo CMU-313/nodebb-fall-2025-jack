@@ -84,3 +84,5 @@ test.sh
 
 # stryker temp files
 .stryker-tmp
+.stryker-incremental.json
+reports/mutation/**
