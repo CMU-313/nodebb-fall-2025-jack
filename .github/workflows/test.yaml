@@ -111,12 +111,27 @@ jobs:
   mutation-test:
     name: Stryker Mutation Tests
     runs-on: ubuntu-latest
+    env:
+      TEST_ENV: 'production'
     needs: test     # only run if regular tests pass
     if: github.event_name == 'pull_request'  # only on PRs
 
+    services:
+      redis:
+        image: 'redis:8.0.1'
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
+
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Install Node
         uses: actions/setup-node@v4
         with:
@@ -160,18 +175,6 @@ jobs:
         run: |
           test -f config.json || echo '{}' > config.json
           jq '. + {
-            "url": "http://127.0.0.1:4567/forum",
-            "secret": "abcdef",
-            "admin:username": "admin",
-            "admin:email": "test@example.org",
-            "admin:password": "hAN3Eg8W",
-            "admin:password:confirm": "hAN3Eg8W",
-
-            "database": "redis",
-            "redis:host": "127.0.0.1",
-            "redis:port": 6379,
-            "redis:password": "",
-            "redis:database": 0
             "test_database": {
               "host": "127.0.0.1",
               "port": 6379,
@@ -182,14 +185,7 @@ jobs:
           echo "✅ Injected test_database into config.json:"
           cat config.json
 
-      - name: Cache Stryker incremental data
-        uses: actions/cache@v4
-        with:
-          path: .stryker-incremental.json
-          key: stryker-${{ hashFiles('src/categories/create.js', 'test/categories.js') }}
-          restore-keys: |
-            stryker-
-
+    
       - name: Run Stryker Mutation Testing
         env:
           NODE_ENV: test
