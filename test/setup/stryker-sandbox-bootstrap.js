@@ -5,8 +5,6 @@
  * Disables slow systems without breaking test mocks.
  */
 
-process.env.DISABLE_EMAIL = 'true';
-process.env.SKIP_ASSET_BUILD = 'true';
 process.env.DISABLE_LOGGING = 'true';
 
 const path = require('path');

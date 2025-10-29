@@ -3,23 +3,6 @@
 const os = require('os');
 const winston = require('winston');
 
-// --- Stryker/test disable flag ---
-if (process.env.SKIP_ASSET_BUILD === 'true') {
-	winston.warn('[build] Skipping all build steps (SKIP_ASSET_BUILD=true)');
-	module.exports = {
-		build: (targets, callback) => {
-			if (typeof callback === 'function') callback(null);
-			return Promise.resolve();
-		},
-		buildAll: (callback) => {
-			if (typeof callback === 'function') callback(null);
-			return Promise.resolve();
-		},
-	};
-	return;
-}
-
-
 const nconf = require('nconf');
 const _ = require('lodash');
 const path = require('path');

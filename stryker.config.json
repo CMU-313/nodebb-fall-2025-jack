@@ -5,7 +5,7 @@
 
   "testRunner": "command",
   "commandRunner": {
-    "command": "NODE_ENV=test DISABLE_EMAIL=true SKIP_ASSET_BUILD=true DISABLE_LOGGING=true npx mocha test/categories.js"
+    "command": "NODE_ENV=test npx mocha test/categories.js"
   },
 
   "mutate": ["src/categories/create.js","src/categories/delete.js"],
@@ -26,7 +26,7 @@
   },
   "incremental": true,
   "incrementalFile": ".stryker-incremental.json",
-  "coverageAnalysis": "off",
+  "coverageAnalysis": "perTest",
   "timeoutMS": 90000,
   "timeoutFactor": 1.5,
   "concurrency": 6
