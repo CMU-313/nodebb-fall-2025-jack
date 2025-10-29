@@ -19,7 +19,13 @@
     "build/public/plugins/**",
     "build/public/uploads/**"
   ],
-
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 50
+  },
+  "incremental": true,
+  "incrementalFile": ".stryker-incremental.json",
   "coverageAnalysis": "off",
   "timeoutMS": 90000,
   "timeoutFactor": 1.5,

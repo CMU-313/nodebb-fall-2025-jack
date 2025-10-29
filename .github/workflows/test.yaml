@@ -1,4 +1,4 @@
-name: Lint and test
+name: Lint, Test, and Mutation
 
 on:
   push:
@@ -107,3 +107,66 @@ jobs:
 
       - name: Test coverage
         uses: coverallsapp/github-action@v2
+  
+  mutation-test:
+    name: Stryker Mutation Tests
+    runs-on: ubuntu-latest
+    needs: test     # only run if regular tests pass
+    if: github.event_name == 'pull_request'  # only on PRs
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: NPM Install
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
+
+      - name: Cache Stryker incremental data
+        uses: actions/cache@v4
+        with:
+          path: .stryker-incremental.json
+          key: stryker-${{ hashFiles('src/categories/create.js', 'test/categories.js') }}
+          restore-keys: |
+            stryker-
+
+      - name: Run Stryker Mutation Testing
+        env:
+          NODE_ENV: test
+          DISABLE_EMAIL: true
+          SKIP_ASSET_BUILD: true
+          DISABLE_LOGGING: true
+        run: |
+          echo "Running Stryker mutation tests..."
+          npx stryker run
+          SCORE=$(grep -o '"mutationScore": *[0-9.]*' mutation-report/mutation.json | head -1 | grep -o '[0-9.]*')
+          echo "SCORE=$SCORE" >> $GITHUB_ENV
+
+      - name: Upload mutation report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: mutation-report
+
+      - name: Post PR comment with mutation score
+        if: env.SCORE != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const score = process.env.SCORE;
+            const thresholds = "high 80 | low 60 | break 50";
+            const body = `**Stryker mutation score:** ${score}%  
+            Thresholds: ${thresholds}  
+            [Download full HTML report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+
