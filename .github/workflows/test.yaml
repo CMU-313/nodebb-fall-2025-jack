@@ -127,34 +127,6 @@ jobs:
         with:
           useLockFile: false
 
-      - name: Setup on Redis
-        env:
-          SETUP: >-
-            {
-              "url": "http://127.0.0.1:4567/forum",
-              "secret": "abcdef",
-              "admin:username": "admin",
-              "admin:email": "test@example.org",
-              "admin:password": "hAN3Eg8W",
-              "admin:password:confirm": "hAN3Eg8W",
-
-              "database": "redis",
-              "redis:host": "127.0.0.1",
-              "redis:port": 6379,
-              "redis:password": "",
-              "redis:database": 0
-            }
-          CI: >-
-            {
-              "host": "127.0.0.1",
-              "database": 1,
-              "port": 6379
-            }
-            MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
-            MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
-        run: |
-          node app --setup="${SETUP}" --ci="${CI}"
-
       # add test_database to config.json
       - name: Add test_database to config.json
         run: |
