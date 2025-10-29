@@ -206,21 +206,3 @@ jobs:
         with:
           name: mutation-report
           path: reports/mutation/mutation.html
-
-      - name: Post PR comment with mutation score
-        if: github.event_name == 'pull_request' && env.SCORE != ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const score = process.env.SCORE;
-            const thresholds = "high 80 | low 60 | break 50";
-            const body = `**Stryker mutation score:** ${score}%  
-            Thresholds: ${thresholds}  
-            [Download full HTML report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body
-            });
-
