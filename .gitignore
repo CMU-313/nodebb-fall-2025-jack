@@ -81,3 +81,8 @@ test.sh
 .env
 /build/
 /build/!export
+
+# stryker temp files
+.stryker-tmp
+.stryker-incremental.json
+reports/mutation/**

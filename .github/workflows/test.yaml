@@ -1,4 +1,4 @@
-name: Lint and test
+name: Lint, Test, and Mutation
 
 on:
   push:
@@ -107,3 +107,103 @@ jobs:
 
       - name: Test coverage
         uses: coverallsapp/github-action@v2
+  
+  mutation-test:
+    name: Stryker Mutation Tests
+    runs-on: ubuntu-latest
+    needs: test     # only run if regular tests pass
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'  # only on PRs
+    env:
+      TEST_ENV: 'production'
+
+    services:
+      redis:
+        image: 'redis:8.0.1'
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: NPM Install
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
+
+      - name: Setup on Redis
+        env:
+          SETUP: >-
+            {
+              "url": "http://127.0.0.1:4567/forum",
+              "secret": "abcdef",
+              "admin:username": "admin",
+              "admin:email": "test@example.org",
+              "admin:password": "hAN3Eg8W",
+              "admin:password:confirm": "hAN3Eg8W",
+
+              "database": "redis",
+              "redis:host": "127.0.0.1",
+              "redis:port": 6379,
+              "redis:password": "",
+              "redis:database": 0
+            }
+          CI: >-
+            {
+              "host": "127.0.0.1",
+              "database": 1,
+              "port": 6379
+            }
+            MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+            MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+        run: |
+          node app --setup="${SETUP}" --ci="${CI}"
+
+      # add test_database to config.json
+      - name: Add test_database to config.json
+        run: |
+          test -f config.json || echo '{}' > config.json
+          jq '. + {
+            "test_database": {
+              "host": "127.0.0.1",
+              "port": 6379,
+              "password": "",
+              "database": 1
+            }
+          }' config.json > config.json.tmp && mv config.json.tmp config.json
+          echo "✅ Injected test_database into config.json:"
+          cat config.json
+
+      - name: Copy config into Stryker sandboxes
+        run: |
+          mkdir -p .stryker-tmp
+          find .stryker-tmp -type d -name "sandbox-*" -exec cp config.json {}/config.json \; || true
+    
+      - name: Run Stryker Mutation Testing
+        env:
+          NODE_ENV: test
+          REDIS_HOST: 127.0.0.1
+          REDIS_PORT: 6379
+        run: |
+          echo "Running Stryker mutation tests with Mocha runner..."
+          rm -f .stryker-incremental.json
+          npx stryker run
+          SCORE=$(jq -r '.mutationScore' reports/mutation/mutation.json 2>/dev/null || echo "0")
+          echo "SCORE=$SCORE" >> $GITHUB_ENV
+
+      - name: Upload mutation report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: reports/mutation

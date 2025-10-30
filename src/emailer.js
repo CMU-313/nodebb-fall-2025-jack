@@ -23,6 +23,7 @@ const file = require('./file');
 const viewsDir = nconf.get('views_dir');
 const Emailer = module.exports;
 
+
 // custom plugin code to send emails via Mailgun API
 const mailgunSender = require('../nodebb-plugin-mailgun-delivery/library.js');
 
