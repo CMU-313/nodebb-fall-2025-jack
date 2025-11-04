@@ -49,14 +49,14 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/topics/:tid/resolved', [...middlewares], helpers.tryRoute(async (req, res) => {
 		const { tid } = req.params;
 		const data = await resolvedUtils.getTopicResolvedStatus(tid);
-		res.json({ tid: tid, resolved: data.resolved });
+		res.json({ tid, resolved: data.resolved });
 	}));
 
 	router.put('/topics/:tid/resolved', [...middlewares, middleware.exposeUid], helpers.tryRoute(async (req, res) => {
 		const { tid } = req.params;
 		const { resolved } = req.body;
 		const { uid } = req;
-		
+
 		if (!uid) {
 			return res.status(401).json({ error: 'Not logged in' });
 		}
@@ -68,8 +68,8 @@ module.exports = function (app, middleware, controllers) {
 
 		await resolvedUtils.updateTopicResolvedStatus(tid, resolved);
 
-		res.json({ 
-			success: true, 
+		res.json({
+			success: true,
 			resolved,
 			message: resolved ? 'Topic marked as resolved' : 'Topic marked as unresolved',
 		});
@@ -80,13 +80,13 @@ module.exports = function (app, middleware, controllers) {
 		const { cid } = req.params;
 		const resolvedUtils = require('../resolved-basic-utils');
 		const count = await resolvedUtils.getUnresolvedTopicCountInCategory(cid);
-		res.json({ cid: cid, unresolvedTopicCount: count });
+		res.json({ cid, unresolvedTopicCount: count });
 	}));
 	// GET endorsed status - anyone can read
 	router.get('/posts/:pid/endorsed', [...middlewares], helpers.tryRoute(async (req, res) => {
 		const { pid } = req.params;
 		const data = await resolvedUtils.getPostEndorsedStatus(pid);
-		res.json({ pid: pid, endorsed: data.endorsed });
+		res.json({ pid, endorsed: data.endorsed });
 	}));
 
 	// PUT endorsed status - admin only
@@ -94,7 +94,7 @@ module.exports = function (app, middleware, controllers) {
 		const { pid } = req.params;
 		const { endorsed } = req.body;
 		const { uid } = req;
-		
+
 		if (!uid) {
 			return res.status(401).json({ error: 'Not logged in' });
 		}
@@ -106,8 +106,8 @@ module.exports = function (app, middleware, controllers) {
 
 		await resolvedUtils.setPostEndorsedStatus(pid, endorsed);
 
-		res.json({ 
-			success: true, 
+		res.json({
+			success: true,
 			endorsed,
 			message: endorsed ? 'Post endorsed' : 'Post unendorsed',
 		});

@@ -1,4 +1,4 @@
-//file to create basic resolved/unresolved functions for recognizing admin
+// file to create basic resolved/unresolved functions for recognizing admin
 
 'use strict';
 
@@ -11,7 +11,7 @@ const resolvedUtils = {};
 resolvedUtils.isCourseStaff = async function (uid) {
 	if (!uid) return false;
 	const userData = await User.getUserData(uid);
-	
+
 	// Check if user is in administrators group
 	const isAdmin = userData.groupTitleArray && userData.groupTitleArray.includes('administrators');
 	return isAdmin;
@@ -26,9 +26,9 @@ resolvedUtils.getTopicResolvedStatus = async function (tid) {
 // Update status
 resolvedUtils.updateTopicResolvedStatus = async function (tid, resolved) {
 	await database.setObjectField(`topic:${tid}`, 'resolved', resolved ? 1 : 0);
-	return { resolved: resolved };
+	return { resolved };
 };
-//write a function to get the number of resolved topics in a category
+// write a function to get the number of resolved topics in a category
 resolvedUtils.getUnresolvedTopicCountInCategory = async function (cid) {
 	const tids = await database.getSortedSetRange(`cid:${cid}:tids`, 0, -1);
 	let unresolvedCount = 0;
@@ -51,6 +51,5 @@ resolvedUtils.getPostEndorsedStatus = async function (pid) {
 resolvedUtils.setPostEndorsedStatus = async function (pid, endorsed) {
 	await database.setObjectField(`post:${pid}`, 'endorsed', endorsed ? 1 : 0);
 };
-
 
 module.exports = resolvedUtils;

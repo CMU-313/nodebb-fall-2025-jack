@@ -31,8 +31,6 @@ if (process.env.CI) {
 // Now import after stubbing (important!)
 const activitypub = require('../src/activitypub');
 
-
-
 describe('ActivityPub integration', () => {
 	before(async () => {
 		meta.config.activitypubEnabled = 1;
@@ -69,7 +67,7 @@ describe('ActivityPub integration', () => {
 		it('calls to activitypub.get should throw', async () => {
 			await assert.rejects(
 				activitypub.get('uid', 0, 'https://example.org'),
-				{ message: '[[error:activitypub.not-enabled]]' },
+				{ message: '[[error:activitypub.not-enabled]]' }
 			);
 		});
 
@@ -82,7 +80,6 @@ describe('ActivityPub integration', () => {
 				`Unexpected ActivityPub log output: ${log}`
 			);
 		});
-
 
 		it('request for an activitypub route should return 404 Not Found', async () => {
 			const uid = user.create({ username: utils.generateUUID() });
@@ -244,7 +241,7 @@ describe('ActivityPub integration', () => {
 		describe('.remoteAnchorToLocalProfile', () => {
 			const uuid1 = utils.generateUUID();
 			const id1 = `https://example.org/uuid/${uuid1}`;
-			const url1 = `https://example.org/test`;
+			const url1 = 'https://example.org/test';
 			const uuid2 = utils.generateUUID();
 			const id2 = `https://example.org/uuid/${uuid2}`;
 			const localUsername = utils.generateUUID();
@@ -390,9 +387,9 @@ describe('ActivityPub integration', () => {
 					({ cid } = await categories.create({ name: utils.generateUUID().slice(0, 8) }));
 
 					activitypub._cache.set(`0;${id}`, remoteNote);
-					activitypub._cache.set(`0;https://example.org/user/foobar`, remoteUser);
+					activitypub._cache.set('0;https://example.org/user/foobar', remoteUser);
 					await db.sortedSetAdd(`followersRemote:${remoteUser.id}`, Date.now(), 1); // fake a follow
-					
+
 					// Pass cid in the request context or ensure it's available
 					const req = {
 						body: {
@@ -402,11 +399,11 @@ describe('ActivityPub integration', () => {
 						},
 						uid: 0,
 					};
-					const res = { 
+					const res = {
 						sendStatus: () => {},
 						status: () => ({ json: () => {} }),
 					};
-					
+
 					await controllers.activitypub.postInbox(req, res);
 				});
 

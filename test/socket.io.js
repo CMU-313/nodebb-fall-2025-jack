@@ -2,7 +2,6 @@
 
 // see https://gist.github.com/jfromaniello/4087861#gistcomment-1447029
 
-
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const util = require('util');
@@ -48,12 +47,11 @@ describe('socket.io', () => {
 		cid = data[2].cid;
 		await topics.post({
 			uid: adminUid,
-			cid: cid,
+			cid,
 			title: 'Test Topic',
 			content: 'Test topic content',
 		});
 	});
-
 
 	it('should connect and auth properly', async () => {
 		const { response, csrf_token } = await helpers.loginUser('admin', 'adminpwd');
@@ -229,7 +227,7 @@ describe('socket.io', () => {
 	describe('validation emails', () => {
 		const plugins = require('../src/plugins');
 
-		async function dummyEmailerHook(data) {
+		async function dummyEmailerHook (data) {
 			// pretend to handle sending emails
 		}
 		before(() => {
@@ -273,7 +271,6 @@ describe('socket.io', () => {
 		const socketMeta = require('../src/socket.io/meta');
 		await socketMeta.reconnected({ uid: 1 }, {});
 	});
-
 
 	it('should error if the room is missing', (done) => {
 		io.emit('meta.rooms.enter', null, (err) => {
@@ -725,7 +722,7 @@ describe('socket.io', () => {
 		it('should not generate code if rate limited', async () => {
 			await assert.rejects(
 				socketUser.reset.send({ uid: 0 }, 'regular@test.com'),
-				{ message: '[[error:reset-rate-limited]]' },
+				{ message: '[[error:reset-rate-limited]]' }
 			);
 			const [count, eventsData] = await Promise.all([
 				db.sortedSetCount('reset:issueDate', 0, Date.now()),

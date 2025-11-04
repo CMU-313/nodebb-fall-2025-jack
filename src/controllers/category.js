@@ -1,6 +1,5 @@
 'use strict';
 
-
 const nconf = require('nconf');
 const validator = require('validator');
 const qs = require('querystring');
@@ -46,7 +45,7 @@ categoryController.get = async function (req, res, next) {
 					handle: item.handle || 'viewall',
 				}));
 			}
-	
+
 			return res.render('recent', data);
 		} catch (err) {
 			return next(err);
@@ -120,15 +119,15 @@ categoryController.get = async function (req, res, next) {
 
 	const categoryData = await categories.getCategoryById({
 		uid: req.uid,
-		cid: cid,
-		start: start,
-		stop: stop,
-		sort: sort,
+		cid,
+		start,
+		stop,
+		sort,
 		settings: userSettings,
 		query: req.query,
 		tag: req.query.tag,
-		targetUid: targetUid,
-		courseStaffUids: courseStaffUids,
+		targetUid,
+		courseStaffUids,
 	});
 	if (!categoryData) {
 		return next();
@@ -219,7 +218,7 @@ categoryController.get = async function (req, res, next) {
 	res.render('category', categoryData);
 };
 
-async function buildBreadcrumbs(req, categoryData) {
+async function buildBreadcrumbs (req, categoryData) {
 	const breadcrumbs = [
 		{
 			text: categoryData.name,
@@ -233,7 +232,7 @@ async function buildBreadcrumbs(req, categoryData) {
 	}
 }
 
-function addTags(categoryData, res, currentPage) {
+function addTags (categoryData, res, currentPage) {
 	res.locals.metaTags = [
 		{
 			name: 'title',
@@ -297,7 +296,7 @@ function addTags(categoryData, res, currentPage) {
 	}
 }
 
-async function getCourseStaffUids(filterValue) {
+async function getCourseStaffUids (filterValue) {
 	if (filterValue !== '1') {
 		return null;
 	}

@@ -1,6 +1,5 @@
 'use strict';
 
-
 const assert = require('assert');
 
 const nconf = require('nconf');
@@ -44,7 +43,7 @@ describe('Post\'s', () => {
 
 		({ topicData, postData } = await topics.post({
 			uid: voteeUid,
-			cid: cid,
+			cid,
 			title: 'Test Topic Title',
 			content: 'The content of test topic',
 		}));
@@ -53,7 +52,7 @@ describe('Post\'s', () => {
 
 	it('should update category teaser properly', async () => {
 		const getCategoriesAsync = async () => (await request.get(`${nconf.get('url')}/api/categories`, { })).body;
-		const postResult = await topics.post({ uid: globalModUid, cid: cid, title: 'topic title', content: '123456789' });
+		const postResult = await topics.post({ uid: globalModUid, cid, title: 'topic title', content: '123456789' });
 
 		let data = await getCategoriesAsync();
 		assert.equal(data.categories[0].teaser.pid, postResult.postData.pid);
@@ -61,7 +60,7 @@ describe('Post\'s', () => {
 		assert.equal(data.categories[0].posts[0].pid, postResult.postData.pid);
 
 		const newUid = await user.create({ username: 'teaserdelete' });
-		const newPostResult = await topics.post({ uid: newUid, cid: cid, title: 'topic title', content: 'xxxxxxxx' });
+		const newPostResult = await topics.post({ uid: newUid, cid, title: 'topic title', content: 'xxxxxxxx' });
 
 		data = await getCategoriesAsync();
 		assert.equal(data.categories[0].teaser.pid, newPostResult.postData.pid);
@@ -79,7 +78,7 @@ describe('Post\'s', () => {
 	it('should change owner of post and topic properly', async () => {
 		const oldUid = await user.create({ username: 'olduser' });
 		const newUid = await user.create({ username: 'newuser' });
-		const postResult = await topics.post({ uid: oldUid, cid: cid, title: 'change owner', content: 'original post' });
+		const postResult = await topics.post({ uid: oldUid, cid, title: 'change owner', content: 'original post' });
 		const postData = await topics.reply({ uid: oldUid, tid: postResult.topicData.tid, content: 'firstReply' });
 		const pid1 = postResult.postData.pid;
 		const pid2 = postData.pid;
@@ -171,7 +170,7 @@ describe('Post\'s', () => {
 		});
 
 		it('should get voters', (done) => {
-			socketPosts.getVoters({ uid: globalModUid }, { pid: postData.pid, cid: cid }, (err, data) => {
+			socketPosts.getVoters({ uid: globalModUid }, { pid: postData.pid, cid }, (err, data) => {
 				assert.ifError(err);
 				assert.equal(data.upvoteCount, 1);
 				assert.equal(data.downvoteCount, 0);
@@ -290,7 +289,7 @@ describe('Post\'s', () => {
 		});
 
 		it('should load post tools', (done) => {
-			socketPosts.loadPostTools({ uid: globalModUid }, { pid: postData.pid, cid: cid }, (err, data) => {
+			socketPosts.loadPostTools({ uid: globalModUid }, { pid: postData.pid, cid }, (err, data) => {
 				assert.ifError(err);
 				assert(data.posts.display_edit_tools);
 				assert(data.posts.display_delete_tools);
@@ -302,10 +301,10 @@ describe('Post\'s', () => {
 	});
 
 	describe('delete/restore/purge', () => {
-		async function createTopicWithReply() {
+		async function createTopicWithReply () {
 			const topicPostData = await topics.post({
 				uid: voterUid,
-				cid: cid,
+				cid,
 				title: 'topic to delete/restore/purge',
 				content: 'A post to delete/restore/purge',
 			});
@@ -341,7 +340,7 @@ describe('Post\'s', () => {
 		});
 
 		it('should delete a post', async () => {
-			await apiPosts.delete({ uid: voterUid }, { pid: replyPid, tid: tid });
+			await apiPosts.delete({ uid: voterUid }, { pid: replyPid, tid });
 			const isDeleted = await posts.getPostField(replyPid, 'deleted');
 			assert.strictEqual(isDeleted, 1);
 		});
@@ -357,13 +356,13 @@ describe('Post\'s', () => {
 		});
 
 		it('should restore a post', async () => {
-			await apiPosts.restore({ uid: voterUid }, { pid: replyPid, tid: tid });
+			await apiPosts.restore({ uid: voterUid }, { pid: replyPid, tid });
 			const isDeleted = await posts.getPostField(replyPid, 'deleted');
 			assert.strictEqual(isDeleted, 0);
 		});
 
 		it('should delete topic if last main post is deleted', async () => {
-			const data = await topics.post({ uid: voterUid, cid: cid, title: 'test topic', content: 'test topic' });
+			const data = await topics.post({ uid: voterUid, cid, title: 'test topic', content: 'test topic' });
 			await apiPosts.delete({ uid: globalModUid }, { pid: data.postData.pid });
 			const deleted = await topics.getTopicField(data.topicData.tid, 'deleted');
 			assert.strictEqual(deleted, 1);
@@ -387,7 +386,7 @@ describe('Post\'s', () => {
 		before((done) => {
 			topics.post({
 				uid: voterUid,
-				cid: cid,
+				cid,
 				title: 'topic to edit',
 				content: 'A post to edit',
 				tags: ['nodebb'],
@@ -397,7 +396,7 @@ describe('Post\'s', () => {
 				tid = data.topicData.tid;
 				topics.reply({
 					uid: voterUid,
-					tid: tid,
+					tid,
 					timestamp: Date.now(),
 					content: 'A reply to edit',
 				}, (err, data) => {
@@ -410,7 +409,7 @@ describe('Post\'s', () => {
 
 		it('should error if user is not logged in', async () => {
 			try {
-				await apiPosts.edit({ uid: 0 }, { pid: pid, content: 'gg' });
+				await apiPosts.edit({ uid: 0 }, { pid, content: 'gg' });
 			} catch (err) {
 				return assert.equal(err.message, '[[error:not-logged-in]]');
 			}
@@ -428,7 +427,7 @@ describe('Post\'s', () => {
 
 		it('should error if title is too short', async () => {
 			try {
-				await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: 'a' });
+				await apiPosts.edit({ uid: voterUid }, { pid, content: 'edited post content', title: 'a' });
 			} catch (err) {
 				return assert.equal(err.message, `[[error:title-too-short, ${meta.config.minimumTitleLength}]]`);
 			}
@@ -438,7 +437,7 @@ describe('Post\'s', () => {
 		it('should error if title is too long', async () => {
 			const longTitle = new Array(meta.config.maximumTitleLength + 2).join('a');
 			try {
-				await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: longTitle });
+				await apiPosts.edit({ uid: voterUid }, { pid, content: 'edited post content', title: longTitle });
 			} catch (err) {
 				return assert.equal(err.message, `[[error:title-too-long, ${meta.config.maximumTitleLength}]]`);
 			}
@@ -449,7 +448,7 @@ describe('Post\'s', () => {
 			const oldValue = meta.config.minimumTagsPerTopic;
 			meta.config.minimumTagsPerTopic = 1;
 			try {
-				await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', tags: [] });
+				await apiPosts.edit({ uid: voterUid }, { pid, content: 'edited post content', tags: [] });
 			} catch (err) {
 				assert.equal(err.message, `[[error:not-enough-tags, ${meta.config.minimumTagsPerTopic}]]`);
 				meta.config.minimumTagsPerTopic = oldValue;
@@ -464,7 +463,7 @@ describe('Post\'s', () => {
 				tags.push(`tag${i}`);
 			}
 			try {
-				await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', tags: tags });
+				await apiPosts.edit({ uid: voterUid }, { pid, content: 'edited post content', tags });
 			} catch (err) {
 				return assert.equal(err.message, `[[error:too-many-tags, ${meta.config.maximumTagsPerTopic}]]`);
 			}
@@ -473,7 +472,7 @@ describe('Post\'s', () => {
 
 		it('should error if content is too short', async () => {
 			try {
-				await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'e' });
+				await apiPosts.edit({ uid: voterUid }, { pid, content: 'e' });
 			} catch (err) {
 				return assert.equal(err.message, `[[error:content-too-short, ${meta.config.minimumPostLength}]]`);
 			}
@@ -483,7 +482,7 @@ describe('Post\'s', () => {
 		it('should error if content is too long', async () => {
 			const longContent = new Array(meta.config.maximumPostLength + 2).join('a');
 			try {
-				await apiPosts.edit({ uid: voterUid }, { pid: pid, content: longContent });
+				await apiPosts.edit({ uid: voterUid }, { pid, content: longContent });
 			} catch (err) {
 				return assert.equal(err.message, `[[error:content-too-long, ${meta.config.maximumPostLength}]]`);
 			}
@@ -492,7 +491,7 @@ describe('Post\'s', () => {
 
 		it('should edit post', async () => {
 			const data = await apiPosts.edit({ uid: voterUid }, {
-				pid: pid,
+				pid,
 				content: 'edited post content',
 				title: 'edited title',
 				tags: ['edited'],
@@ -510,7 +509,7 @@ describe('Post\'s', () => {
 			meta.config.newbiePostEditDuration = 1;
 			await sleep(1000);
 			try {
-				await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content again', title: 'edited title again', tags: ['edited-twice'] });
+				await apiPosts.edit({ uid: voterUid }, { pid, content: 'edited post content again', title: 'edited title again', tags: ['edited-twice'] });
 			} catch (err) {
 				assert.equal(err.message, '[[error:post-edit-duration-expired, 1]]');
 				meta.config.newbiePostEditDuration = 3600;
@@ -520,8 +519,8 @@ describe('Post\'s', () => {
 		});
 
 		it('should edit a deleted post', async () => {
-			await apiPosts.delete({ uid: voterUid }, { pid: pid, tid: tid });
-			const data = await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited deleted content', title: 'edited deleted title', tags: ['deleted'] });
+			await apiPosts.delete({ uid: voterUid }, { pid, tid });
+			const data = await apiPosts.edit({ uid: voterUid }, { pid, content: 'edited deleted content', title: 'edited deleted title', tags: ['deleted'] });
 			assert.equal(data.content, 'edited deleted content');
 			assert.equal(data.editor, voterUid);
 			assert.equal(data.topic.title, 'edited deleted title');
@@ -609,14 +608,14 @@ describe('Post\'s', () => {
 		before(async () => {
 			const topic1 = await topics.post({
 				uid: voterUid,
-				cid: cid,
+				cid,
 				title: 'topic 1',
 				content: 'some content',
 			});
 			tid = topic1.topicData.tid;
 			const topic2 = await topics.post({
 				uid: voterUid,
-				cid: cid,
+				cid,
 				title: 'topic 2',
 				content: 'some content',
 			});
@@ -624,7 +623,7 @@ describe('Post\'s', () => {
 
 			const reply = await topics.reply({
 				uid: voterUid,
-				tid: tid,
+				tid,
 				timestamp: Date.now(),
 				content: 'A reply to move',
 			});
@@ -868,7 +867,7 @@ describe('Post\'s', () => {
 
 		it('should get post timestamp by index', async () => {
 			const summary = await socketPosts.getPostSummaryByPid({ uid: voterUid }, {
-				pid: pid,
+				pid,
 			});
 			assert(summary);
 		});
@@ -879,12 +878,12 @@ describe('Post\'s', () => {
 		});
 
 		it('should get pid index', async () => {
-			const index = await socketPosts.getPidIndex({ uid: voterUid }, { pid: pid, tid: topicData.tid, topicPostSort: 'oldest_to_newest' });
+			const index = await socketPosts.getPidIndex({ uid: voterUid }, { pid, tid: topicData.tid, topicPostSort: 'oldest_to_newest' });
 			assert.equal(index, 4);
 		});
 
 		it('should get pid index', async () => {
-			const index = await apiPosts.getIndex({ uid: voterUid }, { pid: pid, sort: 'oldest_to_newest' });
+			const index = await apiPosts.getIndex({ uid: voterUid }, { pid, sort: 'oldest_to_newest' });
 			assert.strictEqual(index, 4);
 		});
 
@@ -962,14 +961,14 @@ describe('Post\'s', () => {
 		});
 
 		it('should add topic to post queue', async () => {
-			const result = await apiTopics.create({ uid: uid }, { title: 'should be queued', content: 'queued topic content', cid: cid });
+			const result = await apiTopics.create({ uid }, { title: 'should be queued', content: 'queued topic content', cid });
 			assert.strictEqual(result.queued, true);
 			assert.equal(result.message, '[[success:post-queued]]');
 			topicQueueId = result.id;
 		});
 
 		it('should add reply to post queue', async () => {
-			const result = await apiTopics.reply({ uid: uid }, { content: 'this is a queued reply', tid: topicData.tid });
+			const result = await apiTopics.reply({ uid }, { content: 'this is a queued reply', tid: topicData.tid });
 			assert.strictEqual(result.queued, true);
 			assert.equal(result.message, '[[success:post-queued]]');
 			queueId = result.id;
@@ -988,7 +987,7 @@ describe('Post\'s', () => {
 		it('should error if data is invalid', async () => {
 			await assert.rejects(
 				apiPosts.editQueuedPost({ uid: globalModUid }, null),
-				{ message: '[[error:invalid-data]]' },
+				{ message: '[[error:invalid-data]]' }
 			);
 		});
 
@@ -1014,20 +1013,20 @@ describe('Post\'s', () => {
 			const { posts } = body;
 			assert.equal(posts[0].type, 'topic');
 			assert.equal(posts[0].data.cid, 2);
-			await apiPosts.editQueuedPost({ uid: globalModUid }, { id: topicQueueId, cid: cid });
+			await apiPosts.editQueuedPost({ uid: globalModUid }, { id: topicQueueId, cid });
 		});
 
 		it('should prevent regular users from approving posts', async () => {
 			await assert.rejects(
-				apiPosts.acceptQueuedPost({ uid: uid }, { id: queueId }),
-				{ message: '[[error:no-privileges]]' },
+				apiPosts.acceptQueuedPost({ uid }, { id: queueId }),
+				{ message: '[[error:no-privileges]]' }
 			);
 		});
 
 		it('should prevent regular users from approving non existing posts', async () => {
 			await assert.rejects(
-				apiPosts.acceptQueuedPost({ uid: uid }, { id: 123123 }),
-				{ message: '[[error:no-post]]' },
+				apiPosts.acceptQueuedPost({ uid }, { id: 123123 }),
+				{ message: '[[error:no-post]]' }
 			);
 		});
 
@@ -1040,7 +1039,7 @@ describe('Post\'s', () => {
 		it('should not crash if id does not exist', async () => {
 			await assert.rejects(
 				apiPosts.removeQueuedPost({ uid: globalModUid }, { id: '123123123' }),
-				{ message: '[[error:no-post]]' },
+				{ message: '[[error:no-post]]' }
 			);
 		});
 
@@ -1048,17 +1047,17 @@ describe('Post\'s', () => {
 			const oldValue = meta.config.groupsExemptFromPostQueue;
 			meta.config.groupsExemptFromPostQueue = ['registered-users'];
 			const uid = await user.create({ username: 'mergeexemptuser' });
-			const result = await apiTopics.create({ uid: uid, emit: () => {} }, { title: 'should not be queued', content: 'topic content', cid: cid });
+			const result = await apiTopics.create({ uid, emit: () => {} }, { title: 'should not be queued', content: 'topic content', cid });
 			assert.strictEqual(result.title, 'should not be queued');
 			meta.config.groupsExemptFromPostQueue = oldValue;
 		});
 
 		it('should update queued post\'s topic if target topic is merged', async () => {
 			const uid = await user.create({ username: 'mergetestsuser' });
-			const result1 = await apiTopics.create({ uid: globalModUid }, { title: 'topic A', content: 'topic A content', cid: cid });
-			const result2 = await apiTopics.create({ uid: globalModUid }, { title: 'topic B', content: 'topic B content', cid: cid });
+			const result1 = await apiTopics.create({ uid: globalModUid }, { title: 'topic A', content: 'topic A content', cid });
+			const result2 = await apiTopics.create({ uid: globalModUid }, { title: 'topic B', content: 'topic B content', cid });
 
-			const result = await apiTopics.reply({ uid: uid }, { content: 'the moved queued post', tid: result1.tid });
+			const result = await apiTopics.reply({ uid }, { content: 'the moved queued post', tid: result1.tid });
 
 			await topics.merge([
 				result1.tid, result2.tid,
@@ -1079,35 +1078,35 @@ describe('Post\'s', () => {
 					pid: 1,
 					uids: [1],
 				}),
-				{ message: '[[error:no-privileges]]' },
+				{ message: '[[error:no-privileges]]' }
 			);
 			await assert.rejects(
 				socketPosts.saveEditors({ uid: 0 }, null),
-				{ message: '[[error:invalid-data]]' },
+				{ message: '[[error:invalid-data]]' }
 			);
 			await assert.rejects(
 				socketPosts.saveEditors({ uid: 0 }, {
 					pid: null,
 					uids: [1],
 				}),
-				{ message: '[[error:invalid-data]]' },
+				{ message: '[[error:invalid-data]]' }
 			);
 			await assert.rejects(
 				socketPosts.saveEditors({ uid: 0 }, {
 					pid: 1,
 					uids: null,
 				}),
-				{ message: '[[error:invalid-data]]' },
+				{ message: '[[error:invalid-data]]' }
 			);
 
 			await assert.rejects(
 				socketPosts.getEditors({ uid: 0 }, null),
-				{ message: '[[error:invalid-data]]' },
+				{ message: '[[error:invalid-data]]' }
 			);
 
 			await assert.rejects(
 				socketPosts.saveEditors({ uid: 0 }, { pid: null }),
-				{ message: '[[error:invalid-data]]' },
+				{ message: '[[error:invalid-data]]' }
 			);
 		});
 
@@ -1118,15 +1117,15 @@ describe('Post\'s', () => {
 				uid: ownerUid,
 				cid,
 				title: 'just a topic for multi editor testing',
-				content: `Some text here for the OP`,
+				content: 'Some text here for the OP',
 			});
 			const { pid } = topic.postData;
 			await socketPosts.saveEditors({ uid: ownerUid }, {
-				pid: pid,
+				pid,
 				uids: [editorUid],
 			});
 
-			const userData = await socketPosts.getEditors({ uid: ownerUid }, { pid: pid });
+			const userData = await socketPosts.getEditors({ uid: ownerUid }, { pid });
 			assert.strictEqual(userData[0].username, 'editor user');
 		});
 	});
@@ -1203,7 +1202,7 @@ describe('Post\'s', () => {
 				`;
 				const count = await topics.syncBacklinks({
 					pid: 2,
-					content: content,
+					content,
 				});
 
 				const backlinks = await db.getSortedSetMembers('pid:2:backlinks');

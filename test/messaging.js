@@ -110,14 +110,14 @@ describe('Messaging Library', () => {
 			await User.setSetting(uid1, 'chatAllowList', JSON.stringify([uid3]));
 			await assert.rejects(
 				Messaging.canMessageUser(uid2, uid1),
-				{ message: '[[error:chat-restricted]]' },
+				{ message: '[[error:chat-restricted]]' }
 			);
 
 			// rejects uid2 denies chat from uid1
 			await User.setSetting(uid2, 'chatDenyList', JSON.stringify([uid1]));
 			await assert.rejects(
 				Messaging.canMessageUser(uid1, uid2),
-				{ message: '[[error:chat-restricted]]' },
+				{ message: '[[error:chat-restricted]]' }
 			);
 		});
 
@@ -170,7 +170,7 @@ describe('Messaging Library', () => {
 				uids: [mocks.users.baz.uid],
 			}, 'foo');
 
-			const { response, body } = await callv3API('post', `/chats`, {
+			const { response, body } = await callv3API('post', '/chats', {
 				uids: [mocks.users.baz.uid],
 			}, 'foo');
 
@@ -182,7 +182,7 @@ describe('Messaging Library', () => {
 
 		it('should create a new chat room', async () => {
 			await User.setSetting(mocks.users.baz.uid, 'disableIncomingMessages', '0');
-			const { body } = await callv3API('post', `/chats`, {
+			const { body } = await callv3API('post', '/chats', {
 				uids: [mocks.users.baz.uid],
 			}, 'foo');
 			await User.setSetting(mocks.users.baz.uid, 'disableIncomingMessages', '1');
@@ -341,7 +341,7 @@ describe('Messaging Library', () => {
 		});
 
 		it('should remove user from room', async () => {
-			const { response, body } = await callv3API('post', `/chats`, {
+			const { response, body } = await callv3API('post', '/chats', {
 				uids: [mocks.users.herp.uid],
 			}, 'foo');
 			const { roomId } = body.response;
@@ -356,10 +356,10 @@ describe('Messaging Library', () => {
 		});
 
 		it('should fail to send a message to room with invalid data', async () => {
-			let { body } = await callv3API('post', `/chats/abc`, { message: 'test' }, 'foo');
+			let { body } = await callv3API('post', '/chats/abc', { message: 'test' }, 'foo');
 			assert.strictEqual(body.status.message, await translator.translate('[[error:invalid-data]]'));
 
-			({ body } = await callv3API('post', `/chats/1`, {}, 'foo'));
+			({ body } = await callv3API('post', '/chats/1', {}, 'foo'));
 			assert.strictEqual(body.status.message, await translator.translate('[[error:required-parameters-missing, message]]'));
 		});
 
@@ -374,7 +374,7 @@ describe('Messaging Library', () => {
 		});
 
 		it('should send a message to a room', async () => {
-			const { body } = await callv3API('post', `/chats/${roomId}`, { roomId: roomId, message: 'first chat message' }, 'foo');
+			const { body } = await callv3API('post', `/chats/${roomId}`, { roomId, message: 'first chat message' }, 'foo');
 			const messageData = body.response;
 			assert(messageData);
 			assert.equal(messageData.content, 'first chat message');
@@ -390,8 +390,8 @@ describe('Messaging Library', () => {
 			const oldValue = meta.config.chatMessageDelay;
 			meta.config.chatMessageDelay = 1000;
 
-			await callv3API('post', `/chats/${roomId}`, { roomId: roomId, message: 'first chat message' }, 'foo');
-			const { body } = await callv3API('post', `/chats/${roomId}`, { roomId: roomId, message: 'first chat message' }, 'foo');
+			await callv3API('post', `/chats/${roomId}`, { roomId, message: 'first chat message' }, 'foo');
+			const { body } = await callv3API('post', `/chats/${roomId}`, { roomId, message: 'first chat message' }, 'foo');
 			const { status } = body;
 			assert.equal(status.message, await translator.translate('[[error:too-many-messages]]'));
 			meta.config.chatMessageDelay = oldValue;
@@ -402,7 +402,6 @@ describe('Messaging Library', () => {
 				api.chats.getRawMessage({ uid: mocks.users.foo.uid }, undefined),
 				{ message: '[[error:invalid-data]]' }
 			);
-
 
 			await assert.rejects(
 				api.chats.getRawMessage({ uid: mocks.users.foo.uid }, {}),
@@ -431,7 +430,6 @@ describe('Messaging Library', () => {
 			assert.equal(content, 'admin will see this');
 		});
 
-
 		it('should notify offline users of message', async () => {
 			meta.config.notificationSendDelay = 0.1;
 
@@ -442,7 +440,7 @@ describe('Messaging Library', () => {
 			await callv3API('post', `/chats/${roomId}/users`, { uids: [mocks.users.herp.uid] }, 'foo');
 			await db.sortedSetAdd('users:online', Date.now() - ((meta.config.onlineCutoff * 60000) + 50000), mocks.users.herp.uid);
 
-			await callv3API('post', `/chats/${roomId}`, { roomId: roomId, message: 'second chat message **bold** text' }, 'foo');
+			await callv3API('post', `/chats/${roomId}`, { roomId, message: 'second chat message **bold** text' }, 'foo');
 			await sleep(3000);
 			const data = await User.notifications.get(mocks.users.herp.uid);
 			assert(data.unread[0]);
@@ -485,7 +483,7 @@ describe('Messaging Library', () => {
 		});
 
 		it('should mark room read', async () => {
-			await api.chats.mark({ uid: mocks.users.foo.uid }, { state: 0, roomId: roomId });
+			await api.chats.mark({ uid: mocks.users.foo.uid }, { state: 0, roomId });
 		});
 
 		it('should fail to rename room with invalid data', async () => {
@@ -508,7 +506,7 @@ describe('Messaging Library', () => {
 		});
 
 		it('should fail to load room with invalid-data', async () => {
-			const { body } = await callv3API('get', `/chats/abc`, {}, 'foo');
+			const { body } = await callv3API('get', '/chats/abc', {}, 'foo');
 			assert.strictEqual(body.status.message, await translator.translate('[[error:invalid-data]]'));
 		});
 
@@ -553,7 +551,7 @@ describe('Messaging Library', () => {
 		});
 
 		it('should escape teaser', async () => {
-			await callv3API('post', `/chats/${roomId}`, { roomId: roomId, message: '<svg/onload=alert(document.location);' }, 'foo');
+			await callv3API('post', `/chats/${roomId}`, { roomId, message: '<svg/onload=alert(document.location);' }, 'foo');
 			const { rooms } = await api.chats.list(
 				{ uid: mocks.users.foo.uid }, { start: 0, stop: 9, uid: mocks.users.foo.uid }
 			);
@@ -583,13 +581,13 @@ describe('Messaging Library', () => {
 		let firstMid;
 		before(async () => {
 			// create room
-			const { body } = await callv3API('post', `/chats`, {
+			const { body } = await callv3API('post', '/chats', {
 				uids: [mocks.users.bar.uid],
 			}, 'foo');
 			roomId = body.response.roomId;
 			// send message
 			const result = await callv3API('post', `/chats/${roomId}`, {
-				roomId: roomId,
+				roomId,
 				message: 'first chat message',
 			}, 'foo');
 
@@ -598,7 +596,7 @@ describe('Messaging Library', () => {
 
 		it('should fail if toMid is not a number', async () => {
 			const result = await callv3API('post', `/chats/${roomId}`, {
-				roomId: roomId,
+				roomId,
 				message: 'invalid',
 				toMid: 'osmaosd',
 			}, 'foo');
@@ -607,7 +605,7 @@ describe('Messaging Library', () => {
 
 		it('should reply to firstMid using toMid', async () => {
 			const { body } = await callv3API('post', `/chats/${roomId}`, {
-				roomId: roomId,
+				roomId,
 				message: 'invalid',
 				toMid: firstMid,
 			}, 'bar');
@@ -619,7 +617,7 @@ describe('Messaging Library', () => {
 			await callv3API('post', `/chats/${roomId}/users`, { uids: [mocks.users.herp.uid] }, 'foo');
 			// try to reply to firstMid that this user cant see
 			const { body } = await callv3API('post', `/chats/${roomId}`, {
-				roomId: roomId,
+				roomId,
 				message: 'invalid',
 				toMid: firstMid,
 			}, 'herp');
@@ -633,9 +631,9 @@ describe('Messaging Library', () => {
 		let mid2;
 		before(async () => {
 			await callv3API('post', `/chats/${roomId}/users`, { uids: [mocks.users.baz.uid] }, 'foo');
-			let { body } = await callv3API('post', `/chats/${roomId}`, { roomId: roomId, message: 'first chat message' }, 'foo');
+			let { body } = await callv3API('post', `/chats/${roomId}`, { roomId, message: 'first chat message' }, 'foo');
 			mid = body.response.messageId;
-			({ body } = await callv3API('post', `/chats/${roomId}`, { roomId: roomId, message: 'second chat message' }, 'baz'));
+			({ body } = await callv3API('post', `/chats/${roomId}`, { roomId, message: 'second chat message' }, 'baz'));
 			mid2 = body.response.messageId;
 		});
 
@@ -644,7 +642,7 @@ describe('Messaging Library', () => {
 		});
 
 		it('should fail to edit message with invalid data', async () => {
-			let { response, body } = await callv3API('put', `/chats/1/messages/10000`, { message: 'foo' }, 'foo');
+			let { response, body } = await callv3API('put', '/chats/1/messages/10000', { message: 'foo' }, 'foo');
 			assert.strictEqual(response.statusCode, 400);
 			assert.strictEqual(body.status.message, await translator.translate('[[error:invalid-mid]]'));
 

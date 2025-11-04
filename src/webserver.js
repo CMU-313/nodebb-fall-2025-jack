@@ -1,4 +1,3 @@
-
 'use strict';
 
 const fs = require('fs');
@@ -102,14 +101,14 @@ exports.listen = async function () {
 	await listen();
 };
 
-async function initializeNodeBB() {
+async function initializeNodeBB () {
 	const middleware = require('./middleware');
 	await meta.themes.setupPaths();
 	await plugins.init(app, middleware);
 	await plugins.hooks.fire('static:assets.prepare', {});
 	await plugins.hooks.fire('static:app.preload', {
-		app: app,
-		middleware: middleware,
+		app,
+		middleware,
 	});
 	// Mount API routes directly on the app before all other routes
 	// apiRoutes(app, middleware, require('./controllers'));
@@ -125,7 +124,7 @@ async function initializeNodeBB() {
 	}
 }
 
-function setupExpressApp(app) {
+function setupExpressApp (app) {
 	const middleware = require('./middleware');
 	const pingController = require('./controllers/ping');
 
@@ -202,7 +201,7 @@ function setupExpressApp(app) {
 	toobusy.interval(meta.config.eventLoopInterval);
 }
 
-function setupHelmet(app) {
+function setupHelmet (app) {
 	const options = {
 		contentSecurityPolicy: false, // defaults are too restrive and break plugins that load external assets... 🔜
 		crossOriginOpenerPolicy: { policy: meta.config['cross-origin-opener-policy'] },
@@ -226,8 +225,7 @@ function setupHelmet(app) {
 	}
 }
 
-
-function setupFavicon(app) {
+function setupFavicon (app) {
 	let faviconPath = meta.config['brand:favicon'] || 'favicon.ico';
 	faviconPath = path.join(nconf.get('base_dir'), 'public', faviconPath.replace(/assets\/uploads/, 'uploads'));
 	if (file.existsSync(faviconPath)) {
@@ -235,7 +233,7 @@ function setupFavicon(app) {
 	}
 }
 
-function configureBodyParser(app) {
+function configureBodyParser (app) {
 	const urlencodedOpts = nconf.get('bodyParser:urlencoded') || {};
 	if (!urlencodedOpts.hasOwnProperty('extended')) {
 		urlencodedOpts.extended = true;
@@ -252,7 +250,7 @@ function configureBodyParser(app) {
 	app.use(bodyParser.json(jsonOpts));
 }
 
-function setupCookie() {
+function setupCookie () {
 	const cookie = meta.configs.cookie.get();
 	const ttl = meta.getSessionTTLSeconds() * 1000;
 	cookie.maxAge = ttl;
@@ -260,7 +258,7 @@ function setupCookie() {
 	return cookie;
 }
 
-async function listen() {
+async function listen () {
 	let port = nconf.get('port');
 	const isSocket = isNaN(port) && !Array.isArray(port);
 	const socketPath = isSocket ? nconf.get('port') : '';

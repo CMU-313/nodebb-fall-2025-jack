@@ -20,7 +20,6 @@ const util = require('util');
 process.env.NODE_ENV = process.env.TEST_ENV || 'production';
 global.env = process.env.NODE_ENV || 'production';
 
-
 const winston = require('winston');
 const packageInfo = require('../../package.json');
 
@@ -151,7 +150,6 @@ before(async function () {
 	nconf.set('jobsDisabled', false);
 	nconf.set('acpPluginInstallDisabled', false);
 
-
 	await db.init();
 	if (db.hasOwnProperty('createIndices')) {
 		await db.createIndices();
@@ -186,7 +184,7 @@ before(async function () {
 	});
 });
 
-async function setupMockDefaults() {
+async function setupMockDefaults () {
 	const meta = require('../../src/meta');
 	await db.emptydb();
 
@@ -215,7 +213,6 @@ async function setupMockDefaults() {
 	const fs = require('fs');
 	await fs.promises.rm('test/uploads', { recursive: true, force: true });
 
-
 	const { mkdirp } = require('mkdirp');
 
 	const folders = [
@@ -232,7 +229,7 @@ async function setupMockDefaults() {
 }
 db.setupMockDefaults = setupMockDefaults;
 
-async function setupDefaultConfigs(meta) {
+async function setupDefaultConfigs (meta) {
 	winston.info('Populating database with default configs, if not already set...\n');
 
 	const defaults = require(path.join(nconf.get('base_dir'), 'install/data/defaults.json'));
@@ -241,7 +238,7 @@ async function setupDefaultConfigs(meta) {
 	await meta.configs.setOnEmpty(defaults);
 }
 
-async function giveDefaultGlobalPrivileges() {
+async function giveDefaultGlobalPrivileges () {
 	winston.info('Giving default global privileges...\n');
 	const privileges = require('../../src/privileges');
 	await privileges.global.give([
@@ -255,7 +252,7 @@ async function giveDefaultGlobalPrivileges() {
 	await privileges.global.give(['groups:view:users'], 'fediverse');
 }
 
-async function enableDefaultPlugins() {
+async function enableDefaultPlugins () {
 	winston.info('Enabling default plugins\n');
 	const testPlugins = Array.isArray(nconf.get('test_plugins')) ? nconf.get('test_plugins') : [];
 	const defaultEnabled = [

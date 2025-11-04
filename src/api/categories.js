@@ -21,7 +21,7 @@ const hasAdminPrivilege = async (uid, privilege = 'categories') => {
 };
 
 categoriesAPI.list = async (caller) => {
-	async function getCategories() {
+	async function getCategories () {
 		const cids = await categories.getCidsByPrivilege('categories:cid', caller.uid, 'find');
 		return await categories.getCategoriesData(cids);
 	}
@@ -78,8 +78,8 @@ categoriesAPI.delete = async function (caller, { cid }) {
 		type: 'category-purge',
 		uid: caller.uid,
 		ip: caller.ip,
-		cid: cid,
-		name: name,
+		cid,
+		name,
 	});
 };
 
@@ -252,7 +252,7 @@ categoriesAPI.setModerator = async (caller, { cid, member, set }) => {
 	await categoriesAPI.setPrivilege(caller, { cid, privilege: privilegeList, member, set });
 };
 
-async function getCourseStaffUids(filterValue) {
+async function getCourseStaffUids (filterValue) {
 	if (filterValue !== '1') {
 		return null;
 	}

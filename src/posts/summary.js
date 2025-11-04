@@ -1,4 +1,3 @@
-
 'use strict';
 
 const validator = require('validator');
@@ -68,7 +67,7 @@ module.exports = function (Posts) {
 		posts = posts.filter(post => tidToTopic[post.tid]);
 
 		posts = await parsePosts(posts, options);
-		const result = await plugins.hooks.fire('filter:post.getPostSummaryByPids', { posts: posts, uid: uid });
+		const result = await plugins.hooks.fire('filter:post.getPostSummaryByPids', { posts, uid });
 
 		if (Array.isArray(result.posts)) {
 			result.posts.forEach((post) => {
@@ -84,7 +83,7 @@ module.exports = function (Posts) {
 		return result.posts;
 	};
 
-	async function parsePosts(posts, options) {
+	async function parsePosts (posts, options) {
 		return await Promise.all(posts.map(async (post) => {
 			if (!post.content && !post.sourceContent) {
 				return post;
@@ -103,7 +102,7 @@ module.exports = function (Posts) {
 		}));
 	}
 
-	async function getTopicAndCategories(tids) {
+	async function getTopicAndCategories (tids) {
 		const topicsData = await topics.getTopicsFields(tids, [
 			'uid', 'tid', 'title', 'cid', 'tags', 'slug',
 			'deleted', 'scheduled', 'postcount', 'mainPid', 'teaserPid',
@@ -118,7 +117,7 @@ module.exports = function (Posts) {
 		return { topics: topicsData, categories: categoriesData };
 	}
 
-	function toObject(key, data) {
+	function toObject (key, data) {
 		const obj = {};
 		for (let i = 0; i < data.length; i += 1) {
 			obj[data[i][key]] = data[i];
@@ -126,7 +125,7 @@ module.exports = function (Posts) {
 		return obj;
 	}
 
-	function stripTags(content) {
+	function stripTags (content) {
 		if (content) {
 			return utils.stripHTMLTags(content, utils.stripTags);
 		}

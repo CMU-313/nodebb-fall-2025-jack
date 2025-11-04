@@ -107,7 +107,7 @@ describe('meta', () => {
 		const anotherList = [];
 
 		it('should set setting with sorted list', (done) => {
-			socketAdmin.settings.set({ uid: fooUid }, { hash: 'another:hash', values: { foo: '1', derp: 'value', someList: someList, anotherList: anotherList } }, (err) => {
+			socketAdmin.settings.set({ uid: fooUid }, { hash: 'another:hash', values: { foo: '1', derp: 'value', someList, anotherList } }, (err) => {
 				if (err) {
 					return done(err);
 				}
@@ -185,7 +185,6 @@ describe('meta', () => {
 			});
 		});
 	});
-
 
 	describe('config', () => {
 		const socketAdmin = require('../src/socket.io/admin');
@@ -394,7 +393,6 @@ describe('meta', () => {
 		});
 	});
 
-
 	describe('session TTL', () => {
 		it('should return 14 days in seconds', (done) => {
 			assert(meta.getSessionTTLSeconds(), 1209600);
@@ -493,7 +491,7 @@ describe('meta', () => {
 		it('Access-Control-Allow-Origin header should be empty', async () => {
 			const jar = request.jar();
 			const { response } = await request.get(`${nconf.get('url')}/api/search?term=bug`, {
-				jar: jar,
+				jar,
 			});
 
 			assert.equal(response.headers['access-control-allow-origin'], undefined);
@@ -504,7 +502,7 @@ describe('meta', () => {
 			const oldValue = meta.config['access-control-allow-origin'];
 			meta.config['access-control-allow-origin'] = 'test.com, mydomain.com';
 			const { response } = await request.get(`${nconf.get('url')}/api/search?term=bug`, {
-				jar: jar,
+				jar,
 				headers: {
 					origin: 'mydomain.com',
 				},
@@ -520,7 +518,7 @@ describe('meta', () => {
 			meta.config['access-control-allow-origin'] = 'test.com, mydomain.com';
 			const { response } = await request.get(`${nconf.get('url')}/api/search?term=bug`, {
 				data: {},
-				jar: jar,
+				jar,
 				headers: {
 					origin: 'notallowed.com',
 				},
@@ -534,7 +532,7 @@ describe('meta', () => {
 			const oldValue = meta.config['access-control-allow-origin-regex'];
 			meta.config['access-control-allow-origin-regex'] = 'match\\.this\\..+\\.domain.com, mydomain\\.com';
 			const { response } = await request.get(`${nconf.get('url')}/api/search?term=bug`, {
-				jar: jar,
+				jar,
 				headers: {
 					origin: 'match.this.anything123.domain.com',
 				},
@@ -549,7 +547,7 @@ describe('meta', () => {
 			const oldValue = meta.config['access-control-allow-origin-regex'];
 			meta.config['access-control-allow-origin-regex'] = 'match\\.this\\..+\\.domain.com, mydomain\\.com';
 			const { response } = await request.get(`${nconf.get('url')}/api/search?term=bug`, {
-				jar: jar,
+				jar,
 				headers: {
 					origin: 'notallowed.com',
 				},
@@ -563,7 +561,7 @@ describe('meta', () => {
 			const oldValue = meta.config['access-control-allow-origin-regex'];
 			meta.config['access-control-allow-origin-regex'] = '[match\\.this\\..+\\.domain.com, mydomain\\.com';
 			const { response } = await request.get(`${nconf.get('url')}/api/search?term=bug`, {
-				jar: jar,
+				jar,
 				headers: {
 					origin: 'mydomain.com',
 				},

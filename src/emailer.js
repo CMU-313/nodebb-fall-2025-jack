@@ -28,7 +28,7 @@ const Emailer = module.exports;
 const mailgunSender = require('../nodebb-plugin-mailgun-delivery/library.js');
 
 // Helper to create a robust, human-friendly error string for email sends
-function formatEmailErr(err) {
+function formatEmailErr (err) {
 	if (!err) {
 		return 'Unknown error (no error object)';
 	}
@@ -127,10 +127,10 @@ Emailer.getTemplates = async (config) => {
 		const original = await fs.promises.readFile(email, 'utf8');
 
 		return {
-			path: path,
+			path,
 			fullpath: email,
 			text: config[`email:custom:${path}`] || original,
-			original: original,
+			original,
 			isCustom: !!config[`email:custom:${path}`],
 		};
 	}));
@@ -245,7 +245,7 @@ Emailer.send = async (template, uid, params) => {
 	}
 
 	let userData = await User.getUserFields(uid, ['email', 'username', 'email:confirmed', 'banned']);
-	
+
 	if (!userData) {
 		throw new Error(`No user found for uid ${uid}`);
 	} else {
@@ -297,8 +297,8 @@ Emailer.send = async (template, uid, params) => {
 
 	const result = await Plugins.hooks.fire('filter:email.cancel', {
 		cancel: false, // set to true in plugin to cancel sending email
-		template: template,
-		params: params,
+		template,
+		params,
 	});
 
 	if (result.cancel) {
@@ -308,14 +308,14 @@ Emailer.send = async (template, uid, params) => {
 };
 
 Emailer.sendToEmail = async (template, email, language, params) => {
-	console.log('SendToEmail called:', {email, params });
+	console.log('SendToEmail called:', { email, params });
 
 	const lang = language || meta.config.defaultLang || 'en-GB';
 	const unsubscribable = ['digest', 'notification'];
 
 	// Digests and notifications can be one-click unsubbed
 	let payload = {
-		template: template,
+		template,
 		uid: params.uid,
 	};
 
@@ -338,10 +338,10 @@ Emailer.sendToEmail = async (template, email, language, params) => {
 	}
 
 	const result = await Plugins.hooks.fire('filter:email.params', {
-		template: template,
-		email: email,
+		template,
+		email,
 		language: lang,
-		params: params,
+		params,
 	});
 
 	template = result.template;
@@ -359,11 +359,11 @@ Emailer.sendToEmail = async (template, email, language, params) => {
 		from: meta.config['email:from'] || `no-reply@${getHostname()}`,
 		from_name: meta.config['email:from_name'] || 'NodeBB',
 		subject: `[${meta.config.title}] ${_.unescape(subject)}`,
-		html: html,
+		html,
 		plaintext: htmlToText(html, {
 			tags: { img: { format: 'skip' } },
 		}),
-		template: template,
+		template,
 		uid: params.uid,
 		pid: params.pid,
 		fromUid: params.fromUid,

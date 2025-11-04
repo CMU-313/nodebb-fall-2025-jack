@@ -28,11 +28,11 @@ describe('Plugins', () => {
 	});
 
 	it('should register and fire a filter hook', (done) => {
-		function filterMethod1(data, callback) {
+		function filterMethod1 (data, callback) {
 			data.foo += 1;
 			callback(null, data);
 		}
-		function filterMethod2(data, callback) {
+		function filterMethod2 (data, callback) {
 			data.foo += 5;
 			callback(null, data);
 		}
@@ -48,17 +48,17 @@ describe('Plugins', () => {
 	});
 
 	it('should register and fire a filter hook having 3 methods', async () => {
-		function method1(data, callback) {
+		function method1 (data, callback) {
 			data.foo += 1;
 			callback(null, data);
 		}
-		async function method2(data) {
+		async function method2 (data) {
 			return new Promise((resolve) => {
 				data.foo += 5;
 				resolve(data);
 			});
 		}
-		function method3(data) {
+		function method3 (data) {
 			data.foo += 1;
 			return data;
 		}
@@ -72,11 +72,11 @@ describe('Plugins', () => {
 	});
 
 	it('should not error with invalid hooks', async () => {
-		function method1(data, callback) {
+		function method1 (data, callback) {
 			data.foo += 1;
 			return data;
 		}
-		function method2(data, callback) {
+		function method2 (data, callback) {
 			data.foo += 2;
 			// this is invalid
 			callback(null, data);
@@ -91,13 +91,13 @@ describe('Plugins', () => {
 	});
 
 	it('should register and fire a filter hook that returns a promise that gets rejected', (done) => {
-		async function method(data) {
+		async function method (data) {
 			return new Promise((resolve, reject) => {
 				data.foo += 5;
 				reject(new Error('nope'));
 			});
 		}
-		plugins.hooks.register('test-plugin', { hook: 'filter:test.hook4', method: method });
+		plugins.hooks.register('test-plugin', { hook: 'filter:test.hook4', method });
 		plugins.hooks.fire('filter:test.hook4', { foo: 1 }, (err) => {
 			assert(err);
 			done();
@@ -105,7 +105,7 @@ describe('Plugins', () => {
 	});
 
 	it('should register and fire an action hook', (done) => {
-		function actionMethod(data) {
+		function actionMethod (data) {
 			assert.equal(data.bar, 'test');
 			done();
 		}
@@ -115,7 +115,7 @@ describe('Plugins', () => {
 	});
 
 	it('should register and fire a static hook', (done) => {
-		function actionMethod(data, callback) {
+		function actionMethod (data, callback) {
 			assert.equal(data.bar, 'test');
 			callback();
 		}
@@ -128,13 +128,13 @@ describe('Plugins', () => {
 	});
 
 	it('should register and fire a static hook returning a promise', (done) => {
-		async function method(data) {
+		async function method (data) {
 			assert.equal(data.bar, 'test');
 			return new Promise((resolve) => {
 				resolve();
 			});
 		}
-		plugins.hooks.register('test-plugin', { hook: 'static:test.hook', method: method });
+		plugins.hooks.register('test-plugin', { hook: 'static:test.hook', method });
 		plugins.hooks.fire('static:test.hook', { bar: 'test' }, (err) => {
 			assert.ifError(err);
 			done();
@@ -142,13 +142,13 @@ describe('Plugins', () => {
 	});
 
 	it('should register and fire a static hook returning a promise that gets rejected with a error', (done) => {
-		async function method(data) {
+		async function method (data) {
 			assert.equal(data.bar, 'test');
 			return new Promise((resolve, reject) => {
 				reject(new Error('just because'));
 			});
 		}
-		plugins.hooks.register('test-plugin', { hook: 'static:test.hook', method: method });
+		plugins.hooks.register('test-plugin', { hook: 'static:test.hook', method });
 		plugins.hooks.fire('static:test.hook', { bar: 'test' }, (err) => {
 			assert.strictEqual(err.message, 'just because');
 			plugins.hooks.unregister('test-plugin', 'static:test.hook', method);
@@ -157,13 +157,13 @@ describe('Plugins', () => {
 	});
 
 	it('should register and timeout a static hook returning a promise but takes too long', (done) => {
-		async function method(data) {
+		async function method (data) {
 			assert.equal(data.bar, 'test');
 			return new Promise((resolve) => {
 				setTimeout(resolve, 6000);
 			});
 		}
-		plugins.hooks.register('test-plugin', { hook: 'static:test.hook', method: method });
+		plugins.hooks.register('test-plugin', { hook: 'static:test.hook', method });
 		plugins.hooks.fire('static:test.hook', { bar: 'test' }, (err) => {
 			assert.ifError(err);
 			plugins.hooks.unregister('test-plugin', 'static:test.hook', method);
@@ -402,5 +402,3 @@ describe('Plugins', () => {
 		});
 	});
 });
-
-

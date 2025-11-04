@@ -1,6 +1,5 @@
 'use strict';
 
-
 const assert = require('assert');
 const url = require('url');
 const nconf = require('nconf');
@@ -132,7 +131,7 @@ describe('authentication', () => {
 		await helpers.logoutUser(jar);
 
 		const { response, body } = await request.get(`${nconf.get('url')}/api/me`, {
-			jar: jar,
+			jar,
 		});
 		assert.equal(response.statusCode, 401);
 		assert.strictEqual(body.status.code, 'not-authorised');
@@ -149,7 +148,6 @@ describe('authentication', () => {
 		assert.notStrictEqual(newSid, sid);
 	});
 
-
 	it('should revoke all sessions', async () => {
 		const socketAdmin = require('../src/socket.io/admin');
 		let sessionCount = await db.sortedSetCard(`uid:${regularUid}:sessions`);
@@ -164,7 +162,7 @@ describe('authentication', () => {
 		let password;
 		let uid;
 
-		function getCookieExpiry(response) {
+		function getCookieExpiry (response) {
 			const { headers } = response;
 			assert(headers['set-cookie']);
 			assert.strictEqual(headers['set-cookie'].includes('Expires'), true);
@@ -275,7 +273,7 @@ describe('authentication', () => {
 				username: 'regular',
 				password: 'regularpwd',
 			},
-			jar: jar,
+			jar,
 			headers: {
 				'x-csrf-token': csrf_token,
 				'x-forwarded-for': '<script>alert("xss")</script>',
@@ -390,7 +388,6 @@ describe('authentication', () => {
 		assert.equal(body.message, '[[register:registration-added-to-queue]]');
 	});
 
-
 	it('should be able to login with email', async () => {
 		const email = 'ginger@nodebb.org';
 		const uid = await user.create({ username: 'ginger', password: '123456', email });
@@ -414,7 +411,7 @@ describe('authentication', () => {
 
 		const { response, body } = await request.post(`${nconf.get('url')}/logout`, {
 			data: {},
-			jar: jar,
+			jar,
 			headers: {
 				'x-csrf-token': csrf_token,
 			},
@@ -514,9 +511,9 @@ describe('authentication', () => {
 
 		it('should fail with invalid token', async () => {
 			const { response, body } = await helpers.request('get', `/api/self?_uid${newUid}`, {
-				jar: jar,
+				jar,
 				headers: {
-					Authorization: `Bearer sdfhaskfdja-jahfdaksdf`,
+					Authorization: 'Bearer sdfhaskfdja-jahfdaksdf',
 				},
 			});
 			assert.strictEqual(response.statusCode, 401);
@@ -524,7 +521,7 @@ describe('authentication', () => {
 		});
 
 		it('should use a token tied to an uid', async () => {
-			const { response, body } = await helpers.request('get', `/api/self`, {
+			const { response, body } = await helpers.request('get', '/api/self', {
 				headers: {
 					Authorization: `Bearer ${userToken}`,
 				},
@@ -535,7 +532,7 @@ describe('authentication', () => {
 		});
 
 		it('should fail if _uid is not passed in with master token', async () => {
-			const { response, body } = await helpers.request('get', `/api/self`, {
+			const { response, body } = await helpers.request('get', '/api/self', {
 				headers: {
 					Authorization: `Bearer ${masterToken}`,
 				},
