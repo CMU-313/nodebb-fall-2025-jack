@@ -41,6 +41,8 @@ module.exports = function () {
 
 	setupApiRoute(router, 'get', '/:pid/replies', [middleware.assert.post], controllers.write.posts.getReplies);
 
+	setupApiRoute(router, 'post', '/:pid/translate', [middleware.assert.post, middleware.checkRequired.bind(null, ['text', 'targetLanguage'])], controllers.write.posts.translate);
+
 	setupApiRoute(router, 'post', '/queue/:id', controllers.write.posts.acceptQueuedPost);
 	setupApiRoute(router, 'delete', '/queue/:id', controllers.write.posts.removeQueuedPost);
 	setupApiRoute(router, 'put', '/queue/:id', controllers.write.posts.editQueuedPost);

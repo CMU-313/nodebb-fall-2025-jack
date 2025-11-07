@@ -84,6 +84,7 @@
 		<div class="content text-break" component="post/content" itemprop="text">
 			{posts.content}
 		</div>
+		<div component="post/translation" class="translation-text hidden" style="color: #0066cc; margin-top: 8px;"></div>
 
 		<div component="post/footer" class="post-footer border-bottom pb-2">
 			{{{ if posts.user.signature }}}
@@ -112,6 +113,7 @@
 					<!-- IMPORT partials/topic/reactions.tpl -->
 					<a component="post/reply" href="#" class="btn btn-ghost btn-sm {{{ if !privileges.topics:reply }}}hidden{{{ end }}}" title="[[topic:reply]]"><i class="fa fa-fw fa-reply text-primary"></i></a>
 					<a component="post/quote" href="#" class="btn btn-ghost btn-sm {{{ if !privileges.topics:reply }}}hidden{{{ end }}}" title="[[topic:quote]]"><i class="fa fa-fw fa-quote-right text-primary"></i></a>
+					<a component="post/translate" href="#" class="btn btn-ghost btn-sm" title="Translate"><i class="fa fa-fw fa-language text-primary"></i></a>
 
 					{{{ if ./announces }}}
 					<a component="post/announce-count" href="#" class="btn btn-ghost btn-sm d-flex gap-2 align-items-center" title="[[topic:announcers]]"><i class="fa fa-share-alt text-primary"></i> {./announces}</a>

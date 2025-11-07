@@ -670,3 +670,22 @@ async function sendQueueNotification(type, targetUid, path, notificationText) {
 	const notifObj = await notifications.create(notifData);
 	await notifications.push(notifObj, [targetUid]);
 }
+
+postsAPI.translate = async function (caller, data) {
+	// Verify that the post exists and user has permission to read it
+	const userPrivileges = await privileges.posts.get([data.pid], caller.uid);
+	const userPrivilege = userPrivileges[0];
+	if (!userPrivilege['topics:read']) {
+		throw new Error('[[error:no-privileges]]');
+	}
+
+	// For now, return a hardcoded English translation response
+	// This will be replaced with actual LLM integration in the implementation phase
+	const preview = data.text.substring(0, 50);
+	
+	// Return hardcoded response for checkpoint
+	return {
+		translatedText: `[Hardcoded English translation of: "${preview}${data.text.length > 50 ? '...' : ''}"]`,
+		targetLanguage: 'en',
+	};
+};

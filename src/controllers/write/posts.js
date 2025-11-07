@@ -210,3 +210,12 @@ Posts.notifyQueuedPostOwner = async (req, res) => {
 	await api.posts.notifyQueuedPostOwner(req, { id, message: req.body.message });
 	helpers.formatApiResponse(200, res);
 };
+
+Posts.translate = async (req, res) => {
+	const result = await api.posts.translate(req, {
+		pid: req.params.pid,
+		text: req.body.text,
+		targetLanguage: req.body.targetLanguage,
+	});
+	helpers.formatApiResponse(200, res, result);
+};

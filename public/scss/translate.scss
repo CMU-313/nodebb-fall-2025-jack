@@ -1,0 +1,48 @@
+// Translation Feature Styles
+
+.translation-text {
+	color: #0066cc;
+	font-style: italic;
+	margin-top: 8px;
+	padding: 8px 12px;
+	background-color: rgba(0, 102, 204, 0.05);
+	border-left: 3px solid #0066cc;
+	border-radius: 4px;
+	
+	&.hidden {
+		display: none;
+	}
+	
+	// Smooth fade-in animation when translation appears
+	animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-5px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+// Translate button styling
+[component="post/translate"] {
+	transition: all 0.2s ease;
+	
+	&:hover {
+		background-color: rgba(0, 102, 204, 0.1);
+	}
+	
+	i.fa-language {
+		font-size: 1em;
+	}
+}
+
+// Loading spinner for translation
+.translation-text .fa-spinner {
+	margin-right: 5px;
+}
+

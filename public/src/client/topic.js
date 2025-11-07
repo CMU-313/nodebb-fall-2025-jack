@@ -5,6 +5,7 @@ define('forum/topic', [
 	'forum/topic/postTools',
 	'forum/topic/events',
 	'forum/topic/posts',
+	'forum/topic/translate',
 	'navigator',
 	'sort',
 	'quickreply',
@@ -17,7 +18,7 @@ define('forum/topic', [
 	'clipboard',
 ], function (
 	infinitescroll, threadTools, postTools,
-	events, posts, navigator, sort, quickreply,
+	events, posts, translate, navigator, sort, quickreply,
 	components, storage, hooks, api, alerts,
 	bootbox, clipboard
 ) {
@@ -49,9 +50,10 @@ define('forum/topic', [
 		await posts.onTopicPageLoad(components.get('post'));
 		navigator.init('[component="topic"]>[component="post"]', ajaxify.data.postcount, Topic.toTop, Topic.toBottom, Topic.navigatorCallback);
 
-		postTools.init(tid);
-		threadTools.init(tid, $('.topic'));
-		events.init();
+	postTools.init(tid);
+	threadTools.init(tid, $('.topic'));
+	events.init();
+	translate.init();
 
 		sort.handleSort('topicPostSort', 'topic/' + ajaxify.data.slug);
 
