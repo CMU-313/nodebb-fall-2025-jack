@@ -1,5 +1,3 @@
-/* eslint-disable strict */
-
 'use strict';
 
 const translatorApi = module.exports;
