@@ -1,0 +1,51 @@
+post:
+  tags:
+    - posts
+  summary: translate a post
+  description: This operation translates a post's content to English.
+  parameters:
+    - in: path
+      name: pid
+      schema:
+        type: string
+      required: true
+      description: a valid post id
+      example: 2
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            text:
+              type: string
+              description: The text content to translate
+              example: "Hello world"
+            targetLanguage:
+              type: string
+              description: The target language code (currently only 'en' for English is supported)
+              example: "en"
+          required:
+            - text
+            - targetLanguage
+  responses:
+    '200':
+      description: Post successfully translated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../../components/schemas/Status.yaml#/Status
+              response:
+                type: object
+                properties:
+                  translatedText:
+                    type: string
+                    description: The translated text
+                  targetLanguage:
+                    type: string
+                    description: The target language code
+
