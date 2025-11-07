@@ -2,10 +2,10 @@
 
 const translatorApi = module.exports;
 
-const BASE = process.env.TRANSLATOR_API_BASE || 'http://localhost:5000';
-
 translatorApi.translate = async function (postData) {
 	try {
+		// Get BASE dynamically so tests can override it
+		const BASE = process.env.TRANSLATOR_API_BASE || 'http://localhost:5000';
 		const content = postData.content || '';
 		const url = `${BASE}/?content=${encodeURIComponent(content)}`;
 		const response = await fetch(url);
