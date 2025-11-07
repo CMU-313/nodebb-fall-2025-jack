@@ -18,7 +18,8 @@ translatorApi.translate = async function (postData) {
 		const data = await response.json();
 		// Expecting: { is_english: bool, translated_content: str }
 		const isEnglish = data.is_english !== false;
-		const translatedContent = data.translated_content || '';
+		// Ensure translatedContent is always a string, handle null/undefined
+		const translatedContent = data.translated_content != null ? String(data.translated_content) : '';
 		return [isEnglish, translatedContent];
 	} catch (error) {
 		console.error('Translation error:', error);
