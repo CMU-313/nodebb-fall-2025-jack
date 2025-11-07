@@ -1,17 +1,30 @@
-
 /* eslint-disable strict */
-//var request = require('request');
+
+'use strict';
 
 const translatorApi = module.exports;
 
-translatorApi.translate = function (postData) {
-	return ['is_english',postData];
-};
+const BASE = process.env.TRANSLATOR_API_BASE || 'http://localhost:3001';
 
-// translatorApi.translate = async function (postData) {
-//  Edit the translator URL below
-//  const TRANSLATOR_API = "TODO"
-//  const response = await fetch(TRANSLATOR_API+'/?content='+postData.content);
-//  const data = await response.json();
-//  return ['is_english','translated_content'];
-// };
+translatorApi.translate = async function (postData) {
+	try {
+		const content = postData.content || '';
+		const url = `${BASE}/api/translate?text=${encodeURIComponent(content)}`;
+		const response = await fetch(url);
+		
+		if (!response.ok) {
+			// On error, assume it's English and return empty translation
+			return [true, ''];
+		}
+		
+		const data = await response.json();
+		// Expecting: { ok, input, translation }
+		// If ok is false or no translation, it's English
+		const isEnglish = data.ok === false || !data.translation;
+		return [isEnglish, data.translation || ''];
+	} catch (error) {
+		console.error('Translation error:', error);
+		// On error, assume it's English
+		return [true, ''];
+	}
+};
