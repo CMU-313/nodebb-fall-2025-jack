@@ -76,5 +76,11 @@ function modifyPost(post, fields) {
 		if (post.translatedContent === undefined) {
 			post.translatedContent = '';
 		}
+		// Ensure endorsed field is always present (default to false)
+		if (post.endorsed === undefined || post.endorsed === null) {
+			post.endorsed = false;
+		} else {
+			post.endorsed = post.endorsed === 'true' || post.endorsed === true || post.endorsed === 1 || post.endorsed === '1';
+		}
 	}
 }
