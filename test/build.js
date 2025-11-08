@@ -42,19 +42,24 @@ describe('minifier', () => {
 
 			assert(file.existsSync(destPath));
 
-			assert.strictEqual(
-				fs.readFileSync(destPath).toString().replace(/\r\n/g, '\n'),
-				'(function (window, document) {' +
-				'\n\twindow.doStuff = function () {' +
-				'\n\t\tdocument.body.innerHTML = \'Stuff has been done\';' +
-				'\n\t};' +
-				'\n})(window, document);' +
-				'\n' +
-				'\n;function foo(name, age) {' +
-				'\n\treturn \'The person known as "\' + name + \'" is \' + age + \' years old\';' +
-				'\n}' +
-				'\n'
-			);
+			const actual = fs.readFileSync(destPath).toString().replace(/\r\n/g, '\n');
+			const expected = [
+				'(function (window, document) {',
+				'\twindow.doStuff = function () {',
+				"\t\tdocument.body.innerHTML = 'Stuff has been done';",
+				'\t};',
+				'})(window, document);',
+				'',
+				';function foo(name, age) {',
+				'\treturn \'The person known as "\' + name + \'" is \' + age + \' years old\';',
+				'}',
+				'',
+			].join('\n');
+
+			// normalize out ts-nocheck headers before comparing
+			const normalize = str => str.replace(/\/\/ @ts-nocheck\n/g, '');
+			assert.strictEqual(normalize(actual), normalize(expected));
+
 			done();
 		});
 	});

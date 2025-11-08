@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "reporters": ["clear-text", "progress", "html", "json"],
+
+  "testRunner": "mocha",
+  "mochaOptions": {
+    "spec": ["test/categories.js"]
+  },
+
+  "mutate": ["src/categories/create.js","src/categories/delete.js"],
+
+  "ignorePatterns": [
+    "node_modules/**",
+    ".stryker-tmp/**",
+    "require-main.js",
+    ".nyc_output/**",
+    "coverage/**",
+    "logs/**",
+    "build/public/plugins/**",
+    "build/public/uploads/**"
+  ],
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 50
+  },
+  "incremental": true,
+  "incrementalFile": ".stryker-incremental.json",
+  "coverageAnalysis": "perTest",
+  "timeoutMS": 90000,
+  "timeoutFactor": 1.5,
+  "concurrency": 6
+}

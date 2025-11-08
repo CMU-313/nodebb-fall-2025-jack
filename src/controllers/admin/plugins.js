@@ -32,6 +32,13 @@ pluginsController.get = async function (req, res) {
 		});
 
 	const upgrade = compatible.filter(p => p.installed && p.outdated);
+
+	upgrade.forEach((p) => {
+		if (!p.url) {
+			p.url = `https://www.npmjs.com/package/${p.name}`;
+		}
+	});
+
 	res.render('admin/extend/plugins', {
 		installed: installedPlugins,
 		installedCount: installedPlugins.length,
