@@ -76,6 +76,8 @@ define('forum/topic', [
 		handleTopicSearch();
 
 		hooks.fire('action:topic.loaded', ajaxify.data);
+		addResolved_Status();
+		addEndorsed_Status();
 	};
 
 	function configurePostToggle() {
@@ -494,6 +496,141 @@ define('forum/topic', [
 		if (!currentBookmark || parseInt(index, 10) >= parseInt(currentBookmark, 10)) {
 			alerts.remove('bookmark');
 		}
+	}
+
+	function addResolved_Status() { 
+		const firstPost = $('[component="post"][data-index="0"]');
+		if (!firstPost.length) return;
+
+		const isAdmin = app.user && app.user.isAdmin;
+		const tid = ajaxify.data.tid;
+		
+		firstPost.prepend('<div class="resolved-loading">Loading...</div>');
+		
+		fetch(`/api/topics/${tid}/resolved`).then(res => res.json())
+			.then(data => {
+				const isResolved = data.resolved;
+				
+				const currStatus = $(`
+					<div class="post-toggle" style="cursor: ${isAdmin ? 'pointer' : 'default'}; padding: 5px; margin: 5px; display: flex; align-items: center; gap: 8px;">
+						<div class="checkbox" style="width: 15px; height: 15px; border: 2px solid #999; display: inline-block; text-align: center; line-height: 12px; font-size: 12px;">
+							${isResolved ? '✓' : ''}
+						</div>
+						<span class="current_status" style="color: ${isResolved ? 'green' : 'red'}">
+							${isResolved ? 'resolved' : 'unresolved'}
+						</span>
+						${!isAdmin ? '<span style="color: #999; font-size: 11px;">(admin only)</span>' : ''}
+					</div>
+				`);
+
+				if (isAdmin) {
+					currStatus.on('click', function () {
+						const checkbox = $(this).find('.checkbox');
+						const statusText = $(this).find('.current_status');
+						const currentResolved = checkbox.text().trim() === '✓';
+						const newStatus = !currentResolved;
+						
+						fetch(`${config.relative_path}/api/topics/${tid}/resolved`, {
+							method: 'PUT',
+							headers: { 
+								'Content-Type': 'application/json',
+								'x-csrf-token': config.csrf_token,
+							},
+							credentials: 'same-origin',
+							body: JSON.stringify({ resolved: newStatus }),
+						})
+							.then(res => {
+								if (!res.ok) {
+									return res.json().then(err => {
+										console.log('Error response:', err);
+										throw new Error('Failed to update');
+									});
+								}
+								return res.json();
+							})
+							.then((data) => {
+								console.log('Success response:', data);
+								checkbox.text(newStatus ? '✓' : '');
+								statusText.text(newStatus ? 'resolved' : 'unresolved');
+								statusText.css('color', newStatus ? 'green' : 'red');
+								alerts.success(newStatus ? 'Marked as resolved' : 'Marked as unresolved');
+							})
+							.catch((err) => {
+								console.log('Catch error:', err);
+								alerts.error('Failed to update');
+							});
+					});
+				}
+
+				firstPost.find('.resolved-loading').replaceWith(currStatus);
+			});
+	}
+
+	function addEndorsed_Status() {
+		const allPosts = $('[component="post"]');
+		const isAdmin = app.user && app.user.isAdmin;
+		
+		allPosts.each(function () {
+			const postElem = $(this);
+			const pid = postElem.attr('data-pid');
+			
+			if (!pid) return;
+			
+			postElem.prepend('<div class="endorsed-loading">Loading...</div>');
+			
+			fetch(`/api/posts/${pid}/endorsed`, {
+				credentials: 'same-origin',
+			}).then(r => r.json())
+				.then(data => {
+					const isEndorsed = data.endorsed;
+					
+					let endorsedStatus;
+					
+					if (isAdmin) {
+						// Admin sees a button with data attribute to track state
+						endorsedStatus = $(`
+							<button class="endorsed-button btn btn-sm" data-endorsed="${isEndorsed}" style="margin: 5px; ${isEndorsed ? 'background-color: #007bff; color: white; border: none;' : 'background-color: #f0f0f0; color: #666; border: 2px solid #007bff;'}">
+								${isEndorsed ? 'Endorsed ✓' : 'Endorse this post?'}
+							</button>
+						`);
+						
+						endorsedStatus.on('click', function () {
+							const button = $(this);
+							const currentState = button.attr('data-endorsed') === 'true'; // Read current state from button
+							const newStatus = !currentState;
+							
+							fetch(`/api/posts/${pid}/endorsed`, {
+								method: 'PUT',
+								headers: {
+									'Content-Type': 'application/json',
+									'x-csrf-token': config.csrf_token,
+								},
+								credentials: 'same-origin',
+								body: JSON.stringify({ endorsed: newStatus }),
+							}).then(r => r.json())
+								.then(() => {
+									button.attr('data-endorsed', newStatus); // Update state on button
+									if (newStatus) {
+										button.text('Endorsed ✓').css({'background-color': '#007bff', 'color': 'white', 'border': 'none'});
+									} else {
+										button.text('Endorse this post?').css({'background-color': '#f0f0f0', 'color': '#666', 'border': '2px solid #007bff'});
+									}
+									alerts.success(newStatus ? 'Post endorsed' : 'Post unendorsed');
+								})
+								.catch(() => alerts.error('Failed to update'));
+						});
+					} else {
+						// Non-admin sees read-only status
+						endorsedStatus = $(`
+							<div style="padding: 5px; margin: 5px; color: ${isEndorsed ? 'blue' : '#999'}; font-size: 14px;">
+								${isEndorsed ? 'Endorsed by admin ✓' : ''}
+							</div>
+						`);
+					}
+					
+					postElem.find('.endorsed-loading').replaceWith(endorsedStatus);
+				});
+		});
 	}
 
 
