@@ -70,5 +70,17 @@ function modifyPost(post, fields) {
 		if (!fields.length || fields.includes('attachments')) {
 			post.attachments = (post.attachments || '').split(',').filter(Boolean);
 		}
+		// Mark post as "English" if decided by translator service or if it has no info
+		post.isEnglish = post.isEnglish == 'true' || post.isEnglish === undefined;
+		// If translatedContent is undefined, default to empty string (no translation needed for English posts)
+		if (post.translatedContent === undefined) {
+			post.translatedContent = '';
+		}
+		// Ensure endorsed field is always present (default to false)
+		if (post.endorsed === undefined || post.endorsed === null) {
+			post.endorsed = false;
+		} else {
+			post.endorsed = post.endorsed === 'true' || post.endorsed === true || post.endorsed === 1 || post.endorsed === '1';
+		}
 	}
 }

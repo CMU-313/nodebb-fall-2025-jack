@@ -22,7 +22,7 @@ module.exports = function (Posts) {
 		options.escape = options.hasOwnProperty('escape') ? options.escape : false;
 		options.extraFields = options.hasOwnProperty('extraFields') ? options.extraFields : [];
 
-		const fields = ['pid', 'tid', 'toPid', 'url', 'content', 'sourceContent', 'uid', 'timestamp', 'deleted', 'upvotes', 'downvotes', 'replies', 'handle'].concat(options.extraFields);
+		const fields = ['pid', 'tid', 'toPid', 'url', 'content', 'sourceContent', 'uid', 'timestamp', 'deleted', 'upvotes', 'downvotes', 'replies', 'handle', 'isEnglish', 'translatedContent'].concat(options.extraFields);
 
 		let posts = await Posts.getPostsFields(pids, fields);
 		posts = posts.filter(Boolean);
@@ -69,18 +69,6 @@ module.exports = function (Posts) {
 
 		posts = await parsePosts(posts, options);
 		const result = await plugins.hooks.fire('filter:post.getPostSummaryByPids', { posts: posts, uid: uid });
-
-		if (Array.isArray(result.posts)) {
-			result.posts.forEach((post) => {
-				if (post) {
-					if (!post.hasOwnProperty('endorsed')) {
-						post.endorsed = false; // Default for old posts
-					} else {
-						post.endorsed = post.endorsed === '1' || post.endorsed === true || post.endorsed === 1;
-					}
-				}
-			});
-		}
 		return result.posts;
 	};
 

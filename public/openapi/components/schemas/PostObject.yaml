@@ -37,6 +37,12 @@ PostObject:
     endorsed:
       type: boolean
       description: Whether this post has been endorsed by an administrator
+    isEnglish:
+      type: boolean
+      description: Whether the post content is in English (determined by translator service)
+    translatedContent:
+      type: string
+      description: Machine-translated English version of the post content (empty if post is already in English)
     timestampISO:
       type: string
       description: An ISO 8601 formatted date string (complementing `timestamp`)
@@ -180,6 +186,12 @@ PostDataObject:
         endorsed:                   
           type: boolean
           description: Whether this post has been endorsed by an administrator
+        isEnglish:
+          type: boolean
+          description: Whether the post content is in English (determined by translator service)
+        translatedContent:
+          type: string
+          description: Machine-translated English version of the post content (empty if post is already in English)
         deleted:
           type: number
         upvotes:
