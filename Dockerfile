@@ -33,7 +33,12 @@ USER ${USER}
 
 # Install all dependencies (root + plugin deps, including mailgun.js)
 RUN npm install --omit=dev \
-    && npm install nodebb-theme-persona \
+    # ensure persona theme is installed and linked
+    && npm install nodebb-theme-persona --save \
+    && npm install nodebb-theme-lavender --save \
+    # sanity check: list installed themes
+    && npm ls | grep nodebb-theme || true \
+    # prebuild to register themes
     && ./nodebb build || true
 
 # Copy source but don't overwrite package.json
@@ -71,7 +76,7 @@ COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
 # Copy everything built (app + node_modules + plugin)
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
 
-# Permissions
+# Permissionsa
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/tini
 
