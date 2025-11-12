@@ -16,11 +16,9 @@ COPY package*.json ./
 # Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
 COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 
-# Install corepack to allow usage of other package managers
-RUN corepack enable
-
-# Install tini
-RUN apt-get update \
+# Install corepack and tini
+RUN corepack enable \
+    && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tini \
     && rm -rf /var/lib/apt/lists/*
 
@@ -31,17 +29,10 @@ RUN groupadd --gid ${GID} ${USER} \
 
 USER ${USER}
 
-# Install all dependencies (root + plugin deps, including mailgun.js)
-RUN npm install --omit=dev \
-    # ensure persona theme is installed and linked
-    && npm install nodebb-theme-persona --save \
-    && npm install nodebb-theme-lavender --save \
-    # sanity check: list installed themes
-    && npm ls | grep nodebb-theme || true \
-    # prebuild to register themes
-    && ./nodebb build || true
+# Install dependencies (includes plugins + Mailgun)
+RUN npm install --omit=dev
 
-# Copy source but don't overwrite package.json
+# Copy source code
 COPY . /usr/src/app/
 COPY package*.json /usr/src/app/
 
@@ -61,22 +52,17 @@ ENV NODE_ENV=production \
 
 WORKDIR /usr/src/app/
 
-# Enable corepack + create user
 RUN corepack enable \
     && groupadd --gid ${GID} ${USER} \
     && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
     && mkdir -p /usr/src/app/logs/ /opt/config/ \
     && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
 
-# Copy entrypoint and tini
-COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/setup.json /usr/src/app/install/docker/setup.json
-COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
-
-# Copy everything built (app + node_modules + plugin)
+# Copy from build
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
+COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Permissionsa
 RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/tini
 
@@ -84,9 +70,7 @@ USER ${USER}
 
 EXPOSE 4567
 
-# Protect critical paths
-# VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
-VOLUME ["/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
-
+# Keep volumes for persistence
+VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
 
 ENTRYPOINT ["tini", "--", "entrypoint.sh"]
