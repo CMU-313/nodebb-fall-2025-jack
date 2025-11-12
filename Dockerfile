@@ -32,7 +32,9 @@ RUN groupadd --gid ${GID} ${USER} \
 USER ${USER}
 
 # Install all dependencies (root + plugin deps, including mailgun.js)
-RUN npm install --omit=dev
+RUN npm install --omit=dev \
+    && npm install nodebb-theme-persona \
+    && ./nodebb build || true
 
 # Copy source but don't overwrite package.json
 COPY . /usr/src/app/

@@ -17,6 +17,7 @@ services:
       MAILGUN_API_KEY: ${MAILGUN_API_KEY}
       MAILGUN_DOMAIN: ${MAILGUN_DOMAIN}
       TRANSLATOR_API_BASE: "http://host.docker.internal:5000"
+      NO_UPGRADE: "true" # prevent auto-upgrade on every restart
     depends_on:
       - redis
 
