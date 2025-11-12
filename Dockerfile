@@ -80,6 +80,8 @@ USER ${USER}
 EXPOSE 4567
 
 # Protect critical paths
-VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
+# VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
+VOLUME ["/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
+
 
 ENTRYPOINT ["tini", "--", "entrypoint.sh"]
