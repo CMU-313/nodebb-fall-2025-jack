@@ -40,7 +40,9 @@ RUN groupadd --gid ${GID} ${USER} \
 USER ${USER}
 
 # 8️⃣ Install all dependencies (including mailgun plugin deps)
-RUN npm install --omit=dev && rm -rf .npm
+RUN npm install --no-audit --no-fund --omit=dev || npm install --package-lock=false --omit=dev
+RUN rm -rf .npm
+
 
 # ---------- Final Runtime Stage ----------
 FROM node:lts-slim AS final
