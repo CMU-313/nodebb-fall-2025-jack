@@ -14,7 +14,6 @@ WORKDIR /usr/src/app/
 COPY . /usr/src/app/
 
 # 2️⃣ Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
-#    (this ensures it's available for install)
 COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 
 # 3️⃣ Enable corepack for modern package managers
@@ -39,9 +38,10 @@ RUN groupadd --gid ${GID} ${USER} \
 
 USER ${USER}
 
-# 8️⃣ Install all dependencies (including mailgun plugin deps)
-RUN npm install --no-audit --no-fund --omit=dev || npm install --package-lock=false --omit=dev
-RUN rm -rf .npm
+# 8️⃣ Install all dependencies (including plugin deps)
+RUN npm install --no-audit --no-fund --omit=dev || npm install --package-lock=false --omit=dev \
+ && npm install --no-audit --no-fund --omit=dev --prefix nodebb-plugin-mailgun-delivery || npm install --package-lock=false --omit=dev --prefix nodebb-plugin-mailgun-delivery \
+ && rm -rf .npm
 
 
 # ---------- Final Runtime Stage ----------
