@@ -24,7 +24,8 @@ RUN corepack enable
 RUN find . -mindepth 1 -maxdepth 1 -name '.*' ! -name '.' ! -name '..' -exec bash -c 'echo "Deleting {}"; rm -rf {}' \;
 
 # 5️⃣ Prepare NodeBB's package.json (as the original build expects)
-RUN cp /usr/src/app/install/package.json /usr/src/app/
+RUN rm -f /usr/src/app/package.json && \
+    cp /usr/src/app/install/package.json /usr/src/app/package.json
 
 # 6️⃣ Install tini
 RUN apt-get update \
