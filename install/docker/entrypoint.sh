@@ -103,24 +103,30 @@ build_forum() {
   local config="$1"
   local start_build="$2"
   local package_hash=$(md5sum install/package.json | head -c 32)
-  if [ "$package_hash" != "$(cat $CONFIG_DIR/install_hash.md5 || true)" ]; then
-      echo "package.json was updated. Upgrading..."
-      /usr/src/app/nodebb upgrade --config="$config" || {
-          echo "Failed to build NodeBB. Exiting..."
-          exit 1
-        }
-  elif [ "$start_build" = true ]; then
-    echo "Build before start is enabled. Building..."
-    /usr/src/app/nodebb "${NODEBB_BUILD_VERB}" --config="$config" || {
-        echo "Failed to build NodeBB. Exiting..."
-        exit 1
-      }
+  local last_hash=$(cat "$CONFIG_DIR/install_hash.md5" 2>/dev/null || echo "")
+
+  echo "🧩 Checking if NodeBB assets need rebuild..."
+
+  if [ "$package_hash" != "$last_hash" ]; then
+    echo "Detected package.json changes. Running upgrade..."
+    /usr/src/app/nodebb upgrade --config="$config" || {
+      echo "❌ Failed to upgrade NodeBB. Exiting..."
+      exit 1
+    }
   else
-    echo "No changes in package.json. Skipping build..."
-    return
+    echo "No package.json changes detected."
   fi
-  echo -n $package_hash > $CONFIG_DIR/install_hash.md5
+
+  echo "🔧 Building NodeBB front-end assets..."
+  /usr/src/app/nodebb build --config="$config" || {
+    echo "❌ Failed to build NodeBB assets. Exiting..."
+    exit 1
+  }
+
+  echo -n "$package_hash" > "$CONFIG_DIR/install_hash.md5"
+  echo "✅ NodeBB build complete!"
 }
+
 
 
 # Function to start forum
