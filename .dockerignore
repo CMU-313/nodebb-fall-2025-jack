@@ -1,10 +1,9 @@
-.*
+# Ignore unnecessary stuff, but keep files needed for building NodeBB
+.git
 logs
 test
 node_modules
 commitlint.config.js
 nodebb.bat
 renovate.json
-*.yml
-*.md
-Dockerfile
+README.md
