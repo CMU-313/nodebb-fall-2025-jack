@@ -8,22 +8,17 @@ ENV NODE_ENV=production \
     UID=1001 \
     GID=1001
 
-# 1️⃣ Copy package.json before setting WORKDIR
-COPY package.json /tmp/package.json
+# Copy package.json before setting WORKDIR
+COPY package.json /usr/src/app/package.json
 
-# 2️⃣ Now switch to your working directory
+# Set working directory AFTER copying
 WORKDIR /usr/src/app/
 
-# Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
+# Copy custom plugin early
 COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 
-# Install corepack to allow usage of other package managers
 RUN corepack enable
-
-# Install tini
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tini \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tini && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
 RUN groupadd --gid ${GID} ${USER} \
@@ -32,12 +27,10 @@ RUN groupadd --gid ${GID} ${USER} \
 
 USER ${USER}
 
-# Install all dependencies (root + plugin deps, including mailgun.js)
-COPY /tmp/package.json ./package.json
+# Install dependencies
 RUN npm install --omit=dev
 
-# Copy everything else
+# Copy rest of project (source + config)
 COPY . .
 
-# Cleanup npm cache
 RUN rm -rf .npm
