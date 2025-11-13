@@ -1,16 +1,21 @@
-version: '3.8'
+# docker-compose-redis.yml
+# Modern Compose (v2) automatically ignores "version", but it's fine to keep it for readability
+version: "3.8"
 
 services:
+  # Ollama LLM backend
   ollama:
     image: ollama/ollama
     container_name: ollama
     volumes:
-      - ollama_data:/root/.ollama  # persists ollama data
+      - ollama_data:/root/.ollama  # persist Ollama models/config
     restart: unless-stopped
 
-  # Translator microservice
+  # 🗣️ Translator microservice (Flask)
   translator:
-    build: ../llm-experiment-microservice-jack
+    build:
+      context: ../llm-experiment-microservice-jack
+      dockerfile: Dockerfile
     command: flask run --host=0.0.0.0
     depends_on:
       - ollama
@@ -23,14 +28,15 @@ services:
     working_dir: /app
     restart: unless-stopped
 
-  # NodeBB Forum
+  # NodeBB forum container
   nodebb:
-    build: .
-    dockerfile: ./Dockerfile
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
     # image: ghcr.io/nodebb/nodebb:latest
     restart: unless-stopped
     ports:
-      - '4567:4567'
+      - "4567:4567"
     volumes:
       - nodebb-build:/usr/src/app/build
       - nodebb-uploads:/usr/src/app/public/uploads
@@ -44,10 +50,11 @@ services:
   redis:
     image: redis:8.0.1-alpine
     restart: unless-stopped
-    command: ['redis-server', '--appendonly', 'yes', '--loglevel', 'warning']
+    command: ["redis-server", "--appendonly", "yes", "--loglevel", "warning"]
     volumes:
       - redis-data:/data
 
+# Named volumes (bind-mounted to host paths)
 volumes:
   ollama_data:
 
