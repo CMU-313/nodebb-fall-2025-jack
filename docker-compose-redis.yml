@@ -8,16 +8,8 @@ services:
       - ollama_data:/root/.ollama  # persists ollama data
     restart: unless-stopped
 
-  # this provides your translator microservice
+  # Translator microservice
   translator:
-
-    ###########################################################################
-    # NOTE: you will need to update the build path to point to your translator service code
-    # you will also need to manually rebuild the image when you make changes to your code
-    #
-    # docker compose -f docker-compose-redis.yml build translator
-    ###########################################################################
-
     build: ../translator-service
     command: flask run --host=0.0.0.0
     depends_on:
@@ -31,22 +23,27 @@ services:
     working_dir: /app
     restart: unless-stopped
 
+  # NodeBB Forum
   nodebb:
     build: .
     # image: ghcr.io/nodebb/nodebb:latest
     restart: unless-stopped
     ports:
-      - '4567:4567' # comment this out if you don't want to expose NodeBB to the host, or change the first number to any port you want
+      - '4567:4567'
     volumes:
       - nodebb-build:/usr/src/app/build
       - nodebb-uploads:/usr/src/app/public/uploads
       - nodebb-config:/opt/config
       - ./install/docker/setup.json:/usr/src/app/setup.json
+    depends_on:
+      - redis
+      - translator
+
+  # Redis cache
   redis:
     image: redis:8.0.1-alpine
     restart: unless-stopped
     command: ['redis-server', '--appendonly', 'yes', '--loglevel', 'warning']
-    # command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"] # uncomment if you want to use snapshotting instead of AOF
     volumes:
       - redis-data:/data
 
@@ -56,3 +53,27 @@ volumes:
   redis-data:
     driver: local
     driver_opts:
+      o: bind
+      type: none
+      device: ./data/redis
+
+  nodebb-build:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./.docker/build
+
+  nodebb-uploads:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./.docker/uploads
+
+  nodebb-config:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./.docker/config
