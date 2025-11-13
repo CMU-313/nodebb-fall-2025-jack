@@ -8,29 +8,70 @@ ENV NODE_ENV=production \
     UID=1001 \
     GID=1001
 
-# Copy package.json before setting WORKDIR
-COPY package.json /usr/src/app/package.json
-
-# Set working directory AFTER copying
 WORKDIR /usr/src/app/
 
-# Copy custom plugin early
+# 1️⃣ Copy entire repo (NodeBB + install scripts + plugin)
+COPY . /usr/src/app/
+
+# 2️⃣ Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
+#    (this ensures it's available for install)
 COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
 
+# 3️⃣ Enable corepack for modern package managers
 RUN corepack enable
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tini && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# 4️⃣ Remove unnecessary hidden files (e.g., .git, .vscode)
+RUN find . -mindepth 1 -maxdepth 1 -name '.*' ! -name '.' ! -name '..' -exec bash -c 'echo "Deleting {}"; rm -rf {}' \;
+
+# 5️⃣ Prepare NodeBB's package.json (as the original build expects)
+RUN cp /usr/src/app/install/package.json /usr/src/app/
+
+# 6️⃣ Install tini
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tini \
+    && rm -rf /var/lib/apt/lists/*
+
+# 7️⃣ Create non-root user and fix permissions
 RUN groupadd --gid ${GID} ${USER} \
     && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
     && chown -R ${USER}:${USER} /usr/src/app/
 
 USER ${USER}
 
-# Install dependencies
-RUN npm install --omit=dev
+# 8️⃣ Install all dependencies (including mailgun plugin deps)
+RUN npm install --omit=dev && rm -rf .npm
 
-# Copy rest of project (source + config)
-COPY . .
+# ---------- Final Runtime Stage ----------
+FROM node:lts-slim AS final
 
-RUN rm -rf .npm
+ENV NODE_ENV=production \
+    DAEMON=false \
+    SILENT=false \
+    USER=nodebb \
+    UID=1001 \
+    GID=1001
+
+WORKDIR /usr/src/app/
+
+# 9️⃣ Enable corepack and create user
+RUN corepack enable \
+    && groupadd --gid ${GID} ${USER} \
+    && useradd --uid ${UID} --gid ${GID} --home-dir /usr/src/app/ --shell /bin/bash ${USER} \
+    && mkdir -p /usr/src/app/logs/ /opt/config/ \
+    && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
+
+# 🔟 Copy built app + plugin + entrypoint
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/
+COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/local/bin/tini
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && chmod +x /usr/local/bin/tini
+
+USER ${USER}
+
+EXPOSE 4567
+
+VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/uploads", "/opt/config/"]
+
+ENTRYPOINT ["tini", "--", "entrypoint.sh"]
