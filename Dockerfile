@@ -11,7 +11,7 @@ ENV NODE_ENV=production \
 WORKDIR /usr/src/app/
 
 # Copy package manifests first for caching
-COPY package*.json ./
+COPY package.json ./
 
 # Copy custom plugin early so npm can resolve "file:./nodebb-plugin-mailgun-delivery"
 COPY nodebb-plugin-mailgun-delivery ./nodebb-plugin-mailgun-delivery
@@ -36,7 +36,7 @@ RUN npm install --omit=dev
 
 # Copy source but don't overwrite package.json
 COPY . /usr/src/app/
-COPY package*.json /usr/src/app/
+COPY package.json /usr/src/app/
 
 # Cleanup npm cache
 RUN rm -rf .npm
