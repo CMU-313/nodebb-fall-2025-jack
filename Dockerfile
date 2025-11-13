@@ -38,9 +38,10 @@ RUN groupadd --gid ${GID} ${USER} \
 
 USER ${USER}
 
-# 8️⃣ Install all dependencies (including plugin deps)
+# 8️⃣ Install all dependencies (including plugin & theme)
 RUN npm install --no-audit --no-fund --omit=dev || npm install --package-lock=false --omit=dev \
  && npm install --no-audit --no-fund --omit=dev --prefix nodebb-plugin-mailgun-delivery || npm install --package-lock=false --omit=dev --prefix nodebb-plugin-mailgun-delivery \
+ && npm install nodebb-theme-harmony --no-audit --no-fund --omit=dev \
  && rm -rf .npm
 
 
