@@ -10,7 +10,7 @@ services:
 
   # Translator microservice
   translator:
-    build: ../translator-service
+    build: ../llm-experiment-microservice-jack
     command: flask run --host=0.0.0.0
     depends_on:
       - ollama
