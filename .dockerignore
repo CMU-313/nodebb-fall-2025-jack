@@ -7,3 +7,7 @@ commitlint.config.js
 nodebb.bat
 renovate.json
 README.md
+
+# Ignore Docker volume data folders (permissions can block build)
+.docker/database/
+data/
