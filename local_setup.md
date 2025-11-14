@@ -98,6 +98,7 @@ Clone nodebb-fall-2025-jack and open it in a DevContainer.
 
 <img width="888" height="191" alt="image" src="https://github.com/user-attachments/assets/9d226a1c-8e49-480c-87cd-692f73e552c7" />
 <img width="914" height="164" alt="image" src="https://github.com/user-attachments/assets/09216998-bd4b-4eb3-8a09-02ec4be39cbf" />
+<img width="3024" height="1567" alt="image" src="https://github.com/user-attachments/assets/7209f5b4-7214-4c6a-9031-7dfa604e4533" />
 
 
 ## Troubleshooting
