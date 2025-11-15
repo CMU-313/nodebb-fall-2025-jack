@@ -79,10 +79,13 @@ Clone nodebb-fall-2025-jack and open it in a DevContainer.
 
 ## Verification Steps
 
-- Create a **new post** (old posts won’t have `isEnglish` fields) with non-English content such as:
+- Note: **posts will take a while to translate** and **older posts will have the translation button but will not give translations. **
+- Create a **new post in a non-english language** (old posts won’t have `isEnglish` fields).
+ex post text: (thai)
   ```
   นี่คือข้อความภาษาไทย
   ```
+- Create a **new post in english language** if necessary to verify that the button still appears but upon clicking shows the original text
 
 - If your microservice is running, you will see a **blue button** labeled:
   > “Click here to view the translated message.”
@@ -91,9 +94,11 @@ Clone nodebb-fall-2025-jack and open it in a DevContainer.
 
 
 
+
+
 ### Expected Results
 
-- Posts with `isEnglish: true` → translation button still shows up
+- Posts with `isEnglish: true` → translation button still shows up but shows original english text
 - Posts with `isEnglish: false` → button appears and shows the translated message when clicked
 
 <img width="888" height="191" alt="image" src="https://github.com/user-attachments/assets/9d226a1c-8e49-480c-87cd-692f73e552c7" />
@@ -152,6 +157,5 @@ Cmd+Shift+R (Mac)
 2. `src/posts/create.js` calls `translator.translate()`
 3. Translator calls your microservice
 4. Stores `isEnglish: false` and `translatedContent: "Hello world"`
-5. Template checks `{{{if !posts.isEnglish }}}`
-6. Button appears
-7. Click → translation shows
+5. Button appears
+6. Click → translation shows
